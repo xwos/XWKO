@@ -1,0 +1,111 @@
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+TITLE: XuanWuKo-README
+#+AUTHOR: 隐星魂(Roy.Sun)
+#+EMAIL: roy.sun@starsoul.tech
+#+DATE:
+#+LANGUAGE: zh-CN
+#+OPTIONS: ^:{}
+#+OPTIONS: title:nil
+#+OPTIONS: toc:t
+
+* 简介
+玄武内核模块是一个Linux内核模块，实现了玄武操作系统的各种应用程序接口。
++ 简称：玄武KO
++ 英文名：XuanWuKO
++ 简称：XWKO
+
+* 源码结构
++ Build
+  - xwbs: 编译系统；
++ BSP & Project
+  - xwcd: 架构、CPU、SOC、外设驱动相关的代码；
+  - xwbd: 工程配置、工程驱动与工程应用程序；
++ OS
+  - xwos: 内核；
++ Middleware
+  - xwmd: 中间件；
+
+* 开源协议
+根据Linux内核的相关文档，玄武内核模块以( *Dual MPL/GPL* )的形式发布。
+
+* 分支与版本号
+
+** 分支
++ stable: 稳定版
++ developing: 开发版
+
+** 版本号形式：Major.minor.revision (M.m.r)
++ Major: 大版本号
+  - 包含重大更新的里程碑版本
++ minor: 小版本号
+  - 奇数：表示当前版本是开发版
+  - 偶数：表示当前版本是稳定版
++ revision: 修订号
+  - 对于开发版分支：修订号的每次递增，都包含了数次提交，这些修改可以是bug的修复、
+    增加新功能以及其他任何修改；
+  - 对于稳定版分支：修订号的每次递增，表示从开发版分支中合并了部分提交，
+    这些提交只是修复Bug及其他错误。
+
+** 版本变化规则
++ Major在以下情况下增加1：
+  - 重要新功能引入后；
+  - 破坏性修改(BREAK CHANGE)，例如，修改API的原型，删除API等后；
+  - 累积了多次小版本号更新后。
++ minor：
+  - 发布一个新的稳定版本，开发版分支的minor+1变成偶数，
+    并合并到稳定版分支；
+  - 新的稳定版发布完成后，开发版分支的minor再加1，变成奇数，
+    开启下一个开发周期；
+  - Major+1后，minor回到0。
++ revision：
+  - 对于开发版分支，多次提交后，revision+1；
+  - 对于稳定版分支，从开发版分支中合并了1～n个修复Bug及其他错误的提交后，
+    revision+1；
+  - minor+1后，revision回到0；
+  - Major+1后，revision回到0。
+
+** 稳定版发布条件
++ 开发版分支中增加了1～n个新功能；
++ 开发版分支中修复了重大Bug。
+
+* git commit规范
+
+#+BEGIN_SRC shell
+# [页眉] <type>(<scope>): :emoji: <subject>
+# - type: feat, fix, perf, refactor, style, build, revert, docs, test,
+#         chore, milestone, release, developing, patch
+# - scope: 可为空
+# - subject: 以动词开始的短语，结尾无句号
+# - 页眉只占一行
+# - 每行总长度不超过72个字符（中文字符算2个字符）
+#
+# [正文] 描述
+# - 为什么需要修改？
+# - 如何定位问题？
+# - 修改有什么副作用？
+# - 每行总长度不超过72个字符（中文字符算2个字符）
+#
+# [页脚]
+# - 问题的ID或链接
+# - BREAKING CHANGE（破坏API原型的修改）
+# - 每行总长度不超过72个字符（中文字符算2个字符）
+#+END_SRC
+
+参考：[[https://www.conventionalcommits.org/][https://www.conventionalcommits.org/]]
+
+** type说明
++ feat: 新功能
++ fix: 修复BUG
++ perf: 性能优化，不影响功能
++ refactor: 重构代码，不影响功能
++ style: 格式调整（删除行尾空格等）
++ build: 编译系统
++ revert: 回退提交
++ docs: 文档
++ test: 测试
++ chore: 依赖、工具
++ milestone: 更新大版本号
++ release: 更新稳定版的小版本号（偶数）
++ developing: 切换到下一个开发版的小版本号（奇数）
++ patch: 更新修订号
