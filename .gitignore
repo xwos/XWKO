@@ -1,13 +1,14 @@
+.cache.mk
 *.cmd
 *.ko
 *.mod.c
 modules.order
 Module.symvers
-StarsOulOS.symvers
+XuanWuOS.symvers
 *.o
 .tmp_versions
 wkspc
-StarsOulOS.cfg
+XuanWuOS.cfg
 Makefile
 GTAGS
 GRTAGS

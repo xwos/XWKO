@@ -49,7 +49,7 @@ struct xwosal_barrier {
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层API：静态方式初始化线程屏障。
+ * @brief XWOSAL API：静态方式初始化线程屏障
  * @param barrier: (I) 线程屏障的指针
  * @return 错误码
  * @note
@@ -64,7 +64,7 @@ xwer_t xwosal_barrier_init(struct xwosal_barrier * bar)
 }
 
 /**
- * @brief 操作系统抽象层API：销毁静态方式初始化的线程屏障。
+ * @brief XWOSAL API：销毁静态方式初始化的线程屏障
  * @param barrier: (I) 线程屏障的指针
  * @return 错误码
  * @note
@@ -79,7 +79,7 @@ xwer_t xwosal_barrier_destroy(struct xwosal_barrier * bar)
 }
 
 /**
- * @brief 操作系统抽象层API：动态方式创建线程屏障。
+ * @brief XWOSAL API：动态方式创建线程屏障
  * @param barbuf: (O) 指向缓冲区的指针，通过此缓冲区返回ID
  * @param val: (I) 线程屏障的初始值
  * @param max: (I) 线程屏障的最大值
@@ -96,7 +96,7 @@ xwer_t xwosal_barrier_create(xwid_t * barbuf)
 }
 
 /**
- * @brief 操作系统抽象层API：删除动态方式创建的线程屏障。
+ * @brief XWOSAL API：删除动态方式创建的线程屏障
  * @param barid: (I) 线程屏障ID
  * @return 错误码
  * @note
@@ -111,7 +111,7 @@ xwer_t xwosal_barrier_delete(xwid_t barid)
 }
 
 /**
- * @brief 操作系统抽象层API：从线程屏障对象指针获取其ID。
+ * @brief XWOSAL API：从线程屏障对象指针获取其ID
  * @param barrier: (I) 线程屏障对象的指针
  * @return 线程屏障ID
  * @note
@@ -126,7 +126,7 @@ xwid_t xwosal_barrier_get_id(struct xwosal_barrier * bar)
 }
 
 /**
- * @brief 操作系统抽象层API：从线程屏障ID获取对象的指针。
+ * @brief XWOSAL API：从线程屏障ID获取对象的指针
  * @param barid: (I) 线程屏障ID
  * @return 线程屏障对象的指针
  * @note
@@ -141,7 +141,7 @@ struct xwosal_barrier * xwosal_barrier_get_obj(xwid_t barid)
 }
 
 /**
- * @brief 操作系统抽象层API：绑定线程屏障到信号选择器
+ * @brief XWOSAL API：绑定线程屏障到信号选择器
  * @param barid: (I) 线程屏障的ID
  * @param sltid: (I) 信号选择器的ID
  * @param pos: (I) 线程屏障对象映射到位图中的位置
@@ -162,7 +162,7 @@ xwer_t xwosal_barrier_bind(xwid_t barid, xwid_t sltid, xwsq_t pos)
 }
 
 /**
- * @brief 操作系统抽象层API：从信号选择器上解绑线程屏障
+ * @brief XWOSAL API：从信号选择器上解绑线程屏障
  * @param barid: (I) 线程屏障的ID
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
@@ -180,7 +180,7 @@ xwer_t xwosal_barrier_unbind(xwid_t barid, xwid_t sltid)
 }
 
 /**
- * @brief 操作系统抽象层API：中断线程屏障等待队列中的所有节点。
+ * @brief XWOSAL API：中断线程屏障等待队列中的所有节点
  * @param barid: (I) 线程屏障ID
  * @return 错误码
  * @retval OK: OK
@@ -198,7 +198,7 @@ xwer_t xwosal_barrier_intr_all(xwid_t barid)
 }
 
 /**
- * @brief 操作系统抽象层API：等待与其他线程同步。
+ * @brief XWOSAL API：等待所有线程到达屏障
  * @param barid: (I) 线程屏障ID
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码
@@ -220,7 +220,7 @@ xwer_t xwosal_barrier_sync(xwid_t barid, xwsq_t pos, xwbmp_t sync[])
 }
 
 /**
- * @brief 操作系统抽象层API：限时等待与其他线程同步。
+ * @brief XWOSAL API：限时等待所有线程到达屏障
  * @param barid: (I) 线程屏障ID
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码

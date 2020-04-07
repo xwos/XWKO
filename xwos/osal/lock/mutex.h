@@ -48,7 +48,7 @@ struct xwosal_mtx {
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层API：静态方式初始化互斥锁。
+ * @brief XWOSAL API：静态方式初始化互斥锁
  * @param mtx: (I) 互斥锁的指针
  * @param sprio: (I) 互斥锁的静态优先级
  * @return 错误码
@@ -64,7 +64,7 @@ xwer_t xwosal_mtx_init(struct xwosal_mtx * mtx, xwpr_t sprio)
 }
 
 /**
- * @brief 操作系统抽象层API：销毁静态方式初始化的互斥锁。
+ * @brief XWOSAL API：销毁静态方式初始化的互斥锁
  * @param mtx: (I) 互斥锁的指针
  * @return 错误码
  * @note
@@ -79,7 +79,7 @@ xwer_t xwosal_mtx_destroy(struct xwosal_mtx * mtx)
 }
 
 /**
- * @brief 操作系统抽象层API：动态方式创建互斥锁。
+ * @brief XWOSAL API：动态方式创建互斥锁
  * @param midbuf: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁的ID
  * @param sprio: (I) 互斥锁的静态优先级
  * @return 错误码
@@ -95,7 +95,7 @@ xwer_t xwosal_mtx_create(xwid_t * midbuf, xwpr_t sprio)
 }
 
 /**
- * @brief 操作系统抽象层API：删除动态方式创建的互斥锁。
+ * @brief XWOSAL API：删除动态方式创建的互斥锁
  * @param mid: (I) 互斥锁ID
  * @return 错误码
  * @note
@@ -110,7 +110,7 @@ xwer_t xwosal_mtx_delete(xwid_t mid)
 }
 
 /**
- * @brief 操作系统抽象层API：从互斥锁对象指针获取互斥锁ID。
+ * @brief XWOSAL API：从互斥锁对象指针获取互斥锁ID
  * @param mtx: (I) 互斥锁对象的指针
  * @return 互斥锁ID
  * @note
@@ -125,7 +125,7 @@ xwid_t xwosal_mtx_get_id(struct xwosal_mtx * mtx)
 }
 
 /**
- * @brief 操作系统抽象层API：从互斥锁ID获取对象的指针。
+ * @brief XWOSAL API：从互斥锁ID获取对象的指针
  * @param mid: (I) 互斥锁ID
  * @return 互斥锁对象的指针
  * @note
@@ -140,7 +140,7 @@ struct xwosal_mtx * xwosal_mtx_get_obj(xwid_t mid)
 }
 
 /**
- * @brief 操作系统抽象层API：解锁互斥锁。
+ * @brief XWOSAL API：解锁互斥锁
  * @param mid: (I) 互斥锁ID
  * @return 错误码
  * @note
@@ -155,7 +155,7 @@ xwer_t xwosal_mtx_unlock(xwid_t mid)
 }
 
 /**
- * @brief 操作系统抽象层API：获取互斥锁。若互斥锁已被其他线程获取，就阻塞等待。
+ * @brief XWOSAL API：等待并上锁互斥锁
  * @param mid: (I) 互斥锁ID
  * @return 错误码
  * @note
@@ -170,7 +170,7 @@ xwer_t xwosal_mtx_lock(xwid_t mid)
 }
 
 /**
- * @brief 操作系统抽象层API：尝试上锁互斥锁。若互斥锁已被其他线程获取，不会阻塞等待。
+ * @brief XWOSAL API：尝试上锁互斥锁
  * @param mid: (I) 互斥锁ID
  * @return 错误码
  * @note
@@ -189,8 +189,7 @@ xwer_t xwosal_mtx_trylock(xwid_t mid)
 }
 
 /**
- * @brief 操作系统抽象层API：上锁互斥锁。
- *                           若互斥锁已经被其他线程获取，就限时阻塞等待。
+ * @brief XWOSAL API：限时等待并上锁互斥锁
  * @param mid: (I) 互斥锁ID
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
@@ -212,8 +211,7 @@ xwer_t xwosal_mtx_timedlock(xwid_t mid, xwtm_t * xwtm)
 }
 
 /**
- * @brief 操作系统抽象层API：上锁互斥锁。
- *                           若互斥锁已经被其他线程获取，就阻塞等待，且不可被中断。
+ * @brief XWOSAL API：等待并上锁互斥锁，且等待不可被中断
  * @param mid: (I) 互斥锁ID
  * @return 错误码
  * @note

@@ -67,7 +67,7 @@ typedef void (* xwosal_swt_f)(struct xwosal_swt * /*swt*/, void * /*arg*/);
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层API：静态方式初始化软件定时器。
+ * @brief XWOSAL API：静态方式初始化软件定时器
  * @param swt: (I) 软件定时器的指针
  * @param name: (I) 软件定时器的名字
  * @param flag: (I) 软件定时器的标志
@@ -84,7 +84,7 @@ xwer_t xwosal_swt_init(struct xwosal_swt * swt, const char * name, xwsq_t flag)
 }
 
 /**
- * @brief 操作系统抽象层API：销毁静态方式初始化的软件定时器。
+ * @brief XWOSAL API：销毁静态方式初始化的软件定时器
  * @param swt: (I) 软件定时器的指针
  * @return 错误码
  * @note
@@ -99,7 +99,7 @@ xwer_t xwosal_swt_destroy(struct xwosal_swt * swt)
 }
 
 /**
- * @brief 操作系统抽象层API：动态方式创建软件定时器。
+ * @brief XWOSAL API：动态方式创建软件定时器
  * @param swtidbuf: (O) 指向缓冲区的指针，通过此缓冲区返回ID
  * @param name: (I) 软件定时器的名字
  * @param flag: (I) 软件定时器的标志
@@ -116,7 +116,7 @@ xwer_t xwosal_swt_create(xwid_t * swtidbuf, const char * name, xwsq_t flag)
 }
 
 /**
- * @brief 操作系统抽象层API：删除动态方式创建的软件定时器。
+ * @brief XWOSAL API：删除动态方式创建的软件定时器
  * @param swtid: (I) 软件定时器ID
  * @return 错误码
  * @note
@@ -131,7 +131,7 @@ xwer_t xwosal_swt_delete(xwid_t swtid)
 }
 
 /**
- * @brief 操作系统抽象层API：从软件定时器对象的指针获取软件定时器ID。
+ * @brief XWOSAL API：从软件定时器对象的指针获取软件定时器ID
  * @param swt: (I) 软件定时器对象的指针
  * @return 软件定时器ID
  * @note
@@ -146,7 +146,7 @@ xwid_t xwosal_swt_get_id(struct xwosal_swt * swt)
 }
 
 /**
- * @brief 操作系统抽象层API：从软件定时器ID获取对象的指针。
+ * @brief XWOSAL API：从软件定时器ID获取对象的指针
  * @param swtid: (I) 软件定时器ID
  * @return 软件定时器对象的指针
  * @note
@@ -161,7 +161,7 @@ struct xwosal_swt * xwosal_swt_get_obj(xwid_t swtid)
 }
 
 /**
- * @brief 操作系统抽象层API：启动软件定时器。
+ * @brief XWOSAL API：启动软件定时器
  * @param swtid: (I) 软件定时器ID
  * @param base: (I) 软件定时器的初始时间
  * @param period: (I) 软件定时器的周期时间
@@ -181,7 +181,7 @@ xwer_t xwosal_swt_start(xwid_t swtid, xwtm_t base, xwtm_t period,
 }
 
 /**
- * @brief 操作系统抽象层API：停止软件定时器。
+ * @brief XWOSAL API：停止软件定时器
  * @param swtid: (I) 软件定时器ID
  * @return 错误码
  * @note
