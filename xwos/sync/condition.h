@@ -28,7 +28,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/object.h>
+#include <xwos/sync/object.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lock/spinlock.h>
 
@@ -43,11 +43,10 @@
  * @brief 条件量
  */
 struct xwsync_cdt {
-        struct xwos_object xwobj; /**< OO in C: extends struct xwos_object */
-        xwssq_t count; /**< counter of condition.
-                            Negative value indicates a negative condition. */
-        struct xwlib_bclst_head wq; /**< waiting-queue */
-        struct xwlk_splk lock; /**< lock to protect this structure */
+        struct xwsync_object xwsyncobj; /**< C语言面向对象：继承struct xwsync_object */
+        xwssq_t count; /**< 计数器：<0，条件量处于负状态；*/
+        struct xwlib_bclst_head wq; /**< 等待队列 */
+        struct xwlk_splk lock; /**< 保护此锁的结构体 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -56,13 +55,13 @@ struct xwsync_cdt {
 static __xw_inline
 xwer_t xwsync_cdt_grab(struct xwsync_cdt * cdt)
 {
-        return xwos_object_grab(&cdt->xwobj);
+        return xwsync_object_grab(&cdt->xwsyncobj);
 }
 
 static __xw_inline
 xwer_t xwsync_cdt_put(struct xwsync_cdt * cdt)
 {
-        return xwos_object_put(&cdt->xwobj);
+        return xwsync_object_put(&cdt->xwsyncobj);
 }
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -94,6 +93,12 @@ xwer_t xwsync_cdt_create(struct xwsync_cdt ** ptrbuf);
 
 __xwos_api
 xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt);
+
+__xwos_api
+xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t pos);
+
+__xwos_api
+xwer_t xwsync_cdt_unbind(struct xwsync_cdt * cdt, struct xwsync_evt * evt);
 
 __xwos_api
 xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt);

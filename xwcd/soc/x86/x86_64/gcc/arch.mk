@@ -22,7 +22,7 @@
 #
 
 ARCH_INCDIRS :=
-ARCH_CFLAGS := -mcx16
+ARCH_CFLAGS := -mcx16 -mhard-float
 ARCH_AFLAGS :=
 ARCH_LDFLAGS :=
 ARCH_EOBJS :=

@@ -32,6 +32,7 @@
 #include <linux/slab.h>
 #include <xwos/core/thread.h>
 #include <xwos/lock/spinlock.h>
+#include <xwos/sync/object.h>
 #include <xwos/sync/condition.h>
 #include <xwos/sync/semaphore.h>
 #include <xwos/sync/event.h>
@@ -176,6 +177,7 @@ err_evt_activate:
 err_evt_alloc:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_create);
 
 xwer_t xwsync_evt_delete(struct xwsync_evt * evt)
 {
@@ -183,6 +185,7 @@ xwer_t xwsync_evt_delete(struct xwsync_evt * evt)
 
         return xwsync_evt_put(evt);
 }
+EXPORT_SYMBOL(xwsync_evt_delete);
 
 xwer_t xwsync_evt_init(struct xwsync_evt * evt, xwbmp_t initval[], xwsq_t attr)
 {
@@ -193,6 +196,7 @@ xwer_t xwsync_evt_init(struct xwsync_evt * evt, xwbmp_t initval[], xwsq_t attr)
         xwsync_evt_construct(evt);
         return xwsync_evt_activate(evt, initval, attr, NULL);
 }
+EXPORT_SYMBOL(xwsync_evt_init);
 
 xwer_t xwsync_evt_destroy(struct xwsync_evt * evt)
 {
@@ -200,6 +204,19 @@ xwer_t xwsync_evt_destroy(struct xwsync_evt * evt)
 
         return xwsync_evt_put(evt);
 }
+EXPORT_SYMBOL(xwsync_evt_destroy);
+
+xwer_t xwsync_evt_bind(struct xwsync_evt * evt, struct xwsync_evt * slt, xwsq_t pos)
+{
+        return xwsync_cdt_bind(&evt->cdt, slt, pos);
+}
+EXPORT_SYMBOL(xwsync_evt_bind);
+
+xwer_t xwsync_evt_unbind(struct xwsync_evt * evt, struct xwsync_evt * slt)
+{
+        return xwsync_cdt_unbind(&evt->cdt, slt);
+}
+EXPORT_SYMBOL(xwsync_evt_unbind);
 
 xwer_t xwsync_evt_intr_all(struct xwsync_evt * evt)
 {
@@ -207,6 +224,7 @@ xwer_t xwsync_evt_intr_all(struct xwsync_evt * evt)
 
         return xwsync_cdt_intr_all(&evt->cdt);
 }
+EXPORT_SYMBOL(xwsync_evt_intr_all);
 
 /******** type:XWSYNC_EVT_TYPE_FLAG ********/
 xwer_t xwsync_evt_s1m(struct xwsync_evt * evt, xwbmp_t msk[])
@@ -233,6 +251,7 @@ xwer_t xwsync_evt_s1m(struct xwsync_evt * evt, xwbmp_t msk[])
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_s1m);
 
 xwer_t xwsync_evt_s1i(struct xwsync_evt * evt, xwsq_t pos)
 {
@@ -257,6 +276,7 @@ xwer_t xwsync_evt_s1i(struct xwsync_evt * evt, xwsq_t pos)
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_s1i);
 
 xwer_t xwsync_evt_c0m(struct xwsync_evt * evt, xwbmp_t msk[])
 {
@@ -282,6 +302,7 @@ xwer_t xwsync_evt_c0m(struct xwsync_evt * evt, xwbmp_t msk[])
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_c0m);
 
 xwer_t xwsync_evt_c0i(struct xwsync_evt * evt, xwsq_t pos)
 {
@@ -307,6 +328,7 @@ xwer_t xwsync_evt_c0i(struct xwsync_evt * evt, xwsq_t pos)
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_c0i);
 
 xwer_t xwsync_evt_x1m(struct xwsync_evt * evt, xwbmp_t msk[])
 {
@@ -332,6 +354,7 @@ xwer_t xwsync_evt_x1m(struct xwsync_evt * evt, xwbmp_t msk[])
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_x1m);
 
 xwer_t xwsync_evt_x1i(struct xwsync_evt * evt, xwsq_t pos)
 {
@@ -357,6 +380,7 @@ xwer_t xwsync_evt_x1i(struct xwsync_evt * evt, xwsq_t pos)
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_x1i);
 
 xwer_t xwsync_evt_read(struct xwsync_evt * evt, xwbmp_t out[])
 {
@@ -379,6 +403,7 @@ xwer_t xwsync_evt_read(struct xwsync_evt * evt, xwbmp_t out[])
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_read);
 
 static
 xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
@@ -563,11 +588,13 @@ xwer_t xwsync_evt_timedwait(struct xwsync_evt * evt,
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_timedwait);
 
 /******** type:XWSYNC_EVT_TYPE_SELECTOR ********/
-__xwos_code
-xwer_t xwsync_evt_smr_bind(struct xwsync_evt * evt, struct xwsync_smr * smr,
-                           xwsq_t pos)
+xwer_t xwsync_evt_obj_bind(struct xwsync_evt * evt,
+                           struct xwsync_object * obj,
+                           xwsq_t pos,
+                           bool exclusive)
 {
         struct xwsync_evt * owner;
         xwreg_t cpuirq;
@@ -584,7 +611,7 @@ xwer_t xwsync_evt_smr_bind(struct xwsync_evt * evt, struct xwsync_smr * smr,
         }
 
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        owner = smr->selector.evt;
+        owner = obj->selector.evt;
         if (NULL != owner) {
                 rc = -EALREADY;
                 goto err_already;
@@ -594,9 +621,11 @@ xwer_t xwsync_evt_smr_bind(struct xwsync_evt * evt, struct xwsync_smr * smr,
                 rc = -EBUSY;
                 goto err_busy;
         }
-        xwbmpop_s1i(evt->msk, pos);
-        smr->selector.evt = evt;
-        smr->selector.pos = pos;
+        if (exclusive) {
+                xwbmpop_s1i(evt->msk, pos);
+        }
+        obj->selector.evt = evt;
+        obj->selector.pos = pos;
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         return OK;
 
@@ -608,8 +637,9 @@ err_evt_grab:
         return rc;
 }
 
-__xwos_code
-xwer_t xwsync_evt_smr_unbind(struct xwsync_evt * evt, struct xwsync_smr * smr)
+xwer_t xwsync_evt_obj_unbind(struct xwsync_evt * evt,
+                             struct xwsync_object * obj,
+                             bool exclusive)
 {
         struct xwsync_evt * owner;
         xwreg_t cpuirq;
@@ -619,14 +649,16 @@ xwer_t xwsync_evt_smr_unbind(struct xwsync_evt * evt, struct xwsync_smr * smr)
                       "type-error", -ETYPE);
 
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        owner = smr->selector.evt;
+        owner = obj->selector.evt;
         if (evt != owner) {
                 rc = -ENOTCONN;
                 goto err_notconn;
         }
-        xwbmpop_c0i(evt->msk, smr->selector.pos);
-        smr->selector.evt = NULL;
-        smr->selector.pos = XWSYNC_EVT_MAXNUM;
+        if (exclusive) {
+                xwbmpop_c0i(evt->msk, obj->selector.pos);
+        }
+        obj->selector.evt = NULL;
+        obj->selector.pos = XWSYNC_EVT_MAXNUM;
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
         return OK;
@@ -636,8 +668,7 @@ err_notconn:
         return rc;
 }
 
-__xwos_code
-xwer_t xwsync_evt_smr_s1i(struct xwsync_evt * evt, struct xwsync_smr * smr)
+xwer_t xwsync_evt_obj_s1i(struct xwsync_evt * evt, struct xwsync_object * obj)
 {
         struct xwsync_evt * owner;
         xwreg_t cpuirq;
@@ -649,12 +680,12 @@ xwer_t xwsync_evt_smr_s1i(struct xwsync_evt * evt, struct xwsync_smr * smr)
         }
 
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        owner = smr->selector.evt;
+        owner = obj->selector.evt;
         if (evt != owner) {
                 rc = -ENOTCONN;
                 goto err_notconn;
         }
-        xwbmpop_s1i(evt->bmp, smr->selector.pos);
+        xwbmpop_s1i(evt->bmp, obj->selector.pos);
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
@@ -667,8 +698,7 @@ err_evt_grab:
         return rc;
 }
 
-__xwos_code
-xwer_t xwsync_evt_smr_c0i(struct xwsync_evt * evt, struct xwsync_smr * smr)
+xwer_t xwsync_evt_obj_c0i(struct xwsync_evt * evt, struct xwsync_object * obj)
 {
         struct xwsync_evt * owner;
         xwreg_t cpuirq;
@@ -680,12 +710,12 @@ xwer_t xwsync_evt_smr_c0i(struct xwsync_evt * evt, struct xwsync_smr * smr)
         }
 
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        owner = smr->selector.evt;
+        owner = obj->selector.evt;
         if (evt != owner) {
                 rc = -ENOTCONN;
                 goto err_notconn;
         }
-        xwbmpop_c0i(evt->bmp, smr->selector.pos);
+        xwbmpop_c0i(evt->bmp, obj->selector.pos);
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
         return OK;
@@ -696,6 +726,47 @@ err_notconn:
 err_evt_grab:
         return rc;
 }
+
+xwer_t xwsync_evt_tryselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
+{
+        xwer_t rc;
+        xwreg_t cpuirq;
+        bool triggered;
+
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE(((evt->attr & XWSYNC_EVT_TYPE_MASK) == XWSYNC_EVT_TYPE_SELECTOR),
+                      "type-error", -ETYPE);
+
+        rc = xwsync_evt_grab(evt);
+        if (rc < 0) {
+                goto err_evt_grab;
+        }
+
+        xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        triggered = xwbmpop_t1mo(evt->bmp, msk, XWSYNC_EVT_MAXNUM);
+        if (triggered) {
+                if (NULL != trg) {
+                        xwbmpop_assign(trg, evt->bmp, XWSYNC_EVT_MAXNUM);
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
+                        xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                        xwbmpop_and(trg, msk, XWSYNC_EVT_MAXNUM);
+                } else {
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
+                        xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                }
+        } else {
+                rc = -ENODATA;
+                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        }
+        xwsync_evt_put(evt);
+
+err_evt_grab:
+        return rc;
+}
+EXPORT_SYMBOL(xwsync_evt_tryselect);
 
 xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                               xwtm_t * xwtm)
@@ -722,11 +793,19 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
                 if (triggered) {
                         if (NULL != trg) {
                                 xwbmpop_assign(trg, evt->bmp, XWSYNC_EVT_MAXNUM);
+                                /* Clear non-exclusive bits */
+                                xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
+                                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                                xwbmpop_and(trg, msk, XWSYNC_EVT_MAXNUM);
+                        } else {
+                                /* Clear non-exclusive bits */
+                                xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
+                                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         }
-                        xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-                        xwbmpop_and(trg, msk, XWSYNC_EVT_MAXNUM);
                         break;
                 } else {
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                         rc = xwsync_cdt_timedwait(&evt->cdt,
                                                   &evt->lock, XWLK_TYPE_SPLK_CPUIRQ,
                                                   NULL, XWOS_UNUSED_ARGUMENT,
@@ -751,6 +830,7 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_timedselect);
 
 /******** type:XWSYNC_EVT_TYPE_BARRIER ********/
 xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
@@ -798,3 +878,4 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
 err_evt_grab:
         return rc;
 }
+EXPORT_SYMBOL(xwsync_evt_timedsync);

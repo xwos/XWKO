@@ -28,8 +28,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/object.h>
 #include <xwos/lock/spinlock.h>
+#include <xwos/sync/object.h>
 #include <xwos/sync/condition.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -56,7 +56,7 @@ enum xwsync_evt_attr_em {
  * @brief 事件触发条件枚举
  */
 enum xwsync_evt_trigger_em {
-        XWSYNC_EVT_TRIGGER_SET_ALL, /**< 掩码中所有位被置1 */
+        XWSYNC_EVT_TRIGGER_SET_ALL = 0, /**< 掩码中所有位被置1 */
         XWSYNC_EVT_TRIGGER_SET_ANY, /**< 掩码中任何位被置1 */
         XWSYNC_EVT_TRIGGER_CLR_ALL, /**< 掩码中所有位被清0 */
         XWSYNC_EVT_TRIGGER_CLR_ANY, /**< 掩码中任何位被清0 */
@@ -128,17 +128,21 @@ __xwos_code
 void xwsync_cdt_xwfs_exit(void);
 
 __xwos_code
-xwer_t xwsync_evt_smr_bind(struct xwsync_evt * evt, struct xwsync_smr * smr,
-                           xwsq_t pos);
+xwer_t xwsync_evt_obj_bind(struct xwsync_evt * evt,
+                           struct xwsync_object * obj,
+                           xwsq_t pos,
+                           bool exclusive);
 
 __xwos_code
-xwer_t xwsync_evt_smr_unbind(struct xwsync_evt * evt, struct xwsync_smr * smr);
+xwer_t xwsync_evt_obj_unbind(struct xwsync_evt * evt,
+                             struct xwsync_object * obj,
+                             bool exclusive);
 
 __xwos_code
-xwer_t xwsync_evt_smr_s1i(struct xwsync_evt * evt, struct xwsync_smr * smr);
+xwer_t xwsync_evt_obj_s1i(struct xwsync_evt * evt, struct xwsync_object * obj);
 
 __xwos_code
-xwer_t xwsync_evt_smr_c0i(struct xwsync_evt * evt, struct xwsync_smr * smr);
+xwer_t xwsync_evt_obj_c0i(struct xwsync_evt * evt, struct xwsync_object * obj);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -154,6 +158,12 @@ xwer_t xwsync_evt_create(struct xwsync_evt ** ptrbuf, xwbmp_t initval[], xwsq_t 
 
 __xwos_api
 xwer_t xwsync_evt_delete(struct xwsync_evt * evt);
+
+__xwos_api
+xwer_t xwsync_evt_bind(struct xwsync_evt * evt, struct xwsync_evt * slt, xwsq_t pos);
+
+__xwos_api
+xwer_t xwsync_evt_unbind(struct xwsync_evt * evt, struct xwsync_evt * slt);
 
 __xwos_api
 xwer_t xwsync_evt_intr_all(struct xwsync_evt * evt);
@@ -184,6 +194,9 @@ xwer_t xwsync_evt_timedwait(struct xwsync_evt * evt,
                             xwsq_t trigger, xwsq_t action,
                             xwbmp_t origin[], xwbmp_t msk[],
                             xwtm_t * xwtm);
+
+__xwos_api
+xwer_t xwsync_evt_tryselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 
 __xwos_api
 xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[],

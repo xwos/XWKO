@@ -38,6 +38,7 @@
 #include <xwmd/xwfs/fs.h>
 #include <xwmd/xwfs/bs.h>
 #include <xwos/sync/event.h>
+#include <xwos/sync/object.h>
 #include <xwos/sync/semaphore.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -94,7 +95,7 @@ void xwsync_smr_construct(void * data)
 {
         struct xwsync_smr * smr = data;
 
-        xwos_object_construct(&smr->xwobj);
+        xwsync_object_construct(&smr->xwsyncobj);
         smr->count = 0;
         smr->max = 0;
         xwlib_bclst_init_head(&smr->wq);
@@ -140,15 +141,15 @@ xwer_t xwsync_smr_activate(struct xwsync_smr * smr, xwssq_t val,
 {
         xwer_t rc;
 
-        rc = xwos_object_activate(&smr->xwobj, gcfunc);
+        rc = xwsync_object_activate(&smr->xwsyncobj, gcfunc);
         if (__unlikely(rc < 0)) {
-                goto err_obj_activate;
+                goto err_xwsyncobj_activate;
         }
         smr->count = val;
         smr->max = max;
         return OK;
 
-err_obj_activate:
+err_xwsyncobj_activate:
         return rc;
 }
 
@@ -212,16 +213,18 @@ EXPORT_SYMBOL(xwsync_smr_delete);
 
 xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t pos)
 {
+        struct xwsync_object * xwsyncobj;
         xwreg_t cpuirq;
         xwer_t rc;
 
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         XWOS_VALIDATE((smr), "nullptr", -EFAULT);
 
+        xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
-        rc = xwsync_evt_smr_bind(evt, smr, pos);
+        rc = xwsync_evt_obj_bind(evt, xwsyncobj, pos, true);
         if ((OK == rc) && (smr->count > 0)) {
-                rc = xwsync_evt_smr_s1i(evt, smr);
+                rc = xwsync_evt_obj_s1i(evt, xwsyncobj);
         }
         xwlk_splk_unlock_cpuirqrs(&smr->lock, cpuirq);
         return rc;
@@ -230,16 +233,18 @@ EXPORT_SYMBOL(xwsync_smr_bind);
 
 xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt)
 {
+        struct xwsync_object * xwsyncobj;
         xwreg_t cpuirq;
         xwer_t rc;
 
         XWOS_VALIDATE((smr), "nullptr", -EFAULT);
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
 
+        xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
-        rc = xwsync_evt_smr_unbind(evt, smr);
+        rc = xwsync_evt_obj_unbind(evt, xwsyncobj, true);
         if (OK == rc) {
-                rc = xwsync_evt_smr_c0i(evt, smr);
+                rc = xwsync_evt_obj_c0i(evt, xwsyncobj);
         }
         xwlk_splk_unlock_cpuirqrs(&smr->lock, cpuirq);
 
@@ -249,6 +254,7 @@ EXPORT_SYMBOL(xwsync_smr_unbind);
 
 xwer_t xwsync_smr_freeze(struct xwsync_smr * smr)
 {
+        struct xwsync_object * xwsyncobj;
         struct xwsync_evt * evt;
         xwreg_t cpuirq;
         xwer_t rc;
@@ -257,15 +263,15 @@ xwer_t xwsync_smr_freeze(struct xwsync_smr * smr)
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
         } else {
+                xwsyncobj = &smr->xwsyncobj;
                 xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
                 if (__unlikely(smr->count < 0)) {
                         rc = -EALREADY;
                 } else {
                         smr->count = XWSYNC_SMR_NEGATIVE;
-
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
                 }
                 xwlk_splk_unlock_cpuirqrs(&smr->lock, cpuirq);
@@ -277,6 +283,7 @@ EXPORT_SYMBOL(xwsync_smr_freeze);
 
 xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
 {
+        struct xwsync_object * xwsyncobj;
         struct xwsync_evt * evt;
         xwreg_t cpuirq;
         xwer_t rc;
@@ -286,6 +293,8 @@ xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                 rc = -EINVAL;
                 goto err_smr_grab;
         }
+
+        xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (__unlikely(smr->count >= 0)) {
                 rc = -EPERM;
@@ -295,9 +304,9 @@ xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
         smr->max = max;
         smr->count = val;
         if (smr->count > 0) {
-                xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                 if (NULL != evt) {
-                        xwsync_evt_smr_s1i(evt, smr);
+                        xwsync_evt_obj_s1i(evt, xwsyncobj);
                 }
         }
         xwlk_splk_unlock_cpuirqrs(&smr->lock, cpuirq);
@@ -314,10 +323,11 @@ EXPORT_SYMBOL(xwsync_smr_thaw);
 
 xwer_t xwsync_smr_post(struct xwsync_smr * smr)
 {
-        xwer_t rc;
-        xwreg_t cpuirq;
+        struct xwsync_object * xwsyncobj;
         struct xwsync_evt * evt;
         struct xwsync_smr_waiter * waiter;
+        xwreg_t cpuirq;
+        xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
         if (__unlikely(rc < 0)) {
@@ -325,6 +335,7 @@ xwer_t xwsync_smr_post(struct xwsync_smr * smr)
                 goto err_smr_grab;
         }
 
+        xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (smr->count < 0) {
                 rc = -ENEGATIVE;
@@ -337,9 +348,9 @@ xwer_t xwsync_smr_post(struct xwsync_smr * smr)
                         smr->count++;
                 }
                 if (smr->count > 0) {
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_s1i(evt, smr);
+                                xwsync_evt_obj_s1i(evt, xwsyncobj);
                         }
                 }
         } else {
@@ -365,25 +376,28 @@ EXPORT_SYMBOL(xwsync_smr_post);
 
 xwer_t xwsync_smr_wait(struct xwsync_smr * smr)
 {
-        xwer_t rc;
-        xwreg_t cpuirq;
+        struct xwsync_object * xwsyncobj;
         struct xwsync_evt * evt;
         struct xwsync_smr_waiter waiter;
         struct task_struct * task;
+        xwreg_t cpuirq;
+        xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_smr_grab;
         }
+
+        xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (likely(smr->count > 0)) {
                 smr->count--;
                 rc = OK;
                 if (0 == smr->count) {
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
                 }
         } else {
@@ -429,6 +443,7 @@ xwer_t xwsync_smr_trywait(struct xwsync_smr * smr)
 {
         xwer_t rc;
         xwreg_t cpuirq;
+        struct xwsync_object * xwsyncobj;
         struct xwsync_evt * evt;
 
         rc = xwsync_smr_grab(smr);
@@ -437,14 +452,15 @@ xwer_t xwsync_smr_trywait(struct xwsync_smr * smr)
                 goto err_smr_grab;
         }
 
+        xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (likely(smr->count > 0)) {
                 smr->count--;
                 rc = OK;
                 if (0 == smr->count) {
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
                 }
         } else {
@@ -465,6 +481,7 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
         struct xwsync_smr_waiter waiter;
         ktime_t expires;
         ktime_t * kt;
+        struct xwsync_object * xwsyncobj;
         struct xwsync_evt * evt;
         struct hrtimer_sleeper hrts;
         struct task_struct * task;
@@ -478,14 +495,15 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
                 goto err_smr_grab;
         }
 
+        xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (__likely(smr->count > 0)) {
                 smr->count--;
                 rc = OK;
                 if (0 == smr->count) {
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
                 }
         } else if (0 == *xwtm) {
@@ -555,6 +573,7 @@ xwer_t xwsync_smr_wait_unintr(struct xwsync_smr * smr)
 {
         xwer_t rc;
         xwreg_t cpuirq;
+        struct xwsync_object * xwsyncobj;
         struct xwsync_evt * evt;
         struct xwsync_smr_waiter waiter;
         struct task_struct * task;
@@ -564,14 +583,16 @@ xwer_t xwsync_smr_wait_unintr(struct xwsync_smr * smr)
                 rc = -EPERM;
                 goto err_smr_grab;
         }
+
+        xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (likely(smr->count > 0)) {
                 smr->count--;
                 rc = OK;
                 if (0 == smr->count) {
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
                 }
         } else {

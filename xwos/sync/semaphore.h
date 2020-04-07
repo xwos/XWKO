@@ -28,7 +28,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/object.h>
+#include <xwos/sync/object.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lock/spinlock.h>
 
@@ -43,67 +43,50 @@
  * @brief 信号量
  */
 struct xwsync_smr {
-        struct xwos_object xwobj; /**<  OO in C: extends struct xwos_object */
-        xwssq_t count; /**< counter of semaphire.
-                            Negative value indicates a negative semaphire. */
-        xwssq_t max; /**< Max value of counter */
-        struct xwlib_bclst_head wq; /**< waiting-queue */
-        struct xwlk_splk lock; /**< lock to protect this structure */
-        struct {
-                struct xwsync_evt * evt; /**< event object */
-                xwsq_t pos; /**< bit position */
-        } selector; /**< semaphore slector */
+        struct xwsync_object xwsyncobj; /**< C语言面向对象：继承struct xwsync_object */
+        xwssq_t count; /**< 信号量计数器：<0，信号量处于负状态 */
+        xwssq_t max; /**< 信号量计数器的最大值 */
+        struct xwlib_bclst_head wq; /**< 等待队列 */
+        struct xwlk_splk lock; /**< 保护此结构体的锁 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
 xwer_t xwsync_smr_cache_create(void);
 
-extern
 void xwsync_smr_cache_destroy(void);
 
-extern
 xwer_t xwsync_smr_xwfs_init(void);
 
-extern
 void xwsync_smr_xwfs_exit(void);
 
-extern
 xwer_t xwsync_smr_init(struct xwsync_smr * smr, xwssq_t val, xwssq_t max);
 
-extern
 xwer_t xwsync_smr_destroy(struct xwsync_smr * smr);
 
-extern
 xwer_t xwsync_smr_create(struct xwsync_smr ** ptrbuf, xwssq_t val, xwssq_t max);
 
-extern
 xwer_t xwsync_smr_delete(struct xwsync_smr * smr);
 
-extern
+xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t pos);
+
+xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt);
+
 xwer_t xwsync_smr_freeze(struct xwsync_smr * smr);
 
-extern
 xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max);
 
-extern
 xwer_t xwsync_smr_post(struct xwsync_smr * smr);
 
-extern
 xwer_t xwsync_smr_wait(struct xwsync_smr * smr);
 
-extern
 xwer_t xwsync_smr_trywait(struct xwsync_smr * smr);
 
-extern
 xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm);
 
-extern
 xwer_t xwsync_smr_wait_unintr(struct xwsync_smr * smr);
 
-extern
 xwer_t xwsync_smr_getvalue(struct xwsync_smr * smr, xwssq_t * sval);
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -112,13 +95,13 @@ xwer_t xwsync_smr_getvalue(struct xwsync_smr * smr, xwssq_t * sval);
 static __xw_inline
 xwer_t xwsync_smr_grab(struct xwsync_smr * smr)
 {
-        return xwos_object_grab(&smr->xwobj);
+        return xwsync_object_grab(&smr->xwsyncobj);
 }
 
 static __xw_inline
 xwer_t xwsync_smr_put(struct xwsync_smr * smr)
 {
-        return xwos_object_put(&smr->xwobj);
+        return xwsync_object_put(&smr->xwsyncobj);
 }
 
 #endif /* xwos/sync/semaphore.h */
