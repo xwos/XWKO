@@ -74,8 +74,6 @@ enum xwsync_evt_action_em {
         XWSYNC_EVT_ACTION_NUM,
 };
 
-struct xwsync_smr;
-
 /**
  * @brief 事件对象
  */
@@ -188,6 +186,11 @@ xwer_t xwsync_evt_x1i(struct xwsync_evt * evt, xwsq_t pos);
 
 __xwos_api
 xwer_t xwsync_evt_read(struct xwsync_evt * evt, xwbmp_t out[]);
+
+__xwos_api
+xwer_t xwsync_evt_trywait(struct xwsync_evt * evt,
+                          xwsq_t trigger, xwsq_t action,
+                          xwbmp_t origin[], xwbmp_t msk[]);
 
 __xwos_api
 xwer_t xwsync_evt_timedwait(struct xwsync_evt * evt,

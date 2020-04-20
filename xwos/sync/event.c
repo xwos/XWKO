@@ -406,6 +406,154 @@ err_evt_grab:
 EXPORT_SYMBOL(xwsync_evt_read);
 
 static
+xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
+                                xwsq_t trigger, xwsq_t action,
+                                xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        bool triggered;
+        xwer_t rc;
+
+        XWOS_VALIDATE((trigger <= XWSYNC_EVT_TRIGGER_CLR_ANY),
+                      "illegal-trigger", -EINVAL);
+        XWOS_VALIDATE((action < XWSYNC_EVT_ACTION_NUM),
+                      "illegal-action", -EINVAL);
+
+        rc = OK;
+        xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
+                switch (trigger) {
+                case XWSYNC_EVT_TRIGGER_SET_ALL:
+                        triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk,
+                                                          XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_SET_ANY:
+                        triggered = xwbmpop_t1mo_then_c0m(evt->bmp, msk,
+                                                          XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_CLR_ALL:
+                        triggered = xwbmpop_t0ma_then_s1m(evt->bmp, msk,
+                                                          XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_CLR_ANY:
+                        triggered = xwbmpop_t0mo_then_s1m(evt->bmp, msk,
+                                                          XWSYNC_EVT_MAXNUM);
+                        break;
+                default:
+                        triggered = true;
+                        rc = -EINVAL;
+                        break;
+                }
+        } else {
+                switch (trigger) {
+                case XWSYNC_EVT_TRIGGER_SET_ALL:
+                        triggered = xwbmpop_t1ma(evt->bmp, msk,
+                                                 XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_SET_ANY:
+                        triggered = xwbmpop_t1mo(evt->bmp, msk,
+                                                 XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_CLR_ALL:
+                        triggered = xwbmpop_t0ma(evt->bmp, msk,
+                                                 XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_CLR_ANY:
+                        triggered = xwbmpop_t0mo(evt->bmp, msk,
+                                                 XWSYNC_EVT_MAXNUM);
+                        break;
+                default:
+                        triggered = true;
+                        rc = -EINVAL;
+                        break;
+                }
+        }
+        xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        if (!triggered) {
+                rc = -ENODATA;
+        }
+        return rc;
+}
+
+static
+xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
+                               xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        xwssq_t cmprc;
+        bool triggered;
+        xwer_t rc;
+        XWSYNC_EVT_DECLARE_BITMAP(cur);
+        XWSYNC_EVT_DECLARE_BITMAP(tmp);
+
+        XWOS_VALIDATE((origin), "nullptr", -EFAULT);
+
+        xwbmpop_and(origin, msk, XWSYNC_EVT_MAXNUM);
+        xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        xwbmpop_assign(cur, evt->bmp, XWSYNC_EVT_MAXNUM);
+        xwbmpop_and(cur, msk, XWSYNC_EVT_MAXNUM);
+        if (XWSYNC_EVT_TRIGGER_TGL_ALL == trigger) {
+                xwbmpop_assign(tmp, cur, XWSYNC_EVT_MAXNUM);
+                xwbmpop_xor(tmp, origin, XWSYNC_EVT_MAXNUM);
+                cmprc = xwbmpop_cmp(tmp, msk, XWSYNC_EVT_MAXNUM);
+                if (0 == cmprc) {
+                        triggered = true;
+                        rc = OK;
+                } else {
+                        triggered = false;
+                        rc = -ENODATA;
+                }
+        } else if (XWSYNC_EVT_TRIGGER_TGL_ANY == trigger) {
+                cmprc = xwbmpop_cmp(origin, cur, XWSYNC_EVT_MAXNUM);
+                if (0 == cmprc) {
+                        triggered = false;
+                        rc = -ENODATA;
+                } else {
+                        triggered = true;
+                        rc = OK;
+                }
+        } else {
+                triggered = true;
+                rc = -EINVAL;
+        }
+        if (triggered) {
+                xwbmpop_assign(origin, cur, XWSYNC_EVT_MAXNUM);
+                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        } else {
+                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        }
+        return rc;
+}
+
+__xwos_api
+xwer_t xwsync_evt_trywait(struct xwsync_evt * evt,
+                          xwsq_t trigger, xwsq_t action,
+                          xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwer_t rc;
+
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE(((evt->attr & XWSYNC_EVT_TYPE_MASK) == XWSYNC_EVT_TYPE_FLAG),
+                      "type-error", -ETYPE);
+
+        rc = xwsync_evt_grab(evt);
+        if (rc < 0) {
+                goto err_evt_grab;
+        }
+        if (trigger <= XWSYNC_EVT_TRIGGER_CLR_ANY) {
+                rc = xwsync_evt_trywait_level(evt, trigger, action, msk);
+        } else {
+                rc = xwsync_evt_trywait_edge(evt, trigger, origin, msk);
+        }
+        xwsync_evt_put(evt);
+
+err_evt_grab:
+        return rc;
+}
+EXPORT_SYMBOL(xwsync_evt_trywait);
+
+static
 xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
                                   xwsq_t trigger, xwsq_t action,
                                   xwbmp_t msk[],
@@ -421,6 +569,7 @@ xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
         XWOS_VALIDATE((action < XWSYNC_EVT_ACTION_NUM),
                       "illegal-action", -EINVAL);
 
+        rc = OK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
                 if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
@@ -757,6 +906,7 @@ xwer_t xwsync_evt_tryselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[
                         xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 }
+                rc = OK;
         } else {
                 rc = -ENODATA;
                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -802,6 +952,7 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
                                 xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         }
+                        rc = OK;
                         break;
                 } else {
                         /* Clear non-exclusive bits */
