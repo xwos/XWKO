@@ -54,16 +54,24 @@
  */
 __xwmd_rodata const xwu8_t xwpcp_cfrm_sync[] = {
         (xwu8_t)XWPCP_HWIFAL_SOF,
-        (xwu8_t)0xD, /* 帧长度 */
-        (xwu8_t)0xB0, /* 帧长度的镜像反转 */
+        (xwu8_t)0x15, /* 帧长度 */
+        (xwu8_t)0xA8, /* 帧长度的镜像反转 */
         (xwu8_t)(XWPCP_QOS(1) | XWPCP_PORT_CMD), /* 端口:0，QoS:1 */
         (xwu8_t)XWPCP_ID_SYNC, /* 同步帧的id */
-        (xwu8_t)XWPCP_SYNC_KEY, /* sdu[0]: 同步帧的秘钥*/
+        (xwu8_t)'X', /* sdu[0]: protocol head 0 */
+        (xwu8_t)'W', /* sdu[1]: protocol head 1 */
+        (xwu8_t)'P', /* sdu[2]: protocol head 2 */
+        (xwu8_t)'C', /* sdu[3]: protocol head 3 */
+        (xwu8_t)'P', /* sdu[4]: protocol head 4 */
+        (xwu8_t)XWPCP_VERSION_MAJOR, /* sdu[5]: major version */
+        (xwu8_t)XWPCP_VERSION_MINOR, /* sdu[6]: minor version */
+        (xwu8_t)XWPCP_VERSION_REVISION, /* sdu[7]: revision */
+        (xwu8_t)XWPCP_SYNC_KEY, /* sdu[8]: 同步秘钥 */
         /* 以下数据需依据实际情况填充 */
-        (xwu8_t)0, /* sdu[1]: 发送计数器：第一字节（最高有效字节） */
-        (xwu8_t)0, /* sdu[2]: 发送计数器：第二字节 */
-        (xwu8_t)0, /* sdu[3]: 发送计数器：第三字节 */
-        (xwu8_t)0, /* sdu[4]: 发送计数器：第四字节（第低有效字节） */
+        (xwu8_t)0, /* sdu[9]: 发送计数器：第一字节（最高有效字节） */
+        (xwu8_t)0, /* sdu[10]: 发送计数器：第二字节 */
+        (xwu8_t)0, /* sdu[11]: 发送计数器：第三字节 */
+        (xwu8_t)0, /* sdu[12]: 发送计数器：第四字节（第低有效字节） */
         (xwu8_t)0, /* CRC32 第一字节（最高有效字节） */
         (xwu8_t)0, /* CRC32 第二字节 */
         (xwu8_t)0, /* CRC32 第三字节 */
@@ -74,18 +82,26 @@ __xwmd_rodata const xwu8_t xwpcp_cfrm_sync[] = {
 /**
  * @brief 控制帧模板：同步应答帧
  */
-__xwmd_rodata const xwu8_t xwpcp_cfrm_syncack[] = {
+__xwmd_rodata const xwu8_t xwpcp_cfrm_sync_ack[] = {
         (xwu8_t)XWPCP_HWIFAL_SOF,
-        (xwu8_t)0xD, /* 帧长度 */
-        (xwu8_t)0xB0, /* 帧长度的镜像反转 */
+        (xwu8_t)0x15, /* 帧长度 */
+        (xwu8_t)0xA8, /* 帧长度的镜像反转 */
         (xwu8_t)(XWPCP_QOS(1) | XWPCP_PORT_CMD), /* 端口:0，QoS:1 */
         (xwu8_t)(XWPCP_ID_SYNC | XWPCP_ID_ACK), /* 同步应答帧的id */
-        (xwu8_t)XWPCP_SYNC_KEY, /* sdu[0]: 同步应答帧的秘钥 */
+        (xwu8_t)'X', /* sdu[0]: protocol head 0 */
+        (xwu8_t)'W', /* sdu[1]: protocol head 1 */
+        (xwu8_t)'P', /* sdu[2]: protocol head 2 */
+        (xwu8_t)'C', /* sdu[3]: protocol head 3 */
+        (xwu8_t)'P', /* sdu[4]: protocol head 4 */
+        (xwu8_t)XWPCP_VERSION_MAJOR, /* sdu[5]: major version */
+        (xwu8_t)XWPCP_VERSION_MINOR, /* sdu[6]: minor version */
+        (xwu8_t)XWPCP_VERSION_REVISION, /* sdu[7]: revision */
+        (xwu8_t)XWPCP_SYNC_KEY, /* sdu[8]: 同步应答帧的秘钥 */
         /* 以下数据需依据实际情况填充 */
-        (xwu8_t)0, /* sdu[1]: 接收计数器：第一字节（最高有效字节） */
-        (xwu8_t)0, /* sdu[2]: 接收计数器：第二字节 */
-        (xwu8_t)0, /* sdu[3]: 接收计数器：第三字节 */
-        (xwu8_t)0, /* sdu[4]: 接收计数器：第四字节（第低有效字节） */
+        (xwu8_t)0, /* sdu[9]: 接收计数器：第一字节（最高有效字节） */
+        (xwu8_t)0, /* sdu[10]: 接收计数器：第二字节 */
+        (xwu8_t)0, /* sdu[11]: 接收计数器：第三字节 */
+        (xwu8_t)0, /* sdu[12]: 接收计数器：第四字节（第低有效字节） */
         (xwu8_t)0, /* CRC32 第一字节（最高有效字节） */
         (xwu8_t)0, /* CRC32 第二字节 */
         (xwu8_t)0, /* CRC32 第三字节 */
@@ -101,7 +117,7 @@ __xwmd_rodata const xwu8_t xwpcp_frm_sdu_ack[] = {
         (xwu8_t)0x9, /* 帧长度 */
         (xwu8_t)0x90, /* 帧长度的镜像反转 */
         /* 以下数据需依据实际情况填充 */
-        (xwu8_t)XWPCP_QOS(1), /* 端口与Qos(1) */
+        (xwu8_t)XWPCP_QOS(1), /* 端口、Qos */
         (xwu8_t)XWPCP_ID_ACK, /* id | XWPCP_ID_ACK */
         (xwu8_t)0, /* sdu[0]: 应答 */
         (xwu8_t)0, /* CRC32 第一字节（最高有效字节） */
@@ -133,7 +149,7 @@ static __xwmd_code
 xwer_t xwpcp_tx_cfrm_sync(struct xwpcp * xwpcp);
 
 static __xwmd_code
-xwer_t xwpcp_tx_cfrm_syncack(struct xwpcp * xwpcp, xwu32_t rxcnt);
+xwer_t xwpcp_tx_cfrm_sync_ack(struct xwpcp * xwpcp, xwu32_t rxcnt);
 
 static __xwmd_code
 xwer_t xwpcp_tx_frm_sdu_ack(struct xwpcp * xwpcp, xwu8_t port, xwu8_t id, xwu8_t ack);
@@ -153,7 +169,7 @@ static __xwmd_code
 xwer_t xwpcp_rx_cfrm_sync(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot);
 
 static __xwmd_code
-xwer_t xwpcp_rx_cfrm_syncack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot);
+xwer_t xwpcp_rx_cfrm_sync_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot);
 
 static __xwmd_code
 xwer_t xwpcp_rx_frm_sdu(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot);
@@ -284,21 +300,6 @@ struct xwpcp_frmslot * xwpcp_txq_choose(struct xwpcp * xwpcp)
  * @brief 发送同步帧
  * @param xwpcp: (I) XWPCP对象的指针
  * @return 错误码
- * @note
- * + 同步帧：
- *   - (xwu8_t)0xD, 帧长度
- *   - (xwu8_t)0xB0, 帧长度的镜像反转
- *   - (xwu8_t)(XWPCP_QOS(1) | XWPCP_PORT_CMD), 端口:XWPCP_PORT_CMD，QoS:1
- *   - (xwu8_t)XWPCP_ID_SYNC, 同步帧的id
- *   - (xwu8_t)XWPCP_SYNC_KEY, sdu[0], 同步帧的秘钥
- *   - (xwu8_t)sdu[1], 发送计数器第一字节（最高有效字节）
- *   - (xwu8_t)sdu[2], 发送计数器第二字节
- *   - (xwu8_t)sdu[3], 发送计数器第三字节
- *   - (xwu8_t)sdu[4], 发送计数器第四字节（第低有效字节）
- *   - (xwu8_t)CRC32 第一字节（最高有效字节）
- *   - (xwu8_t)CRC32 第二字节
- *   - (xwu8_t)CRC32 第三字节
- *   - (xwu8_t)CRC32 第四字节（第低有效字节）
  */
 static __xwmd_code
 xwer_t xwpcp_tx_cfrm_sync(struct xwpcp * xwpcp)
@@ -316,16 +317,16 @@ xwer_t xwpcp_tx_cfrm_sync(struct xwpcp * xwpcp)
         if (XWPCP_ID_SYNC == XWPCP_ID(txcnt)) {
                 xwpcplogf(DEBUG, "TX SYNC frame.\n");
                 memcpy(frm, xwpcp_cfrm_sync, sizeof(xwpcp_cfrm_sync));
-                frm->sdu[1] = (xwu8_t)((txcnt >> 24U) & 0xFFU);
-                frm->sdu[2] = (xwu8_t)((txcnt >> 16U) & 0xFFU);
-                frm->sdu[3] = (xwu8_t)((txcnt >> 8U) & 0xFFU);
-                frm->sdu[4] = (xwu8_t)((txcnt >> 0U) & 0xFFU);
+                frm->sdu[9] = (xwu8_t)((txcnt >> 24U) & 0xFFU);
+                frm->sdu[10] = (xwu8_t)((txcnt >> 16U) & 0xFFU);
+                frm->sdu[11] = (xwu8_t)((txcnt >> 8U) & 0xFFU);
+                frm->sdu[12] = (xwu8_t)((txcnt >> 0U) & 0xFFU);
                 infolen = frm->head.frmlen - XWPCP_CHKSUM_SIZE;
                 crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
-                frm->sdu[5] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
-                frm->sdu[6] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
-                frm->sdu[7] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
-                frm->sdu[8] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
+                frm->sdu[13] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
+                frm->sdu[14] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
+                frm->sdu[15] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
+                frm->sdu[16] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
                 csmtxid = xwosal_mtx_get_id(&xwpcp->txq.csmtx);
                 rc = xwosal_mtx_lock(csmtxid);
                 if (OK == rc) {
@@ -343,26 +344,11 @@ xwer_t xwpcp_tx_cfrm_sync(struct xwpcp * xwpcp)
  * @param xwpcp: (I) XWPCP对象的指针
  * @param rxcnt: (I) 应答接收计数器
  * @return 错误码
- * @note
- * + 同步应答帧：
- *   - (xwu8_t)0xD, 帧长度
- *   - (xwu8_t)0xB0, 帧长度的镜像反转
- *   - (xwu8_t)(XWPCP_QOS(1) | XWPCP_PORT_CMD), 端口:XWPCP_PORT_CMD，QoS:1
- *   - (xwu8_t)(XWPCP_ID_SYNC | XWPCP_ID_ACK), 同步应答帧的id
- *   - (xwu8_t)XWPCP_SYNC_KEY, sdu[0], 同步应答帧的秘钥
- *   - (xwu8_t)sdu[1], 接收计数器：第一字节（最高有效字节）
- *   - (xwu8_t)sdu[2], 接收计数器：第二字节
- *   - (xwu8_t)sdu[3], 接收计数器：第三字节
- *   - (xwu8_t)sdu[4], 接收计数器：第四字节（第低有效字节）
- *   - (xwu8_t)CRC32 第一字节（最高有效字节）
- *   - (xwu8_t)CRC32 第二字节
- *   - (xwu8_t)CRC32 第三字节
- *   - (xwu8_t)CRC32 第四字节（第低有效字节）
  */
 static __xwmd_code
-xwer_t xwpcp_tx_cfrm_syncack(struct xwpcp * xwpcp, xwu32_t rxcnt)
+xwer_t xwpcp_tx_cfrm_sync_ack(struct xwpcp * xwpcp, xwu32_t rxcnt)
 {
-        xwu8_t stream[sizeof(xwpcp_cfrm_syncack)];
+        xwu8_t stream[sizeof(xwpcp_cfrm_sync_ack)];
         struct xwpcp_frame * frm;
         xwid_t csmtxid;
         xwsz_t infolen;
@@ -371,17 +357,17 @@ xwer_t xwpcp_tx_cfrm_syncack(struct xwpcp * xwpcp, xwu32_t rxcnt)
 
         xwpcplogf(DEBUG, "TX SYNC-ACK frame.\n");
         frm = (struct xwpcp_frame *)stream;
-        memcpy(frm, xwpcp_cfrm_syncack, sizeof(xwpcp_cfrm_syncack));
-        frm->sdu[1] = (xwu8_t)((rxcnt >> 24U) & 0xFFU);
-        frm->sdu[2] = (xwu8_t)((rxcnt >> 16U) & 0xFFU);
-        frm->sdu[3] = (xwu8_t)((rxcnt >> 8U) & 0xFFU);
-        frm->sdu[4] = (xwu8_t)((rxcnt >> 0U) & 0xFFU);
+        memcpy(frm, xwpcp_cfrm_sync_ack, sizeof(xwpcp_cfrm_sync_ack));
+        frm->sdu[9] = (xwu8_t)((rxcnt >> 24U) & 0xFFU);
+        frm->sdu[10] = (xwu8_t)((rxcnt >> 16U) & 0xFFU);
+        frm->sdu[11] = (xwu8_t)((rxcnt >> 8U) & 0xFFU);
+        frm->sdu[12] = (xwu8_t)((rxcnt >> 0U) & 0xFFU);
         infolen = frm->head.frmlen - XWPCP_CHKSUM_SIZE;
         crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
-        frm->sdu[5] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
-        frm->sdu[6] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
-        frm->sdu[7] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
-        frm->sdu[8] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
+        frm->sdu[13] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
+        frm->sdu[14] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
+        frm->sdu[15] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
+        frm->sdu[16] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
         csmtxid = xwosal_mtx_get_id(&xwpcp->txq.csmtx);
         rc = xwosal_mtx_lock(csmtxid);
         if (OK == rc) {
@@ -399,17 +385,6 @@ xwer_t xwpcp_tx_cfrm_syncack(struct xwpcp * xwpcp, xwu32_t rxcnt)
  * @param id: (I) 应答远端消息的id
  * @param ack: (I) 应答
  * @return 错误码
- * @note
- * + 数据应答帧：
- *   - (xwu8_t)0x9, 帧长度
- *   - (xwu8_t)0x90, 帧长度的镜像反转
- *   - (xwu8_t)(端口 | QoS(1))
- *   - (xwu8_t)(id | XWPCP_ID_ACK)
- *   - (xwu8_t)sdu[0], 应答
- *   - (xwu8_t)CRC32 第一字节（最高有效字节）
- *   - (xwu8_t)CRC32 第二字节
- *   - (xwu8_t)CRC32 第三字节
- *   - (xwu8_t)CRC32 第四字节（第低有效字节）
  */
 static __xwmd_code
 xwer_t xwpcp_tx_frm_sdu_ack(struct xwpcp * xwpcp, xwu8_t port, xwu8_t id, xwu8_t ack)
@@ -662,38 +637,35 @@ struct xwpcp_frmslot * xwpcp_rxq_choose(struct xwpcp * xwpcp, xwu8_t port)
  * @param xwpcp: (I) XWPCP对象的指针
  * @param frmslot: (I) 接收到的帧的帧槽指针
  * @return 错误码
- * @note
- * + 同步帧：
- *   - (xwu8_t)0xD, 帧长度
- *   - (xwu8_t)0xB0, 帧长度的镜像反转
- *   - (xwu8_t)(XWPCP_QOS(1) | XWPCP_PORT_CMD), 端口:XWPCP_PORT_CMD，QoS:1
- *   - (xwu8_t)XWPCP_ID_SYNC, 同步帧的id
- *   - (xwu8_t)XWPCP_SYNC_KEY, sdu[0], 同步帧的秘钥
- *   - (xwu8_t)sdu[1], 发送计数器第一字节（最高有效字节）
- *   - (xwu8_t)sdu[2], 发送计数器第二字节
- *   - (xwu8_t)sdu[3], 发送计数器第三字节
- *   - (xwu8_t)sdu[4], 发送计数器第四字节（第低有效字节）
- *   - (xwu8_t)CRC32 第一字节（最高有效字节）
- *   - (xwu8_t)CRC32 第二字节
- *   - (xwu8_t)CRC32 第三字节
- *   - (xwu8_t)CRC32 第四字节（第低有效字节）
  */
 static __xwmd_code
 xwer_t xwpcp_rx_cfrm_sync(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
 {
         xwer_t rc;
         xwu32_t rmttxcnt;
+        char proto[6];
 
-        xwpcplogf(DEBUG, "id:0x%X, key:0x%X\n",
-                  frmslot->frm.head.id, frmslot->frm.sdu[0]);
+        proto[0] = frmslot->frm.sdu[0];
+        proto[1] = frmslot->frm.sdu[1];
+        proto[2] = frmslot->frm.sdu[2];
+        proto[3] = frmslot->frm.sdu[3];
+        proto[4] = frmslot->frm.sdu[4];
+        proto[5] = '\0';
+        xwpcplogf(DEBUG, "proto:%s-%d.%d.%d, key:0x%X\n",
+                  proto,
+                  frmslot->frm.sdu[5], frmslot->frm.sdu[6], frmslot->frm.sdu[7],
+                  frmslot->frm.sdu[8]);
         if (((XWPCP_PORT_CMD | XWPCP_QOS(1)) == frmslot->frm.head.port) &&
-            (XWPCP_ID_SYNC == frmslot->frm.head.id) &&
-            (XWPCP_SYNC_KEY == frmslot->frm.sdu[0])) {
-                rmttxcnt = ((xwu32_t)frmslot->frm.sdu[1]) << 24U;
-                rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[2]) << 16U;
-                rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[3]) << 8U;
-                rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[4]) << 0U;
-                rc = xwpcp_tx_cfrm_syncack(xwpcp, rmttxcnt);
+            (0 == strcmp(proto, "XWPCP")) &&
+            (XWPCP_VERSION_MAJOR == frmslot->frm.sdu[5]) &&
+            (XWPCP_VERSION_MINOR == frmslot->frm.sdu[6]) &&
+            (XWPCP_VERSION_REVISION == frmslot->frm.sdu[7]) &&
+            (XWPCP_SYNC_KEY == frmslot->frm.sdu[8])) {
+                rmttxcnt = ((xwu32_t)frmslot->frm.sdu[9]) << 24U;
+                rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[10]) << 16U;
+                rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[11]) << 8U;
+                rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[12]) << 0U;
+                rc = xwpcp_tx_cfrm_sync_ack(xwpcp, rmttxcnt);
                 if (OK == rc) {
                         xwaop_write(xwu32_t, &xwpcp->rxq.cnt, rmttxcnt + 1, NULL);
                 }/* else {} */
@@ -709,36 +681,40 @@ xwer_t xwpcp_rx_cfrm_sync(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
  * @param xwpcp: (I) XWPCP对象的指针
  * @param frmslot: (I) 接收到的帧的帧槽指针
  * @return 错误码
- * @note
- * + 同步应答帧：
- *   - (xwu8_t)0xD, 帧长度
- *   - (xwu8_t)0xB0, 帧长度的镜像反转
- *   - (xwu8_t)(XWPCP_QOS(1) | XWPCP_PORT_CMD), 端口:XWPCP_PORT_CMD，QoS:1
- *   - (xwu8_t)(XWPCP_ID_SYNC | XWPCP_ID_ACK), 同步应答帧的id
- *   - (xwu8_t)XWPCP_SYNC_KEY, sdu[0], 同步应答帧的秘钥
- *   - (xwu8_t)sdu[1], 接收计数器：第一字节（最高有效字节）
- *   - (xwu8_t)sdu[2], 接收计数器：第二字节
- *   - (xwu8_t)sdu[3], 接收计数器：第三字节
- *   - (xwu8_t)sdu[4], 接收计数器：第四字节（第低有效字节）
- *   - (xwu8_t)CRC32 第一字节（最高有效字节）
- *   - (xwu8_t)CRC32 第二字节
- *   - (xwu8_t)CRC32 第三字节
- *   - (xwu8_t)CRC32 第四字节（第低有效字节）
  */
 static __xwmd_code
-xwer_t xwpcp_rx_cfrm_syncack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
+xwer_t xwpcp_rx_cfrm_sync_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
 {
         xwu32_t txcnt;
         xwu32_t rmtrxcnt;
+        char proto[6];
 
-        xwpcplogf(DEBUG, "id:0x%X, key:0x%X\n",
-                  frmslot->frm.head.id, frmslot->frm.sdu[0]);
-        rmtrxcnt = ((xwu32_t)frmslot->frm.sdu[1]) << 24U;
-        rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[2]) << 16U;
-        rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[3]) << 8U;
-        rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[4]) << 0U;
+        proto[0] = frmslot->frm.sdu[0];
+        proto[1] = frmslot->frm.sdu[1];
+        proto[2] = frmslot->frm.sdu[2];
+        proto[3] = frmslot->frm.sdu[3];
+        proto[4] = frmslot->frm.sdu[4];
+        proto[5] = '\0';
+
+        rmtrxcnt = ((xwu32_t)frmslot->frm.sdu[9]) << 24U;
+        rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[10]) << 16U;
+        rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[11]) << 8U;
+        rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[12]) << 0U;
         xwaop_read(xwu32_t, &xwpcp->txq.cnt, &txcnt);
-        if (rmtrxcnt == txcnt) {
+
+        xwpcplogf(DEBUG, "proto:%s-%d.%d.%d, key:0x%X, remote:%d, local:%d\n",
+                  proto,
+                  frmslot->frm.sdu[5], frmslot->frm.sdu[6], frmslot->frm.sdu[7],
+                  frmslot->frm.sdu[8],
+                  rmtrxcnt, txcnt);
+
+        if (((XWPCP_PORT_CMD | XWPCP_QOS(1)) == frmslot->frm.head.port) &&
+            (0 == strcmp(proto, "XWPCP")) &&
+            (XWPCP_VERSION_MAJOR == frmslot->frm.sdu[5]) &&
+            (XWPCP_VERSION_MINOR == frmslot->frm.sdu[6]) &&
+            (XWPCP_VERSION_REVISION == frmslot->frm.sdu[7]) &&
+            (XWPCP_SYNC_KEY == frmslot->frm.sdu[8]) &&
+            (rmtrxcnt == txcnt)) {
                 xwaop_add(xwu32_t, &xwpcp->txq.cnt, 1, NULL, NULL);
                 xwpcp_hwifal_notify(xwpcp, XWPCP_HWIFNTF_CONNECT);
         }/* else {} */
@@ -812,17 +788,6 @@ xwer_t xwpcp_rx_frm_sdu(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
  * @param xwpcp: (I) XWPCP对象的指针
  * @param frmslot: (I) 接收到的帧的帧槽指针
  * @return 错误码
- * @note
- * + 数据应答帧：
- *   - (xwu8_t)0x9, 帧长度
- *   - (xwu8_t)0x90, 帧长度的镜像反转
- *   - (xwu8_t)(端口 | QoS)
- *   - (xwu8_t)(id | XWPCP_ID_ACK)
- *   - (xwu8_t)sdu[0], 应答
- *   - (xwu8_t)CRC32 第一字节（最高有效字节）
- *   - (xwu8_t)CRC32 第二字节
- *   - (xwu8_t)CRC32 第三字节
- *   - (xwu8_t)CRC32 第四字节（第低有效字节）
  */
 static __xwmd_code
 xwer_t xwpcp_rx_frm_sdu_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
@@ -883,7 +848,7 @@ xwer_t xwpcp_rx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                 rc = xwpcp_rx_cfrm_sync(xwpcp, frmslot);
                 break;
         case (XWPCP_ID_SYNC | XWPCP_ID_ACK):
-                rc = xwpcp_rx_cfrm_syncack(xwpcp, frmslot);
+                rc = xwpcp_rx_cfrm_sync_ack(xwpcp, frmslot);
                 break;
         default:
                 if (XWPCP_ID_ACK & id) {
