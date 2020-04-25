@@ -29,6 +29,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <linux/irqflags.h>
+#include <linux/preempt.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
@@ -67,6 +68,23 @@ static __xw_inline
 void xwos_cpuirq_save_lc(xwreg_t * flag)
 {
         local_irq_save(*flag);
+}
+
+static __xw_inline
+xwer_t xwos_irq_get_id(xwirq_t * irqnbuf)
+{
+        xwer_t rc;
+
+        if (in_interrupt()) {
+                if (in_irq()) {
+                        rc = OK;
+                } else {
+                        rc = -EINBH;
+                }
+        } else {
+                rc = -EINTHRD;
+        }
+        return rc;
 }
 
 #endif /* xwos/core/irq.h */

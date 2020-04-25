@@ -28,18 +28,22 @@
 #define OK              0
 #define EEMPTY          180     /* is empty */
 #define ETYPE           181     /* type error */
-#define EOWNER          182     /* owner error */
-#define EALIGN          183     /* not aligned */
-#define E2SMALL         184     /* too small */
-#define EDEAD           185     /* already dead */
-#define ENEGATIVE       186     /* negative resource */
-#define ENOTINISR       187     /* not in isr */
+#define EINTHRD         182     /* in Thread mode */
+#define ENOTINTHRD      183     /* not in Thread mode */
+#define EINBH           184     /* in Bottom Half */
+#define ENOTINBH        185     /* not in Bottom Half */
+#define EINISR          186     /* in ISR */
+#define ENOTINISR       187     /* not in ISR */
 #define EBUG            188     /* is a BUG */
 #define EEXIT           189     /* need to exit */
 #define EBADID          190     /* bad ID */
-#define ESIZE           191     /* size error */
-#define EOOR            192     /* out of range */
-#define EOBJDEAD        193     /* object dead */
-#define EOBJACTIVE      194     /* object active */
+#define EOBJDEAD        191     /* object dead */
+#define EOBJACTIVE      192     /* object active */
+#define ENEGATIVE       193     /* negative resource */
+#define ESIZE           194     /* size error */
+#define E2SMALL         195     /* too small */
+#define EOOR            196     /* out of range */
+#define EALIGN          197     /* not aligned */
+#define EOWNER          198     /* owner error */
 
 #endif /* xwos/lib/errno.h */
