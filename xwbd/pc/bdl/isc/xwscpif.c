@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOSCP硬件接口层
+ * @brief XWSCP硬件接口层
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -35,7 +35,7 @@
 #include <bdl/isc/xwscpif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********           SOSCP HW hwifal            ******** ********
+ ******** ********           XWSCP HW hwifal            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** static function prototypes ******** ********/
 static
@@ -65,7 +65,7 @@ const struct xwscp_hwifal_operations bdl_xwscpif_ops = {
 
 /* hwifal device */
 struct ktermios bdl_xwscpif_dev_termios = {
-        .c_cflag = CREAD | HUPCL | CLOCAL | CS8 | BRDCFG_SOSCPIF_UART_BAUDRATE,
+        .c_cflag = CREAD | HUPCL | CLOCAL | CS8 | BRDCFG_XWSCPIF_UART_BAUDRATE,
         .c_iflag = IGNBRK | IGNPAR,
         .c_oflag = 0,
         .c_lflag = 0,
@@ -168,6 +168,6 @@ xwer_t bdl_xwscpif_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size)
 static
 void bdl_xwscpif_notify(struct xwscp *xwscp, xwsq_t evt)
 {
-        if (SOSCP_HWIFNTF_NETUNREACH == evt) {
+        if (XWSCP_HWIFNTF_NETUNREACH == evt) {
         }
 }

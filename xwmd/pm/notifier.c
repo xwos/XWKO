@@ -39,7 +39,7 @@ void xwmd_pm_notify(unsigned long pmevt)
                 }
 #endif
 #if defined(XWMDCFG_isc_xwscp) && (1 == XWMDCFG_isc_xwscp)
-                if (USI_SOSCP_STATE_START == usi_xwscp_get_state()) {
+                if (USI_XWSCP_STATE_START == usi_xwscp_get_state()) {
                         xwosal_thrd_intr(usi_xwscp_thrd);
                 }
 #endif

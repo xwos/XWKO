@@ -41,14 +41,14 @@
  * @brief 空白帧
  */
 __xwmd_rodata const xwu8_t xwscp_frm_blank[] = {
-        (xwu8_t)SOSCP_HWIFAL_EOF,
-        (xwu8_t)SOSCP_HWIFAL_EOF,
-        (xwu8_t)SOSCP_HWIFAL_EOF,
-        (xwu8_t)SOSCP_HWIFAL_EOF,
-        (xwu8_t)SOSCP_HWIFAL_EOF,
-        (xwu8_t)SOSCP_HWIFAL_EOF,
-        (xwu8_t)SOSCP_HWIFAL_EOF,
-        (xwu8_t)SOSCP_HWIFAL_EOF,
+        (xwu8_t)XWSCP_HWIFAL_EOF,
+        (xwu8_t)XWSCP_HWIFAL_EOF,
+        (xwu8_t)XWSCP_HWIFAL_EOF,
+        (xwu8_t)XWSCP_HWIFAL_EOF,
+        (xwu8_t)XWSCP_HWIFAL_EOF,
+        (xwu8_t)XWSCP_HWIFAL_EOF,
+        (xwu8_t)XWSCP_HWIFAL_EOF,
+        (xwu8_t)XWSCP_HWIFAL_EOF,
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -60,7 +60,7 @@ __xwmd_rodata const xwu8_t xwscp_frm_blank[] = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 打开硬件接口
- * @param xwscp: (I) SOSCP对象的指针
+ * @param xwscp: (I) XWSCP对象的指针
  * @return 错误码
  */
 __xwmd_code
@@ -73,13 +73,13 @@ xwer_t xwscp_hwifal_open(struct xwscp * xwscp)
         } else {
                 rc = OK;
         }
-        xwscp->hwifst = SOSCP_HWIFST_OPENED;
+        xwscp->hwifst = XWSCP_HWIFST_OPENED;
         return rc;
 }
 
 /**
  * @brief 关闭硬件接口
- * @param xwscp: (I) SOSCP对象的指针
+ * @param xwscp: (I) XWSCP对象的指针
  * @return 错误码
  */
 __xwmd_code
@@ -93,14 +93,14 @@ xwer_t xwscp_hwifal_close(struct xwscp * xwscp)
                 rc = OK;
         }
         if (OK == rc) {
-                xwscp->hwifst = SOSCP_HWIFST_CLOSED;
+                xwscp->hwifst = XWSCP_HWIFST_CLOSED;
         }
         return rc;
 }
 
 /**
  * @brief 通过硬件接口发送一帧
- * @param xwscp: (I) SOSCP对象的指针
+ * @param xwscp: (I) XWSCP对象的指针
  * @param frm: (I) 指向发送帧缓冲区的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
@@ -120,7 +120,7 @@ xwer_t xwscp_hwifal_tx(struct xwscp * xwscp, struct xwscp_frame * frm, xwtm_t * 
 
 /**
  * @brief 通过硬件接口接收一帧
- * @param xwscp: (I) SOSCP对象的指针
+ * @param xwscp: (I) XWSCP对象的指针
  * @param frmslotbuf: (O) 指向缓冲区的指针，通过此缓冲区返回struct xwscp_frmslot *
  * @return 错误码
  */
@@ -145,7 +145,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
                 if (__unlikely(rc < 0)) {
                         goto err_sof_ifrx;
                 }
-        } while (SOSCP_HWIFAL_SOF != delimiter);
+        } while (XWSCP_HWIFAL_SOF != delimiter);
 
         /* 接收head */
         do {
@@ -161,12 +161,12 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
                         }
                         rest -= (xwssz_t)rxsize;
                 } while (rest > 0);
-                if (SOSCP_HWIFAL_SOF == stream.data[0]) {
-                        if (SOSCP_HWIFAL_EOF == stream.data[1]) {
+                if (XWSCP_HWIFAL_SOF == stream.data[0]) {
+                        if (XWSCP_HWIFAL_EOF == stream.data[1]) {
                                 total = sizeof(struct xwscp_frmhead);
                                 rest = (xwssz_t)total - 2;
                                 break;
-                        } else if (SOSCP_HWIFAL_SOF == stream.data[1]) {
+                        } else if (XWSCP_HWIFAL_SOF == stream.data[1]) {
                                 /* continue; */
                         } else {
                                 total = sizeof(struct xwscp_frmhead);
@@ -191,6 +191,10 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
                 rest -= (xwssz_t)rxsize;
         } while (rest > 0);
         if (stream.head.frmlen != xwbop_rbit(xwu8_t, stream.head.mirror)) {
+                rc = -EAGAIN;
+                goto err_head_ifrx;
+        }
+        if (stream.head.frmlen < (sizeof(struct xwscp_frmhead) + XWSCP_CHKSUM_SIZE)) {
                 rc = -EAGAIN;
                 goto err_head_ifrx;
         }
@@ -223,7 +227,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
         if (__unlikely(rc < 0)) {
                 goto err_eof_ifrx;
         }
-        if (SOSCP_HWIFAL_EOF != delimiter) {
+        if (XWSCP_HWIFAL_EOF != delimiter) {
                 rc = -EAGAIN;
                 goto err_eof_ifrx;
         }
@@ -241,13 +245,13 @@ err_sof_ifrx:
 
 /**
  * @brief 通知协议层的事件到硬件接口层
- * @param xwscp: (I) SOSCP对象的指针
+ * @param xwscp: (I) XWSCP对象的指针
  * @param evt: (I) 事件
  */
 __xwmd_code
 void xwscp_hwifal_notify(struct xwscp * xwscp, xwsq_t evt, xwtm_t * xwtm)
 {
-        if (SOSCP_HWIFNTF_NETUNREACH == evt) {
+        if (XWSCP_HWIFNTF_NETUNREACH == evt) {
                 xwscp->hwifops->tx(xwscp, xwscp_frm_blank,
                                    sizeof(xwscp_frm_blank),
                                    xwtm);

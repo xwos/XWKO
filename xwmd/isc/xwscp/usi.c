@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Linux内核中SOSCP的适配层
+ * @brief Linux内核中XWSCP的适配层
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -40,10 +40,10 @@
 #include <xwmd/isc/xwscp/usi.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********            SOSCP resrouces            ******** ********
+ ******** ********            XWSCP resrouces            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** macros ******** ********/
-#define USI_SOSCP_THRD_PRIORITY          \
+#define USI_XWSCP_THRD_PRIORITY          \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 20)
 
 /******** ******** .data ******** ********/
@@ -205,10 +205,10 @@ ssize_t usi_xwscp_sysfs_cmd_store(struct xwsys_object *xwobj,
 /******** ******** macros ******** ********/
 
 /******** ******** .data ******** ********/
-xwsq_t usi_xwscp_state = USI_SOSCP_STATE_STOP;
+xwsq_t usi_xwscp_state = USI_XWSCP_STATE_STOP;
 
 /**
- * @brief Get SOSCP state
+ * @brief Get XWSCP state
  */
 xwsq_t usi_xwscp_get_state(void)
 {
@@ -221,7 +221,7 @@ xwer_t usi_xwscp_start(void)
         xwid_t tcbd;
 
         tcbd = 0;
-        if (USI_SOSCP_STATE_START == usi_xwscp_state) {
+        if (USI_XWSCP_STATE_START == usi_xwscp_state) {
                 rc = -EALREADY;
                 goto err_already;
         }
@@ -275,7 +275,7 @@ xwer_t usi_xwscp_start(void)
         rc = xwosal_thrd_create(&tcbd, "xwscp_thread",
                                 (xwosal_thrd_f)xwscp_thrd,
                                 &usi_xwscp, XWOS_UNUSED_ARGUMENT,
-                                USI_SOSCP_THRD_PRIORITY,
+                                USI_XWSCP_THRD_PRIORITY,
                                 XWOS_UNUSED_ARGUMENT);
         if (__unlikely(rc < 0)) {
                 xwscplogf(ERR, "Create xwscp tx thread ... [Failed], errno %d\n", rc);
@@ -284,7 +284,7 @@ xwer_t usi_xwscp_start(void)
         usi_xwscp_thrd = tcbd;
         xwscplogf(INFO, "Create xwscp daemon thread ... [OK]\n");
 
-        usi_xwscp_state = USI_SOSCP_STATE_START;
+        usi_xwscp_state = USI_XWSCP_STATE_START;
 
         return OK;
 
@@ -311,7 +311,7 @@ xwer_t usi_xwscp_stop(void)
 {
         xwer_t rc;
 
-        if (USI_SOSCP_STATE_START != usi_xwscp_state) {
+        if (USI_XWSCP_STATE_START != usi_xwscp_state) {
                 rc = -EPERM;
                 goto err_notstart;
         }
@@ -345,7 +345,7 @@ xwer_t usi_xwscp_stop(void)
         xwfs_rmdir(usi_xwscp_xwfs);
         usi_xwscp_xwfs = NULL;
         xwfs_giveup();
-        usi_xwscp_state = USI_SOSCP_STATE_STOP;
+        usi_xwscp_state = USI_XWSCP_STATE_STOP;
 
         return OK;
 

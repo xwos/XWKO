@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Linux内核中SOSCP的适配层
+ * @brief Linux内核中XWSCP的适配层
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -44,13 +44,13 @@ struct xwscp_usmsg {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define USI_SOSCP_STATE_STOP             0
-#define USI_SOSCP_STATE_START            1
+#define USI_XWSCP_STATE_STOP             0
+#define USI_XWSCP_STATE_START            1
 
-#define UAPI_SOSCP_IOC_MAGIC             's'
-#define UAPI_SOSCP_IOC_TX                _IOC(_IOC_WRITE, UAPI_SOSCP_IOC_MAGIC, 0, \
+#define UAPI_XWSCP_IOC_MAGIC             's'
+#define UAPI_XWSCP_IOC_TX                _IOC(_IOC_WRITE, UAPI_XWSCP_IOC_MAGIC, 0, \
                                               sizeof(struct xwscp_usmsg))
-#define UAPI_SOSCP_IOC_RX                _IOC(_IOC_READ, UAPI_SOSCP_IOC_MAGIC, 0, \
+#define UAPI_XWSCP_IOC_RX                _IOC(_IOC_READ, UAPI_XWSCP_IOC_MAGIC, 0, \
                                               sizeof(struct xwscp_usmsg))
 
 /******** ******** ******** ******** ******** ******** ******** ********

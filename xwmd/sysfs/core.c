@@ -333,7 +333,7 @@ ssize_t xwsys_attr_state_show(struct kobject *kobj,
                         "XWPCP: %s\n"
 #endif
 #if defined(XWMDCFG_isc_xwscp) && (1 == XWMDCFG_isc_xwscp)
-                        "SOSCP: %s\n"
+                        "XWSCP: %s\n"
 #endif
                         ,
                         xwfs_is_started() ? "ON" : "OFF"
@@ -341,7 +341,7 @@ ssize_t xwsys_attr_state_show(struct kobject *kobj,
                         ,(USI_XWPCP_STATE_START == usi_xwpcp_get_state())? "ON" : "OFF"
 #endif
 #if defined(XWMDCFG_isc_xwscp) && (1 == XWMDCFG_isc_xwscp)
-                        ,(USI_SOSCP_STATE_START == usi_xwscp_get_state())? "ON" : "OFF"
+                        ,(USI_XWSCP_STATE_START == usi_xwscp_get_state())? "ON" : "OFF"
 #endif
                        );
         return count;
