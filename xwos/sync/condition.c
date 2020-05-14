@@ -68,14 +68,12 @@ xwer_t xwsync_cdt_gc(void * obj);
 
 static
 xwer_t xwsync_cdt_do_wait(struct xwsync_cdt * cdt,
-                          void * lock, xwid_t lktype,
-                          void * lockdata, xwsz_t datanum,
+                          void * lock, xwid_t lktype, void * lkdata,
                           xwsq_t * lkst);
 
 static
 xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
-                               void * lock, xwid_t lktype,
-                               void * lockdata, xwsz_t datanum,
+                               void * lock, xwid_t lktype, void * lkdata,
                                xwtm_t * xwtm, xwsq_t * lkst);
 
 static
@@ -421,8 +419,7 @@ EXPORT_SYMBOL(xwsync_cdt_unicast);
 
 static
 xwer_t xwsync_cdt_do_wait(struct xwsync_cdt * cdt,
-                          void * lock, xwid_t lktype,
-                          void * lockdata, xwsz_t datanum,
+                          void * lock, xwid_t lktype, void * lkdata,
                           xwsq_t * lkst)
 {
         xwer_t rc;
@@ -430,16 +427,6 @@ xwer_t xwsync_cdt_do_wait(struct xwsync_cdt * cdt,
         struct xwsync_cdt_waiter waiter;
 
         *lkst = XWLK_STATE_LOCKED;
-        switch (lktype) {
-        case XWLK_TYPE_SPLK_IRQS:
-        case XWLK_TYPE_SQLK_RDEX_IRQS:
-        case XWLK_TYPE_SQLK_WR_IRQS:
-                rc = -ENOSYS;
-                goto err_inval;
-        default:
-                break;
-        }
-
         rc = xwsync_cdt_grab(cdt);
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
@@ -453,7 +440,7 @@ xwer_t xwsync_cdt_do_wait(struct xwsync_cdt * cdt,
         set_current_state(TASK_INTERRUPTIBLE);
         xwlib_bclst_add_tail(&cdt->wq, &waiter.node);
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
-        rc = xwos_thrd_do_unlock(lock, lktype, lockdata, datanum);
+        rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
         if (OK == rc) {
                 *lkst = XWLK_STATE_UNLOCKED;
         }
@@ -484,8 +471,7 @@ xwer_t xwsync_cdt_do_wait(struct xwsync_cdt * cdt,
         xwsync_cdt_put(cdt);
         if (OK == rc) {
                 if (XWLK_STATE_UNLOCKED == *lkst) {
-                        rc = xwos_thrd_do_lock(lock, lktype, NULL,
-                                               lockdata, datanum);
+                        rc = xwos_thrd_do_lock(lock, lktype, NULL, lkdata);
                         if (OK == rc) {
                                 *lkst = XWLK_STATE_LOCKED;
                         }
@@ -493,13 +479,11 @@ xwer_t xwsync_cdt_do_wait(struct xwsync_cdt * cdt,
         }
 
 err_cdt_grab:
-err_inval:
         return rc;
 }
 
 xwer_t xwsync_cdt_wait(struct xwsync_cdt * cdt,
-                       void * lock, xwid_t lktype,
-                       void * lockdata, xwsz_t datanum,
+                       void * lock, xwid_t lktype, void * lkdata,
                        xwsq_t * lkst)
 {
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
@@ -507,14 +491,13 @@ xwer_t xwsync_cdt_wait(struct xwsync_cdt * cdt,
         XWOS_VALIDATE(((NULL == lock) || (lktype < XWLK_TYPE_NUM)),
                       "invalid-type", -EINVAL);
 
-        return xwsync_cdt_do_wait(cdt, lock, lktype, lockdata, datanum, lkst);
+        return xwsync_cdt_do_wait(cdt, lock, lktype, lkdata, lkst);
 }
 EXPORT_SYMBOL(xwsync_cdt_wait);
 
 static
 xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
-                               void * lock, xwid_t lktype,
-                               void * lockdata, xwsz_t datanum,
+                               void * lock, xwid_t lktype, void * lkdata,
                                xwtm_t * xwtm, xwsq_t * lkst)
 {
         xwer_t rc;
@@ -531,16 +514,6 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
                 rc = -EINVAL;
                 goto err_inval;
         }
-        switch (lktype) {
-        case XWLK_TYPE_SPLK_IRQS:
-        case XWLK_TYPE_SQLK_RDEX_IRQS:
-        case XWLK_TYPE_SQLK_WR_IRQS:
-                rc = -ENOSYS;
-                goto err_inval;
-        default:
-                break;
-        }
-
         rc = xwsync_cdt_grab(cdt);
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
@@ -562,7 +535,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
         if (__unlikely(0 == *xwtm)) {
                 xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
                 xwsync_cdt_put(cdt);
-                rc = xwos_thrd_do_unlock(lock, lktype, lockdata, datanum);
+                rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
                 if (OK == rc) {
                         *lkst = XWLK_STATE_UNLOCKED;
                 }
@@ -575,7 +548,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
         hrtimer_set_expires_range_ns(&hrts.timer, expires, slack);
         hrtimer_start_expires(&hrts.timer, HRTIMER_MODE_ABS);
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
-        rc = xwos_thrd_do_unlock(lock, lktype, lockdata, datanum);
+        rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
         if (OK == rc) {
                 *lkst = XWLK_STATE_UNLOCKED;
         }
@@ -615,8 +588,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
         xwsync_cdt_put(cdt);
         if (OK == rc) {
                 if (XWLK_STATE_UNLOCKED == *lkst) {
-                        rc = xwos_thrd_do_lock(lock, lktype, xwtm,
-                                               lockdata, datanum);
+                        rc = xwos_thrd_do_lock(lock, lktype, xwtm, lkdata);
                         if (OK == rc) {
                                 *lkst = XWLK_STATE_LOCKED;
                         }
@@ -630,8 +602,7 @@ err_inval:
 }
 
 xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
-                            void * lock, xwid_t lktype,
-                            void * lockdata, xwsz_t datanum,
+                            void * lock, xwid_t lktype, void * lkdata,
                             xwtm_t * xwtm, xwsq_t * lkst)
 {
         xwer_t rc;
@@ -644,13 +615,10 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
                       "invalid-type", -EINVAL);
 
         if (xwtm_cmp(*xwtm, XWTM_MAX) == 0) {
-                rc = xwsync_cdt_do_wait(cdt, lock,
-                                        lktype, lockdata,
-                                        datanum, lkst);
+                rc = xwsync_cdt_do_wait(cdt, lock, lktype, lkdata, lkst);
         } else {
-                rc = xwsync_cdt_do_timedwait(cdt, lock,
-                                             lktype, lockdata,
-                                             datanum, xwtm, lkst);
+                rc = xwsync_cdt_do_timedwait(cdt, lock, lktype, lkdata,
+                                             xwtm, lkst);
         }
         return rc;
 }

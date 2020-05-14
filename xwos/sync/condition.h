@@ -117,14 +117,12 @@ xwer_t xwsync_cdt_unicast(struct xwsync_cdt * cdt);
 
 __xwos_api
 xwer_t xwsync_cdt_wait(struct xwsync_cdt * cdt,
-                       void * lock, xwid_t locktype,
-                       void * lockdata, xwsz_t datanum,
+                       void * lock, xwid_t locktype, void * lockdata,
                        xwsq_t * lkst);
 
 __xwos_api
 xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
-                            void * lock, xwid_t locktype,
-                            void * lockdata, xwsz_t datanum,
+                            void * lock, xwid_t locktype, void * lockdata,
                             xwtm_t * xwtm, xwsq_t * lkst);
 
 #endif /* xwos/sync/condition.h */

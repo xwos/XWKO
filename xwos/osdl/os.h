@@ -210,32 +210,6 @@ bool xwosdl_cthrd_frz_shld_stop(bool * frozen)
 }
 
 static __xw_inline
-xwer_t xwosdl_thrd_continue(xwid_t tid)
-{
-        return xwos_thrd_continue(tid);
-}
-
-static __xw_inline
-xwer_t xwosdl_cthrd_pause(union xwlk_ulock lock, xwsq_t lktype,
-                          void * lkdata, xwsz_t datanum,
-                          xwsq_t * lkst)
-{
-        /* FIXME: find lock from ID table */
-        return xwos_cthrd_pause(lock.anon, lktype, lkdata, datanum, lkst);
-}
-
-static __xw_inline
-xwer_t xwosdl_cthrd_timedpause(union xwlk_ulock lock, xwsq_t lktype,
-                               void * lkdata, xwsz_t datanum,
-                               xwtm_t * xwtm, xwsq_t * lkst)
-{
-        /* FIXME: find lock from ID table */
-        return xwos_cthrd_timedpause(lock.anon, lktype,
-                                     lkdata, datanum,
-                                     xwtm, lkst);
-}
-
-static __xw_inline
 xwer_t xwosdl_cthrd_sleep(xwtm_t * xwtm)
 {
         return xwos_cthrd_sleep(xwtm);
@@ -684,8 +658,7 @@ xwer_t xwosdl_cdt_unicast(xwid_t cdtid)
 
 static __xw_inline
 xwer_t xwosdl_cdt_wait(xwid_t cdtid,
-                       union xwlk_ulock lock, xwsq_t lktype,
-                       void * lkdata, xwsz_t datanum,
+                       union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                        xwsq_t * lkst)
 {
         struct xwosdl_cdt * cdt;
@@ -694,16 +667,14 @@ xwer_t xwosdl_cdt_wait(xwid_t cdtid,
         cdt = xwosdl_cdt_get_obj(cdtid);
         /* FIXME: find lock from ID table */
         rc = xwsync_cdt_wait(cdt,
-                             lock.anon, lktype,
-                             lkdata, datanum,
+                             lock.anon, lktype, lkdata,
                              lkst);
         return rc;
 }
 
 static __xw_inline
 xwer_t xwosdl_cdt_timedwait(xwid_t cdtid,
-                            union xwlk_ulock lock, xwsq_t lktype,
-                            void * lkdata, xwsz_t datanum,
+                            union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                             xwtm_t * xwtm, xwsq_t * lkst)
 {
         struct xwosdl_cdt * cdt;
@@ -712,10 +683,8 @@ xwer_t xwosdl_cdt_timedwait(xwid_t cdtid,
         cdt = xwosdl_cdt_get_obj(cdtid);
         /* FIXME: find lock from ID table */
         rc = xwsync_cdt_timedwait(cdt,
-                                  lock.anon, lktype,
-                                  lkdata, datanum,
-                                  xwtm,
-                                  lkst);
+                                  lock.anon, lktype, lkdata,
+                                  xwtm, lkst);
         return rc;
 }
 

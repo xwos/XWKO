@@ -84,21 +84,9 @@ xwid_t xwos_cthrd_get_id(void);
 
 xwid_t xwos_thrd_get_id(struct xwos_tcb * tcb);
 
-xwer_t xwos_thrd_do_unlock(void * lock, xwid_t lktype,
-                           void * lkdata, xwsz_t datanum);
+xwer_t xwos_thrd_do_unlock(void * lock, xwid_t lktype, void * lkdata);
 
-xwer_t xwos_thrd_do_lock(void * lock, xwid_t lktype, xwtm_t * xwtm,
-                         void * lkdata, xwsz_t datanum);
-
-xwer_t xwos_thrd_continue(xwid_t tid);
-
-xwer_t xwos_cthrd_pause(void * lock, xwid_t lktype,
-                        void * lkdata, xwsz_t datanum,
-                        xwsq_t * lkst);
-
-xwer_t xwos_cthrd_timedpause(void * lock, xwid_t lktype,
-                             void * lkdata, xwsz_t datanum,
-                             xwtm_t * xwtm, xwsq_t * lkst);
+xwer_t xwos_thrd_do_lock(void * lock, xwid_t lktype, xwtm_t * xwtm, void * lkdata);
 
 xwer_t xwos_cthrd_sleep(xwtm_t * xwtm);
 

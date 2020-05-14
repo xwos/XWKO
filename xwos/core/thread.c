@@ -199,8 +199,7 @@ xwid_t xwos_thrd_get_id(struct xwos_tcb * tcb)
 }
 EXPORT_SYMBOL(xwos_thrd_get_id);
 
-xwer_t xwos_thrd_do_unlock(void * lock, xwid_t lktype,
-                           void * lkdata, xwsz_t datanum)
+xwer_t xwos_thrd_do_unlock(void * lock, xwid_t lktype, void * lkdata)
 {
         xwer_t rc;
         union {
@@ -221,20 +220,11 @@ xwer_t xwos_thrd_do_unlock(void * lock, xwid_t lktype,
         case XWLK_TYPE_SPLK:
                 xwlk_splk_unlock(lk.sp);
                 break;
-        case XWLK_TYPE_SPLK_CPUIRQ:
-                xwlk_splk_unlock_cpuirq(lk.sp);
-                break;
         case XWLK_TYPE_SQLK_WR:
                 xwlk_sqlk_wr_unlock(lk.sq);
                 break;
-        case XWLK_TYPE_SQLK_WR_CPUIRQ:
-                xwlk_sqlk_wr_unlock_cpuirq(lk.sq);
-                break;
         case XWLK_TYPE_SQLK_RDEX:
                 xwlk_sqlk_rdex_unlock(lk.sq);
-                break;
-        case XWLK_TYPE_SQLK_RDEX_CPUIRQ:
-                xwlk_sqlk_rdex_unlock_cpuirq(lk.sq);
                 break;
         case XWLK_TYPE_CALLBACK:
                 if (lk.cb->unlock) {
@@ -247,8 +237,7 @@ xwer_t xwos_thrd_do_unlock(void * lock, xwid_t lktype,
         return rc;
 }
 
-xwer_t xwos_thrd_do_lock(void * lock, xwid_t lktype, xwtm_t * xwtm,
-                         void * lkdata, xwsz_t datanum)
+xwer_t xwos_thrd_do_lock(void * lock, xwid_t lktype, xwtm_t * xwtm, void * lkdata)
 {
         xwer_t rc;
         union {
@@ -275,20 +264,11 @@ xwer_t xwos_thrd_do_lock(void * lock, xwid_t lktype, xwtm_t * xwtm,
         case XWLK_TYPE_SPLK:
                 xwlk_splk_lock(lk.sp);
                 break;
-        case XWLK_TYPE_SPLK_CPUIRQ:
-                xwlk_splk_lock_cpuirq(lk.sp);
-                break;
         case XWLK_TYPE_SQLK_WR:
                 xwlk_sqlk_wr_lock(lk.sq);
                 break;
-        case XWLK_TYPE_SQLK_WR_CPUIRQ:
-                xwlk_sqlk_wr_lock_cpuirq(lk.sq);
-                break;
         case XWLK_TYPE_SQLK_RDEX:
                 xwlk_sqlk_rdex_lock(lk.sq);
-                break;
-        case XWLK_TYPE_SQLK_RDEX_CPUIRQ:
-                xwlk_sqlk_rdex_lock_cpuirq(lk.sq);
                 break;
         case XWLK_TYPE_CALLBACK:
                 if (lk.cb->lock) {
