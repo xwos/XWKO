@@ -484,8 +484,8 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
         xwssq_t cmprc;
         bool triggered;
         xwer_t rc;
-        XWSYNC_EVT_DECLARE_BITMAP(cur);
-        XWSYNC_EVT_DECLARE_BITMAP(tmp);
+        xwsync_evt_declare_bitmap(cur);
+        xwsync_evt_declare_bitmap(tmp);
 
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
 
@@ -653,8 +653,8 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
         xwssq_t cmprc;
         bool triggered;
         xwer_t rc;
-        XWSYNC_EVT_DECLARE_BITMAP(cur);
-        XWSYNC_EVT_DECLARE_BITMAP(tmp);
+        xwsync_evt_declare_bitmap(cur);
+        xwsync_evt_declare_bitmap(tmp);
 
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
 

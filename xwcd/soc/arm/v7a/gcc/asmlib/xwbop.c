@@ -318,7 +318,7 @@ xwu64_t arch_xwbop_re64(xwu64_t x)
 }
 EXPORT_SYMBOL(arch_xwbop_re64);
 
-xwssq_t arch_xwbmpop_ffs(xwbmp_t *bmp, xwsz_t num)
+xwssq_t xwbmpop_ffs(xwbmp_t *bmp, xwsz_t num)
 {
         xwsz_t m;
         xwsz_t i;
@@ -351,9 +351,9 @@ xwssq_t arch_xwbmpop_ffs(xwbmp_t *bmp, xwsz_t num)
         }
         return p;
 }
-EXPORT_SYMBOL(arch_xwbmpop_ffs);
+EXPORT_SYMBOL(xwbmpop_ffs);
 
-xwssq_t arch_xwbmpop_ffz(xwbmp_t *bmp, xwsz_t num)
+xwssq_t xwbmpop_ffz(xwbmp_t *bmp, xwsz_t num)
 {
         xwsz_t m;
         xwsz_t i;
@@ -387,9 +387,9 @@ xwssq_t arch_xwbmpop_ffz(xwbmp_t *bmp, xwsz_t num)
         }
         return p;
 }
-EXPORT_SYMBOL(arch_xwbmpop_ffz);
+EXPORT_SYMBOL(xwbmpop_ffz);
 
-xwssq_t arch_xwbmpop_fls(xwbmp_t *bmp, xwsz_t num)
+xwssq_t xwbmpop_fls(xwbmp_t *bmp, xwsz_t num)
 {
         xwsz_t i;
         xwbmp_t msk, tmp;
@@ -418,9 +418,9 @@ xwssq_t arch_xwbmpop_fls(xwbmp_t *bmp, xwsz_t num)
                 p += (xwssq_t)(i << XWBMP_T_SHIFT); /* p += i * BITS_PER_XWBMP_T; */
         return p;
 }
-EXPORT_SYMBOL(arch_xwbmpop_fls);
+EXPORT_SYMBOL(xwbmpop_fls);
 
-xwssq_t arch_xwbmpop_flz(xwbmp_t *bmp, xwsz_t num)
+xwssq_t xwbmpop_flz(xwbmp_t *bmp, xwsz_t num)
 {
         xwsz_t i;
         xwbmp_t msk;
@@ -450,4 +450,4 @@ xwssq_t arch_xwbmpop_flz(xwbmp_t *bmp, xwsz_t num)
                 p += (xwssq_t)(i << XWBMP_T_SHIFT);
         return p;
 }
-EXPORT_SYMBOL(arch_xwbmpop_flz);
+EXPORT_SYMBOL(xwbmpop_flz);
