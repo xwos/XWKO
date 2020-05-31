@@ -48,8 +48,8 @@ void XuanWuKo_exit(void);
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 MODULE_LICENSE("Dual MPL/GPL");
-MODULE_AUTHOR("星魂科技 <https://www.starsoul.tech>");
-MODULE_DESCRIPTION("XuanWuKo");
+MODULE_AUTHOR("隐星魂(Roy.Sun) <https://www.starsoul.tech>");
+MODULE_DESCRIPTION("XuanWuKO");
 module_init(XuanWuKo_init);
 module_exit(XuanWuKo_exit);
 
