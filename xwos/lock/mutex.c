@@ -92,11 +92,11 @@ xwer_t xwlk_mtx_cache_create(void)
                                            xwlk_mtx_construct);
         if (is_err_or_null(xwlk_mtx_cache)) {
                 rc = -ENOMEM;
-                xwlogf(ERR, "Can't create mutex slab!\n");
+                xwoslogf(ERR, "Can't create mutex slab!\n");
                 goto err_slab_create;
         }
 
-        xwlogf(INFO, "Create mutex slab ... [OK]\n");
+        xwoslogf(INFO, "Create mutex slab ... [OK]\n");
         return OK;
 
 err_slab_create:

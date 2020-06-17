@@ -24,7 +24,7 @@
 BDL_CSRCS :=
 
 BDL_CSRCS += board.c
-BDL_CSRCS += xwkac/pm.c
+BDL_CSRCS += xwac/pm.c
 
 BDL_CSRCS += isc/ifdev.c
 ifeq ($(XWMDCFG_isc_xwpcp),y)

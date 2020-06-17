@@ -91,11 +91,11 @@ xwer_t xwos_swt_cache_create(void)
                                            xwos_swt_construct);
         if (is_err_or_null(xwos_swt_cache)) {
                 rc = -ENOMEM;
-                xwlogf(ERR, "Can't create swt slab!\n");
+                xwoslogf(ERR, "Can't create swt slab!\n");
                 goto err_slab_create;
         }
 
-        xwlogf(INFO, "Create swt slab ... [OK]\n");
+        xwoslogf(INFO, "Create swt slab ... [OK]\n");
         return OK;
 
 err_slab_create:

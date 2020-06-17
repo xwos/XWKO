@@ -119,11 +119,11 @@ xwer_t xwsync_smr_cache_create(void)
                                              xwsync_smr_construct);
         if (is_err_or_null(xwsync_smr_cache)) {
                 rc = -ENOMEM;
-                xwlogf(ERR, "Can't create semaphore slab!\n");
+                xwoslogf(ERR, "Can't create semaphore slab!\n");
                 goto err_slab_create;
         }
 
-        xwlogf(INFO, "Create semaphore slab ... [OK]\n");
+        xwoslogf(INFO, "Create semaphore slab ... [OK]\n");
         return OK;
 
 err_slab_create:

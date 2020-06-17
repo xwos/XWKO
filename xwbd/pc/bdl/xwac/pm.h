@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级电源管理
+ * @brief 板级描述层：电源管理
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -21,8 +21,8 @@
  * > under either the MPL or the GPL.
  */
 
-#ifndef __bdl_xwkac_pm_h__
-#define __bdl_xwkac_pm_h__
+#ifndef __bdl_xwac_pm_h__
+#define __bdl_xwac_pm_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -42,4 +42,4 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 void brd_pm_notify(unsigned long pmevt);
 
-#endif /* bdl/xwkac/pm.h */
+#endif /* bdl/xwac/pm.h */

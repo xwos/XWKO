@@ -99,4 +99,6 @@
   #endif
 #endif /* !ARCHCFG_PTRSIZE */
 
+#define xwoslogf(lv, fmt, ...)    xwlogf(lv, "xwos", fmt, ##__VA_ARGS__)
+
 #endif /* xwos/standard.h */

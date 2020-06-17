@@ -31,7 +31,7 @@
 #include <linux/notifier.h>
 #include <linux/suspend.h>
 #include <xwmd/pm/notifier.h>
-#include <bdl/xwkac/pm.h>
+#include <bdl/xwac/pm.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -85,13 +85,13 @@ int xwos_pm_notifier_func(struct notifier_block * notifier,
         switch (pmevt) {
         case PM_HIBERNATION_PREPARE:
         case PM_SUSPEND_PREPARE:
-                xwlogf(INFO, "suspending ...\n");
+                xwoslogf(INFO, "suspending ...\n");
                 xwaop_write(xwssq_t, &xwos_pm_state, XWOS_PM_STATE_LPM, NULL);
                 break;
         case PM_POST_RESTORE:
         case PM_POST_HIBERNATION:
         case PM_POST_SUSPEND:
-                xwlogf(INFO, "resuming ...\n");
+                xwoslogf(INFO, "resuming ...\n");
                 xwaop_write(xwssq_t, &xwos_pm_state, XWOS_PM_STATE_ACTIVE, NULL);
                 break;
         case PM_RESTORE_PREPARE:

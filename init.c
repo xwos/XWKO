@@ -34,6 +34,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#define xwkologf(lv, fmt, ...)    xwlogf(lv, "xwko", fmt, ##__VA_ARGS__)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -61,35 +62,35 @@ int XuanWuKo_init(void)
 {
         xwer_t rc;
 
-        xwlogf(INFO, "XuanWuKo-V%s\n", XWOS_VER_STR);
+        xwkologf(INFO, "V%s\n", XWOS_VER_STR);
 
         rc = xwos_init();
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR, "Init xwos ... [FAILED], rc:%d\n", rc);
+                xwkologf(ERR, "Init xwos ... [FAILED], rc:%d\n", rc);
                 goto err_xwos_init;
         }
-        xwlogf(INFO, "Init xwos ... [OK]\n");
+        xwkologf(INFO, "Init xwos ... [OK]\n");
 
         rc = xwsys_init();
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR, "Init xwmd/xwsys ... [FAILED], rc:%d\n", rc);
+                xwkologf(ERR, "Init xwmd/xwsys ... [FAILED], rc:%d\n", rc);
                 goto err_xwsys_init;
         }
-        xwlogf(INFO, "Init xwmd/xwsys ... [OK]\n");
+        xwkologf(INFO, "Init xwmd/xwsys ... [OK]\n");
 
         rc = xwfs_init();
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR, "Init xwmd/xwfs ... [FAILED], rc:%d\n", rc);
+                xwkologf(ERR, "Init xwmd/xwfs ... [FAILED], rc:%d\n", rc);
                 goto err_xwfs_init;
         }
-        xwlogf(INFO, "Init xwmd/xwfs ... [OK]\n");
+        xwkologf(INFO, "Init xwmd/xwfs ... [OK]\n");
 
         rc = board_init();
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR, "Init board ... [FAILED], rc:%d\n", rc);
+                xwkologf(ERR, "Init board ... [FAILED], rc:%d\n", rc);
                 goto err_board_init;
         }
-        xwlogf(INFO, "Init board... [OK]\n");
+        xwkologf(INFO, "Init board... [OK]\n");
 
         return OK;
 
@@ -107,11 +108,11 @@ static
 void XuanWuKo_exit(void)
 {
 	board_exit();
-        xwlogf(INFO, "clean board ... [OK]\n");
+        xwkologf(INFO, "clean board ... [OK]\n");
         xwfs_exit();
-        xwlogf(INFO, "clean xwmd/xwfs ... [OK]\n");
+        xwkologf(INFO, "clean xwmd/xwfs ... [OK]\n");
         xwsys_exit();
-        xwlogf(INFO, "clean xwmd/xwsys ... [OK]\n");
+        xwkologf(INFO, "clean xwmd/xwsys ... [OK]\n");
         xwos_exit();
-        xwlogf(INFO, "clean xwos ... [OK]\n");
+        xwkologf(INFO, "clean xwos ... [OK]\n");
 }

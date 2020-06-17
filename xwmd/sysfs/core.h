@@ -34,6 +34,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#define xwsyslogf(lv, fmt, ...)    xwlogf(lv, "xwsys", fmt, ##__VA_ARGS__)
+
 #define KOBJ_ATTR(_name, _show, _store) \
         static struct kobj_attribute kobj_attr_##_name = \
                __ATTR(_name, 0644, _show, _store)

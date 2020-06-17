@@ -120,11 +120,11 @@ xwer_t xwsync_cdt_cache_create(void)
                                              xwsync_cdt_construct);
         if (is_err_or_null(xwsync_cdt_cache)) {
                 rc = -ENOMEM;
-                xwlogf(ERR, "Can't create condition slab!\n");
+                xwoslogf(ERR, "Can't create condition slab!\n");
                 goto err_slab_create;
         }
 
-        xwlogf(INFO, "Create condition slab ... [OK]\n");
+        xwoslogf(INFO, "Create condition slab ... [OK]\n");
         return OK;
 
 err_slab_create:

@@ -46,10 +46,12 @@ xwer_t board_init(void)
 
         rc = mcuc_init();
         if (__unlikely(rc < 0)) {
-                xwlogf(INFO, "Initialize MCU Controller ... [FAILED], rc:%d\n", rc);
+                xwlogf(INFO,
+                       "board", "Initialize MCU Controller ... [FAILED], rc:%d\n",
+                       rc);
                 goto err_mcuc_init;
         }
-        xwlogf(INFO, "Initialize MCU Controller ... [OK]\n");
+        xwlogf(INFO, "board", "Initialize MCU Controller ... [OK]\n");
         return OK;
 
 err_mcuc_init:

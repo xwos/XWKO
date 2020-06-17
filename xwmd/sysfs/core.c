@@ -275,14 +275,14 @@ struct xwsys_object *xwsys_register(const char *name,
 
         xwobj = kzalloc(sizeof(struct xwsys_object), GFP_KERNEL);
         if (is_err_or_null(xwobj)) {
-                xwlogf(ERR, "Failed to alloc a xwos sysfs object!\n");
+                xwsyslogf(ERR, "Failed to alloc a xwos sysfs object!\n");
                 rc = -ENOMEM;
                 goto err_out;
         }
 
         rc = kobject_set_name(&xwobj->kset.kobj, "%s", name);
         if (rc < 0) {
-                xwlogf(ERR, "Failed to set kobject name! (errno:%d)\n", rc);
+                xwsyslogf(ERR, "Failed to set kobject name! (errno:%d)\n", rc);
                 goto err_free_xwobj;
         }
         if (parent) {
@@ -299,7 +299,7 @@ struct xwsys_object *xwsys_register(const char *name,
 
         rc = kset_register(&xwobj->kset);
         if (rc) {
-                xwlogf(ERR, "Failed to kset_register()! (errno:%d)\n", rc);
+                xwsyslogf(ERR, "Failed to kset_register()! (errno:%d)\n", rc);
                 kfree(xwobj->kset.kobj.name);
                 xwobj->kset.kobj.name = NULL;
                 goto err_free_xwobj;
@@ -357,15 +357,15 @@ xwer_t xwsys_attr_state_parse_cmd(const char *cmdstring)
         size_t argsize;
         xwer_t rc = -ENOSYS;
 
-        xwlogf(INFO, "cmd=\"%s\"\n", cmdstring);
+        xwsyslogf(INFO, "cmd=\"%s\"\n", cmdstring);
         p = (char *)cmdstring;
         if (*p) {
                 token = match_token(p, xwsys_state_cmd_tokens, tmp);
-                xwlogf(INFO, "cmd=\"%s\"\n", cmdstring);
+                xwsyslogf(INFO, "cmd=\"%s\"\n", cmdstring);
                 switch (token) {
                 case XWSYS_STATE_CMD_START:
                         argsize = match_strlcpy(arg, &tmp[0], XWSYS_ARGBUFSIZE);
-                        xwlogf(INFO, "Get start cmd, arg:%s\n", arg);
+                        xwsyslogf(INFO, "Get start cmd, arg:%s\n", arg);
                         if (0 == strcmp(arg, "xwfs")) {
                                 rc = xwfs_start();
 #if defined(XWMDCFG_isc_xwpcp) && (1 == XWMDCFG_isc_xwpcp)
@@ -383,12 +383,12 @@ xwer_t xwsys_attr_state_parse_cmd(const char *cmdstring)
                                 rc = usi_xwmcupgmc_start();
 #endif
                         } else {
-                                xwlogf(ERR, "un-support cmd, arg:%s\n", arg);
+                                xwsyslogf(ERR, "un-support cmd, arg:%s\n", arg);
                         }
                         break;
                 case XWSYS_STATE_CMD_STOP:
                         argsize = match_strlcpy(arg, &tmp[0], XWSYS_ARGBUFSIZE);
-                        xwlogf(INFO, "Get stop cmd, arg:%s\n", arg);
+                        xwsyslogf(INFO, "Get stop cmd, arg:%s\n", arg);
                         if (0 == strcmp(arg, "xwfs")) {
                                 rc = xwfs_stop();
 #if defined(XWMDCFG_isc_xwpcp) && (1 == XWMDCFG_isc_xwpcp)
@@ -406,7 +406,7 @@ xwer_t xwsys_attr_state_parse_cmd(const char *cmdstring)
                                 rc = usi_xwmcupgmc_stop();
 #endif
                         } else {
-                                xwlogf(ERR, "un-support cmd, arg:%s\n", arg);
+                                xwsyslogf(ERR, "un-support cmd, arg:%s\n", arg);
                         }
                         break;
                 }
@@ -444,13 +444,13 @@ xwer_t xwsys_init(void)
         xwsys_kset = kset_create_and_add("xwos", &xwsys_uevent_ops, NULL);
         if (unlikely(is_err_or_null(xwsys_kset))) {
                 rc = -ENOMEM;
-                xwlogf(ERR, "Can't create xwsys kset!\n");
+                xwsyslogf(ERR, "Can't create xwsys kset!\n");
                 goto err_out;
         }
 
         rc = sysfs_create_file(&xwsys_kset->kobj, &kobj_attr_state.attr);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR, "Can't create attr state!\n");
+                xwsyslogf(ERR, "Can't create attr state!\n");
                 goto err_create_attr_state;
         }
 

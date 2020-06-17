@@ -94,9 +94,9 @@ xwer_t xwos_scheduler_init(void)
 
         rc = linux_thrd_ksym_load();
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "linux_thrd_ksym_load(): faild! <rc:%d>\n",
-                       rc);
+                xwoslogf(ERR,
+                         "linux_thrd_ksym_load(): faild! <rc:%d>\n",
+                         rc);
                 goto err_ksymload;
         }
         return OK;

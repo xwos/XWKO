@@ -146,8 +146,9 @@ xwer_t usi_xwmcupgmc_ops_start(struct xwmcupgmc * pgmc)
         XWOS_UNUSED(pgmc);
         usi_xwmcupgmc_imgbuf = kmalloc(pgmc->size, GFP_KERNEL);
         if (!is_err_or_null(usi_xwmcupgmc_imgbuf)) {
-                xwlogf(INFO, "start, alloc firmware buffer<%p, %d>\n",
-                       usi_xwmcupgmc_imgbuf, pgmc->size);
+                xwmcupgmlogf(INFO,
+                             "start, alloc firmware buffer<%p, %d>\n",
+                             usi_xwmcupgmc_imgbuf, pgmc->size);
         }
         return OK;
 }
@@ -197,7 +198,9 @@ xwer_t usi_xwmcupgmc_ops_program(struct xwmcupgmc * pgmc,
         usi_xwmcupgmc_imgbuf[pgmc->pos + 5] = frm->dfrm.text[5];
         usi_xwmcupgmc_imgbuf[pgmc->pos + 6] = frm->dfrm.text[6];
         usi_xwmcupgmc_imgbuf[pgmc->pos + 7] = frm->dfrm.text[7];
-        xwlogf(INFO, "program(size<%d>, data<0x%llX>)\n", data, frm->dfrm.size);
+        xwmcupgmlogf(INFO,
+                     "program(size<%d>, data<0x%llX>)\n",
+                     data, frm->dfrm.size);
         return OK;
 }
 
@@ -211,11 +214,14 @@ xwer_t usi_xwmcupgmc_ops_finish(struct xwmcupgmc * pgmc,
         val = xwlib_crc32_calms((xwu8_t *)usi_xwmcupgmc_imgbuf, pgmc->size);
         if (val == crc32) {
                 rc = OK;
-                xwlogf(INFO, "Finish ... [OK], CRC32:0x%X\n", crc32);
+                xwmcupgmlogf(INFO,
+                             "Finish ... [OK], CRC32:0x%X\n",
+                             crc32);
         } else {
                 rc = -EFAULT;
-                xwlogf(INFO, "Finish ... [%d], CRC32:<(R)0x%X:(L)0x%X>\n",
-                       rc, crc32, val);
+                xwmcupgmlogf(INFO,
+                             "Finish ... [%d], CRC32:<(R)0x%X:(L)0x%X>\n",
+                             rc, crc32, val);
         }
         return rc;
 }
@@ -229,7 +235,8 @@ xwer_t usi_xwmcupgmc_thread(void * arg)
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 rc = xwmcupgmc_fsm(&usi_xwmcupgmc);
                 if (__unlikely(rc < 0)) {
-                        xwlogf(INFO, "xwmcupgmc_fsm() return %d.\n", rc);
+                        xwmcupgmlogf(INFO,
+                                     "xwmcupgmc_fsm() return %d.\n", rc);
                 }
                 if (XWMCUPGMC_STATE_FINISHED == usi_xwmcupgmc.state) {
                         break;
@@ -267,22 +274,23 @@ xwer_t usi_xwmcupgmc_start(void)
         usi_xwmcupgmc_sysfs_kobj = xwsys_register("xwmcupgmc", NULL, NULL);
         if (__unlikely(is_err_or_null(usi_xwmcupgmc_sysfs_kobj))) {
                 rc = PTR_ERR(usi_xwmcupgmc_sysfs_kobj);
-                xwlogf(ERR,
-                       "Create \"/sys/xwosal/xwmcupgmc\" ... [Failed], errno: %d\n",
-                       rc);
+                xwmcupgmlogf(ERR,
+                             "Create \"/sys/xwosal/xwmcupgmc\" ... [Failed], "
+                             "errno: %d\n",
+                             rc);
                 goto err_xwsys_reg;
         }
-        xwlogf(INFO, "Create \"/sys/xwosal/xwmcupgmc\" ... [OK]\n");
+        xwmcupgmlogf(INFO, "Create \"/sys/xwosal/xwmcupgmc\" ... [OK]\n");
 
         rc = xwsys_create_file(usi_xwmcupgmc_sysfs_kobj, &xwsys_attr_state);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "Create \"/sys/xwosal/xwmcupgmc/state\" ... [Failed],\n"
-                       " errno: %d",
-                       rc);
+                xwmcupgmlogf(ERR,
+                             "Create \"/sys/xwosal/xwmcupgmc/state\" ... [Failed], "
+                             " errno: %d",
+                             rc);
                 goto err_xwsys_create;
         }
-        xwlogf(INFO, "Create \"/sys/xwosal/xwmcupgmc/state\" ... [OK]\n");
+        xwmcupgmlogf(INFO, "Create \"/sys/xwosal/xwmcupgmc/state\" ... [OK]\n");
 
         rc = xwosal_thrd_create(&tcbd, "usi_xwmcupgmc",
                                 (xwosal_thrd_f)usi_xwmcupgmc_thread,
@@ -290,11 +298,13 @@ xwer_t usi_xwmcupgmc_start(void)
                                 USI_XWMCUPGMC_THREAD_PRIORITY,
                                 XWOS_UNUSED_ARGUMENT);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR, "Create xwmcupgmc thread ... [Failed], errno %d\n", rc);
+                xwmcupgmlogf(ERR,
+                             "Create xwmcupgmc thread ... [Failed], errno %d\n",
+                             rc);
                 goto err_xwmcupgmc_thread_create;
         }
         usi_xwmcupgmc_tid = tcbd;
-        xwlogf(INFO, "Create xwscp thread ... [OK]\n");
+        xwmcupgmlogf(INFO, "Create xwscp thread ... [OK]\n");
 
         usi_xwmcupgmc_state = USI_XWMCUPGMC_STATE_START;
         return OK;
@@ -323,7 +333,7 @@ xwer_t usi_xwmcupgmc_stop(void)
                 rc = xwosal_thrd_delete(usi_xwmcupgmc_tid);
                 if (OK == rc) {
                         usi_xwmcupgmc_tid = 0;
-                        xwlogf(INFO, "Terminate xwmcupgmc thread... [OK]\n");
+                        xwmcupgmlogf(INFO, "Terminate xwmcupgmc thread... [OK]\n");
                 }
         }
 

@@ -37,6 +37,10 @@
 #include <xwos/init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      macros       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
@@ -65,47 +69,47 @@ xwer_t xwos_init(void)
         /******** object cache ********/
         rc = xwos_swt_cache_create();
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR, "Create xwos/core/swt cache ... [FAILED], rc:%d\n", rc);
+                xwoslogf(ERR, "Create xwos/core/swt cache ... [FAILED], rc:%d\n", rc);
                 goto err_swt_cache_create;
         }
-        xwlogf(INFO, "Create xwos/core/swt cache ... [OK]\n");
+        xwoslogf(INFO, "Create xwos/core/swt cache ... [OK]\n");
 
         rc = xwsync_smr_cache_create();
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "Create xwos/sync/smr cache ... [FAILED], rc:%d\n",
-                       rc);
+                xwoslogf(ERR,
+                         "Create xwos/sync/smr cache ... [FAILED], rc:%d\n",
+                         rc);
                 goto err_smr_cache_create;
         }
-        xwlogf(INFO, "Create xwos/sync/smr cache ... [OK]\n");
+        xwoslogf(INFO, "Create xwos/sync/smr cache ... [OK]\n");
 
         rc = xwsync_cdt_cache_create();
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "Create xwos/sync/cdt cache ... [FAILED], rc:%d\n",
-                       rc);
+                xwoslogf(ERR,
+                         "Create xwos/sync/cdt cache ... [FAILED], rc:%d\n",
+                         rc);
                 goto err_cdt_cache_create;
         }
-        xwlogf(INFO, "create xwos/sync/cdt cache ... [OK]\n");
+        xwoslogf(INFO, "create xwos/sync/cdt cache ... [OK]\n");
 
         rc = xwlk_mtx_cache_create();
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "Create xwos/lock/mutex cache ... [FAILED], rc:%d\n",
-                       rc);
+                xwoslogf(ERR,
+                         "Create xwos/lock/mutex cache ... [FAILED], rc:%d\n",
+                         rc);
                 goto err_mtx_cache_create;
         }
-        xwlogf(INFO, "Create xwos/lock/mutex cache ... [OK]\n");
+        xwoslogf(INFO, "Create xwos/lock/mutex cache ... [OK]\n");
 
         /******** MM ********/
         rc = xwmm_dkma_init(XWMMCFG_DKMA_SIZE);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "Init xwos/mm/dkma ... [FAILED], rc:%d\n",
-                       rc);
+                xwoslogf(ERR,
+                         "Init xwos/mm/dkma ... [FAILED], rc:%d\n",
+                         rc);
                 goto err_xwmm_dkma_init;
         }
-        xwlogf(INFO, "Init xwos/mm/dkma ... [OK]\n");
+        xwoslogf(INFO, "Init xwos/mm/dkma ... [OK]\n");
 
         return OK;
 

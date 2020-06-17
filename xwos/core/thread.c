@@ -462,23 +462,23 @@ xwer_t linux_thrd_ksym_load(void)
 
         rc = KSYM_LOAD(__lock_task_sighand);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "Failed to load kernel symbol: __lock_task_sighand. rc: %d\n",
-                       rc);
+                xwoslogf(ERR,
+                         "Failed to load kernel symbol: __lock_task_sighand. rc: %d\n",
+                         rc);
                 goto err_ksymload;
         }
         rc = KSYM_LOAD(signal_wake_up_state);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "Failed to load kernel symbol: signal_wake_up_state. rc: %d\n",
-                       rc);
+                xwoslogf(ERR,
+                         "Failed to load kernel symbol: signal_wake_up_state. rc: %d\n",
+                         rc);
                 goto err_ksymload;
         }
         rc = KSYM_LOAD(find_task_by_vpid);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "Failed to load kernel symbol: find_task_by_vpid. rc: %d\n",
-                       rc);
+                xwoslogf(ERR,
+                         "Failed to load kernel symbol: find_task_by_vpid. rc: %d\n",
+                         rc);
                 goto err_ksymload;
         }
 

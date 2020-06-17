@@ -275,38 +275,38 @@ xwer_t usi_xwmcupgmsrv_start(void)
 
         rc = xwfs_mkdir("xwmcupgm", dir_xwmd, &usi_xwmcupgmsrv_xwfs_dir);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR, "Fail to mkdir(\"xwmcupgm\"), "
-                       "rc: %d\n", rc);
+                xwmcupgmlogf(ERR,
+                             "Fail to mkdir(\"xwmcupgm\"), rc: %d\n", rc);
                 goto err_mkdir;
         }
 
         rc = xwfs_mknod("server", 0660, &usi_xwmcupgmsrv_xwfsops, &usi_xwmcupgmsrv,
                         usi_xwmcupgmsrv_xwfs_dir, &usi_xwmcupgmsrv_xwfs_node);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR, "Fail to mknod(\"server\"), rc: %d\n", rc);
+                xwmcupgmlogf(ERR, "Fail to mknod(\"server\"), rc: %d\n", rc);
                 goto err_mknod;
         }
 
         usi_xwmcupgmsrv_sysfs_kobj = xwsys_register("xwmcupgmsrv", NULL, NULL);
         if (__unlikely(is_err_or_null(usi_xwmcupgmsrv_sysfs_kobj))) {
                 rc = PTR_ERR(usi_xwmcupgmsrv_sysfs_kobj);
-                xwlogf(ERR,
-                       "Create \"/sys/xwosal/xwmcupgmsrv\" ... [Failed], "
-                       "rc: %d\n",
-                       rc);
+                xwmcupgmlogf(ERR,
+                             "Create \"/sys/xwosal/xwmcupgmsrv\" ... [Failed], "
+                             "rc: %d\n",
+                             rc);
                 goto err_xwsys_reg;
         }
-        xwlogf(INFO, "Create \"/sys/xwosal/xwmcupgmsrv\" ... [OK]\n");
+        xwmcupgmlogf(INFO, "Create \"/sys/xwosal/xwmcupgmsrv\" ... [OK]\n");
 
         rc = xwsys_create_file(usi_xwmcupgmsrv_sysfs_kobj, &xwsys_attr_state);
         if (__unlikely(rc < 0)) {
-                xwlogf(ERR,
-                       "Create \"/sys/xwosal/xwmcupgmsrv/state\" ... [Failed], "
-                       "rc: %d\n",
-                       rc);
+                xwmcupgmlogf(ERR,
+                             "Create \"/sys/xwosal/xwmcupgmsrv/state\" ... [Failed], "
+                             "rc: %d\n",
+                             rc);
                 goto err_xwsys_create;
         }
-        xwlogf(INFO, "Create \"/sys/xwosal/xwmcupgmsrv/state\" ... [OK]\n");
+        xwmcupgmlogf(INFO, "Create \"/sys/xwosal/xwmcupgmsrv/state\" ... [OK]\n");
 
         usi_xwmcupgmsrv_state = USI_XWMCUPGMSRV_STATE_START;
 

@@ -125,7 +125,7 @@
  * @brief log function of mcupgm client
  */
 #if (defined(XWMDCFG_xwmcupgm_LOG) && (1 == XWMDCFG_xwmcupgm_LOG))
-  #define xwmcupgmlogf(lv, fmt, ...)    xwlogf(lv, fmt, ##__VA_ARGS__)
+  #define xwmcupgmlogf(lv, fmt, ...)    xwlogf(lv, "xwmcupgm", fmt, ##__VA_ARGS__)
 #else
   #define xwmcupgmlogf(lv, fmt, ...)
 #endif

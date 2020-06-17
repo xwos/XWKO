@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：板级电源管理
+ * @brief 板级描述层：电源管理
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -26,7 +26,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/core/pm.h>
-#include <bdl/xwkac/pm.h>
+#include <bdl/xwac/pm.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     static function declarations    ******** ********
