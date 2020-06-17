@@ -54,7 +54,6 @@ void arch_lfq_push(__atomic xwlfq_t * h, __atomic xwlfq_t * n)
         top = (union arch_lfq *)n;
         do {
                 ov.u128 = *h;
-                xwmb_smp_ddb();
                 top->s.link = ov.s.link;
                 top->s.ticket = 0;
                 nv.s.link = (xwptr_t)n;
@@ -77,7 +76,6 @@ xwlfq_t * arch_lfq_pop(__atomic xwlfq_t * h)
 
         do {
                 ov.u128 = *h;
-                xwmb_smp_ddb();
                 if (ov.s.link) {
                         top.lfq = (xwlfq_t *)ov.s.link;
                         nv.s.link = top.arch_lfq->s.link;

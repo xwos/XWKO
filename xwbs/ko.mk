@@ -33,6 +33,7 @@ INCDIRS += $(addprefix -I,$(XWOS_PATH)/$(XWOS_ARCH_DIR))
 INCDIRS += $(addprefix -I,$(XWOS_PATH)/$(XWOS_CPU_DIR))
 INCDIRS += $(addprefix -I,$(XWOS_PATH)/$(XWOS_SOC_DIR))
 INCDIRS += $(addprefix -I,$(XWOS_PATH)/$(XWOS_BRD_DIR))
+INCDIRS += $(addprefix -I,$(XWOS_PATH)/$(XWOS_WKSPC_DIR))
 
 EOBJS =
 obj-m = $(TARGET).o

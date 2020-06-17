@@ -422,7 +422,7 @@ err_notmnt:
  * @param sb: (I) pointer of super block
  * @note
  * - When sb->s_active == 0, this function will be called.
- * - @ref ofs_sops_put_super() will be called in kill_litter_super.
+ * - @ref xwfs_sops_put_super() will be called in kill_litter_super.
  */
 static
 void xwfs_kill_sb(struct super_block * sb)
@@ -432,9 +432,9 @@ void xwfs_kill_sb(struct super_block * sb)
 
 /******** ******** super_operations ******** ********/
 /**
- * @brief Used by kmem_cache_alloc(ofs_inode_cache, ...) to initialize the new
- *        ofs_inode
- * @param data: (I) pointer of the new ofs_inode
+ * @brief Used by kmem_cache_alloc(xwfs_inode_cache, ...) to initialize the new
+ *        xwfs_inode
+ * @param data: (I) pointer of the new xwfs_inode
  */
 static
 void xwfs_entry_construct(void * addr)
@@ -444,7 +444,7 @@ void xwfs_entry_construct(void * addr)
 }
 
 /**
- * @brief super operation to alloc a new ofs inode
+ * @brief super operation to alloc a new xwfs inode
  * @param sb: (I) pointer of super block
  * @return new inode
  * @retval NULL: failed
@@ -535,7 +535,7 @@ void xwfs_sops_destroy_callback(struct rcu_head * head)
 }
 
 /**
- * @brief superblock operation: destroy ofs inode
+ * @brief superblock operation: destroy xwfs inode
  * @param inode: (I) pointer of inode to destory
  */
 static
