@@ -61,6 +61,9 @@ xwu32_t xwaop__xwu32_t__load(__atomic xwu32_t * a,
                 v = *a;
                 xwmb_smp_mb();
                 break;
+        default:
+                v = *a;
+                break;
         }
         return v;
 }
@@ -135,7 +138,6 @@ xwer_t xwaop__xwu32_t__teq_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o == t) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -161,7 +163,6 @@ xwer_t xwaop__xwu32_t__tne_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o != t) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -187,7 +188,6 @@ xwer_t xwaop__xwu32_t__tgt_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o > t) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -213,7 +213,6 @@ xwer_t xwaop__xwu32_t__tge_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o >= t) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -239,7 +238,6 @@ xwer_t xwaop__xwu32_t__tlt_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o < t) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -265,7 +263,6 @@ xwer_t xwaop__xwu32_t__tle_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o <= t) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -291,7 +288,6 @@ xwer_t xwaop__xwu32_t__tgtlt_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o > l) && (o < r)) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -317,7 +313,6 @@ xwer_t xwaop__xwu32_t__tgelt_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o >= l) && (o < r)) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -343,7 +338,6 @@ xwer_t xwaop__xwu32_t__tgtle_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o > l) && (o <= r)) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -369,7 +363,6 @@ xwer_t xwaop__xwu32_t__tgele_then_write(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o >= l) && (o <= r)) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
@@ -394,7 +387,6 @@ void xwaop__xwu32_t__add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 n = o + v;
                 xwmb_smp_mb();
         } while (strex(a, (xwu32_t)n));
@@ -418,7 +410,6 @@ xwer_t xwaop__xwu32_t__teq_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o == t) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -451,7 +442,6 @@ xwer_t xwaop__xwu32_t__tne_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o != t) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -484,7 +474,6 @@ xwer_t xwaop__xwu32_t__tgt_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o > t) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -517,7 +506,6 @@ xwer_t xwaop__xwu32_t__tge_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o >= t) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -550,7 +538,6 @@ xwer_t xwaop__xwu32_t__tlt_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o < t) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -583,7 +570,6 @@ xwer_t xwaop__xwu32_t__tle_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o <= t) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -616,7 +602,6 @@ xwer_t xwaop__xwu32_t__tgtlt_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o > l) && (o < r)) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -649,7 +634,6 @@ xwer_t xwaop__xwu32_t__tgelt_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o >= l) && (o < r)) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -682,7 +666,6 @@ xwer_t xwaop__xwu32_t__tgtle_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o > l) && (o <= r)) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -715,7 +698,6 @@ xwer_t xwaop__xwu32_t__tgele_then_add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o >= l) && (o <= r)) {
                         n = o + v;
                         xwmb_smp_mb();
@@ -746,7 +728,6 @@ void xwaop__xwu32_t__sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 n = o - v;
                 xwmb_smp_mb();
         } while (strex(a, (xwu32_t)n));
@@ -770,7 +751,6 @@ xwer_t xwaop__xwu32_t__teq_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o == t) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -803,7 +783,6 @@ xwer_t xwaop__xwu32_t__tne_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o != t) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -836,7 +815,6 @@ xwer_t xwaop__xwu32_t__tgt_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o > t) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -869,7 +847,6 @@ xwer_t xwaop__xwu32_t__tge_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o >= t) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -902,7 +879,6 @@ xwer_t xwaop__xwu32_t__tlt_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o < t) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -935,7 +911,6 @@ xwer_t xwaop__xwu32_t__tle_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o <= t) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -968,7 +943,6 @@ xwer_t xwaop__xwu32_t__tgtlt_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o > l) && (o < r)) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -1001,7 +975,6 @@ xwer_t xwaop__xwu32_t__tgelt_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o >= l) && (l < r)) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -1034,7 +1007,6 @@ xwer_t xwaop__xwu32_t__tgtle_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o > l) && (o <= r)) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -1067,7 +1039,6 @@ xwer_t xwaop__xwu32_t__tgele_then_sub(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o >= l) && (o <= r)) {
                         n = o - v;
                         xwmb_smp_mb();
@@ -1098,7 +1069,6 @@ void xwaop__xwu32_t__rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 n = v - o;
                 xwmb_smp_mb();
         } while (strex(a, (xwu32_t)n));
@@ -1122,7 +1092,6 @@ xwer_t xwaop__xwu32_t__teq_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o == t) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1155,7 +1124,6 @@ xwer_t xwaop__xwu32_t__tne_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o != t) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1188,7 +1156,6 @@ xwer_t xwaop__xwu32_t__tgt_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o > t) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1221,7 +1188,6 @@ xwer_t xwaop__xwu32_t__tge_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o != t) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1254,7 +1220,6 @@ xwer_t xwaop__xwu32_t__tlt_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o < t) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1287,7 +1252,6 @@ xwer_t xwaop__xwu32_t__tle_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o <= t) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1320,7 +1284,6 @@ xwer_t xwaop__xwu32_t__tgtlt_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o > l) && (o < r)) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1353,7 +1316,6 @@ xwer_t xwaop__xwu32_t__tgelt_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o >= l) && (o < r)) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1386,7 +1348,6 @@ xwer_t xwaop__xwu32_t__tgtle_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o > l) && (o <= r)) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1419,7 +1380,6 @@ xwer_t xwaop__xwu32_t__tgele_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o >= l) && (o <= r)) {
                         n = v - o;
                         xwmb_smp_mb();
@@ -1450,7 +1410,6 @@ void xwaop__xwu32_t__or(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 n = o | v;
                 xwmb_smp_mb();
         } while (strex(a, (xwu32_t)n));
@@ -1472,7 +1431,6 @@ void xwaop__xwu32_t__and(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 n = o & v;
                 xwmb_smp_mb();
         } while (strex(a, (xwu32_t)n));
@@ -1494,7 +1452,6 @@ void xwaop__xwu32_t__xor(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 n = o ^ v;
                 xwmb_smp_mb();
         } while (strex(a, (xwu32_t)n));
@@ -1516,7 +1473,6 @@ void xwaop__xwu32_t__c0m(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 n = o & (~m);
                 xwmb_smp_mb();
         } while (strex(a, (xwu32_t)n));
@@ -1539,7 +1495,6 @@ xwer_t xwaop__xwu32_t__t1ma_then_c0m(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o & m) == m) {
                         n = o & (~m);
                         xwmb_smp_mb();
@@ -1571,7 +1526,6 @@ xwer_t xwaop__xwu32_t__t1mo_then_c0m(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o & m) {
                         n = o & (~m);
                         xwmb_smp_mb();
@@ -1603,7 +1557,6 @@ xwer_t xwaop__xwu32_t__t0ma_then_s1m(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (!(o & m)) {
                         n = o | m;
                         xwmb_smp_mb();
@@ -1635,7 +1588,6 @@ xwer_t xwaop__xwu32_t__t0mo_then_s1m(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if ((o & m) != m) {
                         n = o | m;
                         xwmb_smp_mb();
@@ -1668,7 +1620,6 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (tst) {
                         if (tst((const void *)&o, tst_args)) {
                                 if (op) {
@@ -1678,7 +1629,7 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
                                 } else {
                                         rc = OK;
                                         n = o;
-                                        xwmb_smp_ddb();
+                                        xwmb_smp_mb();
                                         break;
                                 }
                         } else {
@@ -1695,7 +1646,7 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
                         } else {
                                 rc = OK;
                                 n = o;
-                                xwmb_smp_ddb();
+                                xwmb_smp_mb();
                                 break;
                         }
                 }

@@ -35,7 +35,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** 位操作 ******** ********/
 /**
- * @brief XWOS BOPLIB：调用位操作函数
+ * @brief XWOS BOPLIB：调用位操作函数模板
  * @param type: (I) 数据类型
  * @param op: (I) 位操作函数
  * @param ...: (I) 函数的参数
@@ -43,31 +43,31 @@
 #define xwbop(type, op, ...)            xwbop_##op##__##type(__VA_ARGS__)
 
 /**
- * @brief XWOS BOPLIB：掩码位置1
+ * @brief XWOS BOPLIB：将数据掩码部分的位全部置1
  * @param type: (I) 数据类型
- * @param addr: (I) 数据的地址指针
- * @param mask: (I) 置1位的掩码
+ * @param addr: (I) 数据的地址
+ * @param mask: (I) 位的掩码
  */
 #define xwbop_s1m(type, addr, mask)     xwbop(type, s1m, (addr), (mask))
 
 /**
- * @brief XWOS BOPLIB：掩码位清0
+ * @brief XWOS BOPLIB：将数据掩码部分的位全部清0
  * @param type: (I) 数据类型
- * @param addr: (I) 数据的地址指针
- * @param mask: (I) 清1位的掩码
+ * @param addr: (I) 数据的地址
+ * @param mask: (I) 位的掩码
  */
 #define xwbop_c0m(type, addr, mask)     xwbop(type, c0m, (addr), (mask))
 
 /**
- * @brief XWOS BOPLIB：掩码位反转
+ * @brief XWOS BOPLIB：将数据掩码部分的位全部翻转
  * @param type: (I) 数据类型
- * @param addr: (I) 数据的地址指针
- * @param mask: (I) 置1位的掩码
+ * @param addr: (I) 数据的地址
+ * @param mask: (I) 位的掩码
  */
 #define xwbop_x1m(type, addr, mask)     xwbop(type, x1m, (addr), (mask))
 
 /**
- * @brief XWOS BOPLIB：位镜面翻转
+ * @brief XWOS BOPLIB：将数据的位镜面翻转
  * @param type: (I) 数据类型
  * @param data: (I) 数据（注：非指针）
  * @return 镜面翻转后的结果
@@ -75,7 +75,7 @@
 #define xwbop_rbit(type, data)          xwbop(type, rbit, (data))
 
 /**
- * @brief XWOS BOPLIB：调用大小端翻转函数
+ * @brief XWOS BOPLIB：将数据的大小端翻转
  * @param type: (I) 数据类型
  * @param data: (I) 数据（注：非指针）
  * @return 大小端翻转后的结果
@@ -83,9 +83,9 @@
 #define xwbop_re(type, data)            xwbop(type, re, (data))
 
 /**
- * @brief XWOS BOPLIB：在数据中从最低位起查找第一个为1的位
+ * @brief XWOS BOPLIB：在数据中从最低位起查找第一个被置1的位
  * @param type: (I) 数据类型
- * @param x: (I) 数据（注：非指针）
+ * @param data: (I) 数据（注：非指针）
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为1
  * @note
@@ -94,9 +94,9 @@
 #define xwbop_ffs(type, data)           xwbop(type, ffs, (data))
 
 /**
- * @brief XWOS BOPLIB：在数据中从最高位起查找第一个为1的位
+ * @brief XWOS BOPLIB：在数据中从最高位起查找第一个被置1的位
  * @param type: (I) 数据类型
- * @param x: (I) 数据（注：非指针）
+ * @param data: (I) 数据（注：非指针）
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为1
  * @note
@@ -105,9 +105,9 @@
 #define xwbop_fls(type, data)           xwbop(type, fls, (data))
 
 /**
- * @brief XWOS BOPLIB：在数据中从最低位起查找第一个为0的位
+ * @brief XWOS BOPLIB：在数据中从最低位起查找第一个被清0的位
  * @param type: (I) 数据类型
- * @param x: (I) 数据（注：非指针）
+ * @param data: (I) 数据（注：非指针）
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为0
  * @note
@@ -116,9 +116,9 @@
 #define xwbop_ffz(type, data)           xwbop(type, flz, (data))
 
 /**
- * @brief XWOS BOPLIB：在数据中从最高位起查找第一个为0的位
+ * @brief XWOS BOPLIB：在数据中从最高位起查找第一个被清0的位
  * @param type: (I) 数据类型
- * @param x: (I) 数据（注：非指针）
+ * @param data: (I) 数据（注：非指针）
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为0
  * @note
@@ -319,14 +319,14 @@ DEFINE_XWBOP(xwbmp_t, 64)
 
 /******** ******** 位图操作 ******** ********/
 /**
- * @brief 声明位图
+ * @brief XWOS BOPLIB：声明位图
  * @param name: (I) 符号名
  * @param bits: (I) 位图中的位数
  */
 #define xwbmpop_declare(name, bits)  xwbmp_t name[BITS_TO_BMPS(bits)]
 
 /**
- * @brief 赋值操作数到位图
+ * @brief XWOS BOPLIB：赋值操作数到位图
  * @param bmp: (I) 位图的起始地址指针
  * @param opd: (I) 操作数
  * @param num: (I) 位图中总的位数
@@ -335,7 +335,7 @@ __xwlib_code
 void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
- * @brief 从最高字节开始比较位图的数值大小
+ * @brief XWOS BOPLIB：从最高字节开始比较两个位图的数值大小
  * @param bmp: (I) 位图的起始地址指针
  * @param opd: (I) 操作数
  * @param num: (I) 位图中总的位数
@@ -348,7 +348,7 @@ __xwlib_code
 xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
- * @brief 将位图所有位设为1
+ * @brief XWOS BOPLIB：将位图中所有位置1
  * @param bmp: (I) 位图的起始地址指针
  * @param num: (I) 位图中总的位数
  */
@@ -356,7 +356,7 @@ __xwlib_code
 void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num);
 
 /**
- * @brief 清除位图中所有位
+ * @brief XWOS BOPLIB：将位图中所有位清0
  * @param bmp: (I) 位图的起始地址指针
  * @param num: (I) 位图中总的位数
  */
@@ -364,7 +364,7 @@ __xwlib_code
 void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num);
 
 /**
- * @brief 将位图中某位置1
+ * @brief XWOS BOPLIB：将位图中某位置1
  * @param bmp: (I) 位图的起始地址指针
  * @param n: (I) 位的序号
  */
@@ -372,7 +372,7 @@ __xwlib_code
 void xwbmpop_s1i(xwbmp_t * bmp, xwsq_t n);
 
 /**
- * @brief 将位图中掩码部分全部置1
+ * @brief XWOS BOPLIB：将位图中掩码部分置1
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -381,7 +381,7 @@ __xwlib_code
 void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 将位图中某位清0
+ * @brief XWOS BOPLIB：将位图中某位清0
  * @param bmp: (I) 位图的起始地址指针
  * @param n: (I) 被清0的位的序号
  */
@@ -389,7 +389,7 @@ __xwlib_code
 void xwbmpop_c0i(xwbmp_t * bmp, xwsq_t n);
 
 /**
- * @brief 将位图中掩码位全部清0
+ * @brief XWOS BOPLIB：将位图中掩码部分清0
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -398,7 +398,7 @@ __xwlib_code
 void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 将位图中某位翻转
+ * @brief XWOS BOPLIB：将位图中某位翻转
  * @param bmp: (I) 位图的起始地址指针
  * @param n: (I) 被翻转的位的序号
  */
@@ -406,7 +406,7 @@ __xwlib_code
 void xwbmpop_x1i(xwbmp_t * bmp, xwsq_t n);
 
 /**
- * @brief 将位图中掩码位全部翻转
+ * @brief XWOS BOPLIB：将位图中掩码部分翻转
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -415,7 +415,7 @@ __xwlib_code
 void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 测试位图中的某位是否为1
+ * @brief XWOS BOPLIB：测试位图中的某位是否为1
  * @param bmp: (I) 位图的起始地址指针
  * @param n: (I) 被测试的位的序号
  * @return 布尔值
@@ -426,7 +426,7 @@ __xwlib_code
 bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n);
 
 /**
- * @brief 测试位图中掩码位是否全部为1
+ * @brief XWOS BOPLIB：测试位图中掩码部分是否全部为1
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -438,7 +438,7 @@ __xwlib_code
 bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 测试位图中掩码位是否全部为1，如果是，就将掩码位全部清0。
+ * @brief XWOS BOPLIB：测试位图中掩码部分是否全部为1，如果是，就将掩码位全部清0。
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -450,7 +450,7 @@ __xwlib_code
 bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 测试位图中掩码位是否至少有一位为1
+ * @brief XWOS BOPLIB：测试位图中掩码位是否至少有一位为1
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -462,7 +462,7 @@ __xwlib_code
 bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 测试位图中掩码位是否至少有一位为1，如果是，就将掩码位全部清0。
+ * @brief XWOS BOPLIB：测试位图中掩码位是否至少有一位为1，如果是，就将掩码位全部清0。
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -474,7 +474,7 @@ __xwlib_code
 bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 测试位图中掩码位是否全部为0
+ * @brief XWOS BOPLIB：测试位图中掩码位是否全部为0
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -486,7 +486,7 @@ __xwlib_code
 bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 测试位图中掩码位是否全部为0，如果是，就将掩码位全部置1。
+ * @brief XWOS BOPLIB：测试位图中掩码位是否全部为0，如果是，就将掩码位全部置1。
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -498,7 +498,7 @@ __xwlib_code
 bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 测试位图中掩码位是否至少有一位为0
+ * @brief XWOS BOPLIB：测试位图中掩码位是否至少有一位为0
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -510,7 +510,7 @@ __xwlib_code
 bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 测试位图中掩码位是否至少有一位为0，如果是，就将掩码位全部置1。
+ * @brief XWOS BOPLIB：测试位图中掩码位是否至少有一位为0，如果是，就将掩码位全部置1。
  * @param bmp: (I) 位图的起始地址指针
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
@@ -522,7 +522,7 @@ __xwlib_code
 bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief 将位图与操作数进行逐位“与”操作
+ * @brief XWOS BOPLIB：将位图与操作数进行逐位“与”操作
  * @param bmp: (I) 位图的起始地址指针
  * @param opd: (I) 操作数
  * @param num: (I) 掩码的有效位数
@@ -531,7 +531,7 @@ __xwlib_code
 void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
- * @brief 将位图与操作数进行逐位“或”操作
+ * @brief XWOS BOPLIB：将位图与操作数进行逐位“或”操作
  * @param bmp: (I) 位图的起始地址指针
  * @param opd: (I) 操作数
  * @param num: (I) 掩码的有效位数
@@ -540,7 +540,7 @@ __xwlib_code
 void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
- * @brief 将位图与操作数进行逐位“异或”操作
+ * @brief XWOS BOPLIB：将位图与操作数进行逐位“异或”操作
  * @param bmp: (I) 位图的起始地址指针
  * @param opd: (I) 操作数
  * @param num: (I) 掩码的有效位数
@@ -549,7 +549,7 @@ __xwlib_code
 void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
- * @brief 在位图中从最低位起查找第一个被置1的位
+ * @brief XWOS BOPLIB：在位图中从最低位起查找第一个被置1的位
  * @param bmp: (I) 位图的起始地址指针
  * @param num: (I) 位图中总的位数
  * @return 位的序号
@@ -562,7 +562,7 @@ __xwlib_code
 xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num);
 
 /**
- * @brief 在位图中从最低位起查找第一个被清0的位
+ * @brief XWOS BOPLIB：在位图中从最低位起查找第一个被清0的位
  * @param bmp: (I) 位图的起始地址指针
  * @param num: (I) 位图中总的位数
  * @return 位的序号
@@ -575,7 +575,7 @@ __xwlib_code
 xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num);
 
 /**
- * @brief 在位图中从最高位起查找第一个被置1的位
+ * @brief XWOS BOPLIB：在位图中从最高位起查找第一个被置1的位
  * @param bmp: (I) 位图的起始地址指针
  * @param num: (I) 位图中总的位数
  * @return 位的序号
@@ -588,7 +588,7 @@ __xwlib_code
 xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num);
 
 /**
- * @brief 在位图中从最高位起查找第一个被清0的位
+ * @brief XWOS BOPLIB：在位图中从最高位起查找第一个被清0的位
  * @param bmp: (I) 位图的起始地址指针
  * @param num: (I) 位图中总的位数
  * @return 位的序号
