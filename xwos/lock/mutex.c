@@ -244,8 +244,13 @@ xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm)
         if (rt_task(current)) {
                 slack = 0;
         }
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
+        hrtimer_init_sleeper_on_stack(&hrts, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
+#else
         hrtimer_init_on_stack(&hrts.timer, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
         hrtimer_init_sleeper(&hrts, current);
+#endif
         expires = ktime_add_safe(*kt, hrts.timer.base->get_time());
         hrtimer_set_expires_range_ns(&hrts.timer, expires, slack);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0)
@@ -254,7 +259,7 @@ xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm)
         rc = rt_mutex_timed_lock(&mtx->lrtmtx, &hrts, true);
 #endif
         *kt = ktime_sub(expires, hrts.timer.base->get_time());
-        /* destroy_hrtimer_on_stack(&hrts.timer); */
+        destroy_hrtimer_on_stack(&hrts.timer);
         linux_thrd_clear_fake_signal(current);
         if (__unlikely(rc < 0)) {
                 goto err_mtx_lock;

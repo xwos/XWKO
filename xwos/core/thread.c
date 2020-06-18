@@ -290,18 +290,27 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
 
         kt = (ktime_t *)xwtm;
         set_current_state(TASK_INTERRUPTIBLE);
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
+        hrtimer_init_sleeper_on_stack(&hrts, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
+        expires = ktime_add_safe(*kt, hrts.timer.base->get_time());
+        hrtimer_set_expires_range_ns(&hrts.timer, expires, 0);
+        hrtimer_sleeper_start_expires(&hrts, HRTIMER_MODE_ABS);
+#else
         hrtimer_init_on_stack(&hrts.timer, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
         expires = ktime_add_safe(*kt, hrts.timer.base->get_time());
         hrtimer_init_sleeper(&hrts, current);
         hrtimer_set_expires_range_ns(&hrts.timer, expires, 0);
         hrtimer_start_expires(&hrts.timer, HRTIMER_MODE_ABS);
+#endif
         if (__likely(hrts.task)) {
                 schedule();
         }
         hrtimer_cancel(&hrts.timer);
         rc = !hrts.task ? 0 : -EINTR;
         *kt = ktime_sub(expires, hrts.timer.base->get_time());
-        /* destroy_hrtimer_on_stack(&hrts.timer); */
+        destroy_hrtimer_on_stack(&hrts.timer);
+
         set_current_state(TASK_RUNNING);
         linux_thrd_clear_fake_signal(current);
         return rc;
@@ -324,11 +333,20 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
 #endif
 
         set_current_state(TASK_INTERRUPTIBLE);
+
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
+        hrtimer_init_sleeper_on_stack(&hrts, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
+        expires = ktime_add_safe(*ktorigin, ktinc);
+        hrtimer_set_expires_range_ns(&hrts.timer, expires, 0);
+        hrtimer_sleeper_start_expires(&hrts, HRTIMER_MODE_ABS);
+#else
         hrtimer_init_on_stack(&hrts.timer, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
         expires = ktime_add_safe(*ktorigin, ktinc);
         hrtimer_set_expires_range_ns(&hrts.timer, expires, 0);
         hrtimer_init_sleeper(&hrts, current);
         hrtimer_start_expires(&hrts.timer, HRTIMER_MODE_ABS);
+#endif
         if (likely(hrts.task)) {
                 schedule();
         }
@@ -339,7 +357,7 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
         *origin = (xwtm_t)hrts.timer.base->get_time().tv64;
 #endif
         rc = !hrts.task ? 0 : -EINTR;
-        /* destroy_hrtimer_on_stack(&hrts.timer); */
+        destroy_hrtimer_on_stack(&hrts.timer);
         set_current_state(TASK_RUNNING);
         linux_thrd_clear_fake_signal(current);
         return rc;

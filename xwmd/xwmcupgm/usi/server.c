@@ -183,7 +183,7 @@ ssize_t usi_xwmcupgmsrv_sysfs_state_store(struct xwsys_object * xwobj,
 /**
  * @brief entry:/sys/xwosal/xwmcupgmsrv/state
  */
-static XWSYS_ATTR(state, 0644,
+static XWSYS_ATTR(file_xwmcupgmsrv_state, state, 0644,
                   usi_xwmcupgmsrv_sysfs_state_show,
                   usi_xwmcupgmsrv_sysfs_state_store);
 
@@ -298,7 +298,8 @@ xwer_t usi_xwmcupgmsrv_start(void)
         }
         xwmcupgmlogf(INFO, "Create \"/sys/xwosal/xwmcupgmsrv\" ... [OK]\n");
 
-        rc = xwsys_create_file(usi_xwmcupgmsrv_sysfs_kobj, &xwsys_attr_state);
+        rc = xwsys_create_file(usi_xwmcupgmsrv_sysfs_kobj,
+                               &xwsys_attr_file_xwmcupgmsrv_state);
         if (__unlikely(rc < 0)) {
                 xwmcupgmlogf(ERR,
                              "Create \"/sys/xwosal/xwmcupgmsrv/state\" ... [Failed], "
@@ -337,7 +338,8 @@ xwer_t usi_xwmcupgmsrv_stop(void)
                 goto err_notstart;
         }
 
-        xwsys_remove_file(usi_xwmcupgmsrv_sysfs_kobj, &xwsys_attr_state);
+        xwsys_remove_file(usi_xwmcupgmsrv_sysfs_kobj,
+                          &xwsys_attr_file_xwmcupgmsrv_state);
         xwsys_unregister(usi_xwmcupgmsrv_sysfs_kobj);
         usi_xwmcupgmsrv_sysfs_kobj = NULL;
         xwfs_rmnod(usi_xwmcupgmsrv_xwfs_node);

@@ -585,7 +585,7 @@ void xwpcp_finish_tx(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                 xwpcp->txq.tmp = frmslot;
                 break;
         default:
-                xwpcplogf(ALERT, "ACK:0x%X, frmslot:%p\n", rmtack, frmslot);
+                xwpcplogf(ERR, "ACK:0x%X, frmslot:%p\n", rmtack, frmslot);
                 XWPCP_BUG();
                 xwpcp->txq.tmp = frmslot;
                 break;
@@ -913,7 +913,7 @@ xwer_t xwpcp_rxthrd(struct xwpcp * xwpcp)
                         } else if (-EBADMSG == rc) {
                                 xwpcplogf(WARNING, "Bad frame! \n");
                         } else {
-                                xwpcplogf(ALERT, "xwpcp_rxfsm() returns %d.\n", rc);
+                                xwpcplogf(ERR, "xwpcp_rxfsm() returns %d.\n", rc);
                                 xwosal_cthrd_wait_exit();
                                 break;
                         }
@@ -1155,7 +1155,7 @@ xwer_t xwpcp_txthrd(struct xwpcp * xwpcp)
                                 xwpcplogf(DEBUG, "Buffer of HWIF is overflow!\n");
                                 xwpcp_thrd_pause();
                         } else if ((-ETIMEDOUT != rc) && (OK != rc)) {
-                                xwpcplogf(ALERT, "xwpcp_txfsm() ... rc: %d.\n", rc);
+                                xwpcplogf(ERR, "xwpcp_txfsm() ... rc: %d.\n", rc);
                                 xwosal_cthrd_wait_exit();
                                 break;
                         }/* else {} */

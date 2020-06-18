@@ -117,7 +117,7 @@ static struct kset *xwsys_kset;
 /**
  * @brief /sys/xwos/state entry
  */
-KOBJ_ATTR(state, xwsys_attr_state_show, xwsys_attr_state_store);
+KOBJ_ATTR(file_xwos_state, state, xwsys_attr_state_show, xwsys_attr_state_store);
 
 static const match_table_t xwsys_state_cmd_tokens = {
 	{XWSYS_STATE_CMD_START, "start=%s"},
@@ -448,7 +448,7 @@ xwer_t xwsys_init(void)
                 goto err_out;
         }
 
-        rc = sysfs_create_file(&xwsys_kset->kobj, &kobj_attr_state.attr);
+        rc = sysfs_create_file(&xwsys_kset->kobj, &kobj_attr_file_xwos_state.attr);
         if (__unlikely(rc < 0)) {
                 xwsyslogf(ERR, "Can't create attr state!\n");
                 goto err_create_attr_state;
@@ -465,7 +465,7 @@ err_out:
 
 void xwsys_exit(void)
 {
-        sysfs_remove_file(&xwsys_kset->kobj, &kobj_attr_state.attr);
+        sysfs_remove_file(&xwsys_kset->kobj, &kobj_attr_file_xwos_state.attr);
         kset_unregister(xwsys_kset);
         xwsys_kset = NULL;
 }

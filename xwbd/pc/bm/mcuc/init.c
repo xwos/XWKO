@@ -193,7 +193,7 @@ ssize_t xwsys_mcuc_state_store(struct xwsys_object * xwobj,
                                size_t count);
 
 /******** ******** .data ******** ********/
-XWSYS_ATTR(mcuc_state_file, 0644,
+XWSYS_ATTR(file_mcuc_state, state, 0644,
            xwsys_mcuc_state_show,
            xwsys_mcuc_state_store);
 
@@ -252,7 +252,7 @@ xwer_t mcuc_init(void)
         }
         xwsys_mcuc = xwsysobj;
 
-        rc = xwsys_create_file(xwsys_mcuc, &xwsys_attr_mcuc_state_file);
+        rc = xwsys_create_file(xwsys_mcuc, &xwsys_attr_file_mcuc_state);
         if (__unlikely(rc < 0)) {
                 mcuclogf(ERR,
                          "Create /sys/xwos/mcuc/state ... [FAILED], rc:%d\n",
@@ -270,7 +270,7 @@ err_xwsys_reg:
 
 void mcuc_exit(void)
 {
-        xwsys_remove_file(xwsys_mcuc, &xwsys_attr_mcuc_state_file);
+        xwsys_remove_file(xwsys_mcuc, &xwsys_attr_file_mcuc_state);
         xwsys_unregister(xwsys_mcuc);
         xwsys_mcuc = NULL;
 }

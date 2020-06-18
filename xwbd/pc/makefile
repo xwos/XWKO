@@ -22,7 +22,7 @@
 #
 
 WKSPC ?= wkspc
-TARGET ?= XuanWuOS
+TARGET ?= xwos
 
 all: $(WKSPC) cfg
 	$(MAKE) -C $(WKSPC) TARGET=$(TARGET)

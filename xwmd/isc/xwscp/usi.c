@@ -161,7 +161,7 @@ ssize_t usi_xwscp_sysfs_cmd_store(struct xwsys_object *xwobj,
 /**
  * @brief /sys/xwos/xwscp/cmd entry
  */
-static XWSYS_ATTR(cmd, 0644,
+static XWSYS_ATTR(file_xwscp_cmd, cmd, 0644,
                   usi_xwscp_sysfs_cmd_show,
                   usi_xwscp_sysfs_cmd_store);
 
@@ -248,7 +248,7 @@ xwer_t usi_xwscp_start(void)
         }
         xwscplogf(INFO, "Create \"/sys/xwosal/xwscp\" ... [OK]\n");
 
-        rc = xwsys_create_file(usi_xwscp_sysfs, &xwsys_attr_cmd);
+        rc = xwsys_create_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_cmd);
         if (__unlikely(rc < 0)) {
                 xwscplogf(ERR,
                         "Create \"/sys/xwosal/xwscp/cmd\" ... [Failed], errno: %d\n",
@@ -293,7 +293,7 @@ err_xwscp_thread_create:
 err_xwscp_ifopen:
         xwscp_stop(&usi_xwscp);
 err_xwscp_start:
-        xwsys_remove_file(usi_xwscp_sysfs, &xwsys_attr_cmd);
+        xwsys_remove_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_cmd);
 err_usi_xwscp_sysfs_cmd_create:
         xwsys_unregister(usi_xwscp_sysfs);
         usi_xwscp_sysfs = NULL;
@@ -337,7 +337,7 @@ xwer_t usi_xwscp_stop(void)
 
         xwscplogf(INFO, "kfree mempool ... [OK]\n");
 
-        xwsys_remove_file(usi_xwscp_sysfs, &xwsys_attr_cmd);
+        xwsys_remove_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_cmd);
         xwsys_unregister(usi_xwscp_sysfs);
         usi_xwscp_sysfs = NULL;
         xwscplogf(INFO, "destory \"/sys/xwosal/xwscp\" ... [OK]\n");

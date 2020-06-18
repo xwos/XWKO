@@ -41,7 +41,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** point to point communication protocol ******** ********/
 #define XWMDCFG_isc_xwpcp                                       1
-#define XWMDCFG_isc_xwpcp_LOG                                   0
+#define XWMDCFG_isc_xwpcp_LOG                                   1
 #define XWMDCFG_isc_xwpcp_PORT_NUM                              (12U)
 #define XWMDCFG_isc_xwpcp_PRIORITY_NUM                          (4U)
 #define XWMDCFG_isc_xwpcp_RETRY_PERIOD                          (1 * XWTM_S)
@@ -52,7 +52,7 @@
 
 /******** ******** simple communication protocol ******** ********/
 #define XWMDCFG_isc_xwscp                                        1
-#define XWMDCFG_isc_xwscp_LOG                                    0
+#define XWMDCFG_isc_xwscp_LOG                                    1
 #define XWMDCFG_isc_xwscp_PERIOD                                 (1 * XWTM_S)
 #define XWMDCFG_isc_xwscp_RETRY_NUM                              (8U)
 #define XWMDCFG_isc_xwscp_SDU_MAX_SIZE                           (40U)

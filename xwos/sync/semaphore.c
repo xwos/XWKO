@@ -539,6 +539,15 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
                         __set_current_state(TASK_INTERRUPTIBLE);
 #endif
                         xwlk_splk_unlock_cpuirq(&smr->lock);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
+                        hrtimer_init_sleeper_on_stack(&hrts,
+                                                      HRTIMER_BASE_MONOTONIC,
+                                                      HRTIMER_MODE_ABS);
+                        expires = ktime_add_safe(*kt,
+                                                 hrts.timer.base->get_time());
+                        hrtimer_set_expires_range_ns(&hrts.timer, expires, slack);
+                        hrtimer_sleeper_start_expires(&hrts, HRTIMER_MODE_ABS);
+#else
                         hrtimer_init_on_stack(&hrts.timer,
                                               HRTIMER_BASE_MONOTONIC,
                                               HRTIMER_MODE_ABS);
@@ -547,6 +556,7 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
                         hrtimer_set_expires_range_ns(&hrts.timer, expires, slack);
                         hrtimer_init_sleeper(&hrts, task);
                         hrtimer_start_expires(&hrts.timer, HRTIMER_MODE_ABS);
+#endif
                         if (__likely(hrts.task)) {
                                 schedule();
                         }
@@ -554,7 +564,7 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
                         rc = !hrts.task ? -ETIMEDOUT : OK;
                         *kt = ktime_sub(expires,
                                         hrts.timer.base->get_time());
-                        /* destroy_hrtimer_on_stack(&hrts.timer); */
+                        destroy_hrtimer_on_stack(&hrts.timer);
                         xwlk_splk_lock_cpuirq(&smr->lock);
                         if (XWSYNC_SMR_F_UP == waiter.flags) {
                                 rc = OK;

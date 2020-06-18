@@ -383,8 +383,12 @@ struct dentry * xwfs_mount(struct file_system_type * fst,
 	};
         xwer_t rc;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
+        if (SB_KERNMOUNT & flags) {
+#else
         if (MS_KERNMOUNT & flags) {
-                /* mounted by kernel API: kern_mount_data() */
+#endif
+                /* mounted by kernel */
                 sb = sget(fst, NULL, xwfs_set_super, flags, data);
                 if (__unlikely(is_err(sb))) {
                         rootd = (void *)sb;
@@ -396,7 +400,11 @@ struct dentry * xwfs_mount(struct file_system_type * fst,
                         rootd = err_ptr(rc);
                         goto err_fill_sb;
                 }
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
+                sb->s_flags |= SB_ACTIVE;
+#else
                 sb->s_flags |= MS_ACTIVE;
+#endif
         } else {
                 /* mounted by syscall API: sys_mount() */
                 if (!xwfs_is_started()) {
@@ -476,7 +484,6 @@ struct inode * xwfs_new_entry(struct super_block * sb,
                               umode_t mode, dev_t dev)
 {
         union xwfs_entry * oe;
-        struct timespec ctime;
         struct inode * iprnt;
 
         iprnt = parent ? &parent->inode : NULL;
@@ -488,13 +495,14 @@ struct inode * xwfs_new_entry(struct super_block * sb,
                 mapping_set_gfp_mask(oe->inode.i_mapping, GFP_HIGHUSER);
                 mapping_set_unevictable(oe->inode.i_mapping);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0)
-                ctime = current_time(&oe->inode);
+                oe->inode.i_atime =
+                                oe->inode.i_mtime =
+                                oe->inode.i_ctime = current_time(&oe->inode);
 #else
-                ctime = CURRENT_TIME;
+                oe->inode.i_atime =
+                                oe->inode.i_mtime =
+                                oe->inode.i_ctime = CURRENT_TIME;
 #endif
-                oe->inode.i_atime = ctime;
-                oe->inode.i_mtime = ctime;
-                oe->inode.i_ctime = ctime;
                 switch (mode & S_IFMT) {
                 case S_IFREG:
                         oe->inode.i_op = &xwfs_node_iops;
@@ -1208,7 +1216,11 @@ xwer_t xwfs_start(void)
                 goto err_xwfs_alrdymnted;
         }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0)
+        mnt = kern_mount(&xwfs_fstype);
+#else
         mnt = kern_mount_data(&xwfs_fstype, NULL);
+#endif
         if (__unlikely(is_err(mnt))) {
                 rc = ptr_err(mnt);
                 xwfslogf(ERR,

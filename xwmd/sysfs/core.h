@@ -36,19 +36,19 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define xwsyslogf(lv, fmt, ...)    xwlogf(lv, "xwsys", fmt, ##__VA_ARGS__)
 
-#define KOBJ_ATTR(_name, _show, _store) \
-        static struct kobj_attribute kobj_attr_##_name = \
+#define KOBJ_ATTR(_sym, _name, _show, _store) \
+        static struct kobj_attribute kobj_attr_##_sym = \
                __ATTR(_name, 0644, _show, _store)
 
-#define XWSYS_ATTR(_name, _mode, _show, _store) \
-        struct xwsys_attribute xwsys_attr_##_name = \
+#define XWSYS_ATTR(_sym, _name, _mode, _show, _store)    \
+        struct xwsys_attribute xwsys_attr_##_sym = \
                __ATTR(_name, _mode, _show, _store)
 
-#define XWSYS_ATTR_RW(_name) \
-        struct xwsys_attribute xwsys_attr_##_name = __ATTR_RW(_name)
+#define XWSYS_ATTR_RW(_sym, _name) \
+        struct xwsys_attribute xwsys_attr_##_sym = __ATTR_RW(_name)
 
-#define XWSYS_ATTR_RO(_name) \
-        struct xwsys_attribute xwsys_attr_##_name = __ATTR_RO(_name)
+#define XWSYS_ATTR_RO(_sym, _name) \
+        struct xwsys_attribute xwsys_attr_##_sym = __ATTR_RO(_name)
 
 #define TO_SOATTR(_attr) container_of(_attr, struct xwsys_attribute, attr)
 

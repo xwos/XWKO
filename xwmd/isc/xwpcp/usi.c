@@ -205,7 +205,9 @@ ssize_t usi_xwpcp_sysfs_cmd_store(struct xwsys_object * xwobj,
                                  size_t count);
 
 /******** ******** .data ******** ********/
-static XWSYS_ATTR(cmd, 0644, usi_xwpcp_sysfs_cmd_show, usi_xwpcp_sysfs_cmd_store);
+static XWSYS_ATTR(file_xwpcp_cmd, cmd, 0644,
+                  usi_xwpcp_sysfs_cmd_show,
+                  usi_xwpcp_sysfs_cmd_store);
 
 static const match_table_t xwpcp_cmd_tokens = {
         {USI_XWPCP_SYSFS_CMD_UNEXPORT, "unexport=%s"},
@@ -427,7 +429,7 @@ ssize_t usi_xwpcp_sysfs_state_store(struct xwsys_object * xwobj,
                                    size_t count);
 
 /******** ******** .data ******** ********/
-static XWSYS_ATTR(state, 0644,
+static XWSYS_ATTR(file_xwpcp_state, state, 0644,
                   usi_xwpcp_sysfs_state_show,
                   usi_xwpcp_sysfs_state_store);
 
@@ -547,7 +549,7 @@ xwer_t usi_xwpcp_start(const char * cmdstring)
         }
         xwpcplogf(INFO, "Create \"/sys/xwosal/xwpcp\" ... [OK]\n");
 
-        rc = xwsys_create_file(usi_xwpcp_sysfs, &xwsys_attr_cmd);
+        rc = xwsys_create_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_cmd);
         if (__unlikely(rc < 0)) {
                 xwpcplogf(ERR,
                          "Create \"/sys/xwosal/xwpcp/cmd\" ... [rc:%d]\n",
@@ -556,7 +558,7 @@ xwer_t usi_xwpcp_start(const char * cmdstring)
         }
         xwpcplogf(INFO, "Create \"/sys/xwosal/xwpcp/cmd\" ... [OK]\n");
 
-        rc = xwsys_create_file(usi_xwpcp_sysfs, &xwsys_attr_state);
+        rc = xwsys_create_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_state);
         if (__unlikely(rc < 0)) {
                 xwpcplogf(ERR,
                          "Create \"/sys/xwosal/xwpcp/state\" ... [rc:%d]\n",
@@ -608,9 +610,9 @@ err_xwpcp_rxthrd_create:
 err_xwpcp_txthrd_create:
         xwpcp_stop(&usi_xwpcp);
 err_xwpcp_start:
-        xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_state);
+        xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_state);
 err_usi_xwpcp_sysfs_state_create:
-        xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_cmd);
+        xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_cmd);
 err_usi_xwpcp_sysfs_cmd_create:
         xwsys_unregister(usi_xwpcp_sysfs);
         usi_xwpcp_sysfs = NULL;
@@ -661,9 +663,9 @@ xwer_t usi_xwpcp_stop(void)
         }
 
         xwpcplogf(INFO, "destory \"/sys/xwosal/xwpcp/port\" ... [OK]\n");
-        xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_state);
+        xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_state);
         xwpcplogf(INFO, "destory \"/sys/xwosal/xwpcp/state\" ... [OK]\n");
-        xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_cmd);
+        xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_cmd);
         xwpcplogf(INFO, "destory \"/sys/xwosal/xwpcp/cmd\" ... [OK]\n");
         xwsys_unregister(usi_xwpcp_sysfs);
         usi_xwpcp_sysfs = NULL;

@@ -145,7 +145,7 @@ EOBJS += $(XWBM_EOBJS)
 INCDIRS += $(XWBM_INCDIRS)
 
 ######## ######## ######## ######## rule ######## ######## ######## ########
-ccflags-y := -I$(XWOS_PATH) $(INCDIRS) $(ARCH_CFLAGS) -fno-pic
+ccflags-y := -I$(XWOS_PATH) $(INCDIRS) $(ARCH_CFLAGS) -fno-pic -Wno-vla
 ldflags-y := $(ARCH_LDFLAGS) $(CPU_LDFLAGS) $(EOBJS)
 
 all: modules strip
@@ -162,7 +162,7 @@ strip: modules
 
 clean:
 	@rm -rf .tmp_versions
-	@rm -f *~ *.o core .depend .*.cmd *.ko *.mod.c
+	@rm -f *~ *.o core .depend .*.cmd *.ko *.mod.c *.mod
 	@rm -f *.markers *.symvers *.order *.mod.o .cache.mk
 	@rm -f $(ARCH_COBJS)
 	@rm -f $(ARCH_COBJS:.o=.o.ur-safe)

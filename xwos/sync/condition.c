@@ -523,8 +523,13 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
 	xwlib_bclst_init_node(&waiter.node);
         waiter.task = current;
 	waiter.flags = 0;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
+        hrtimer_init_sleeper_on_stack(&hrts, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
+#else
         hrtimer_init_on_stack(&hrts.timer, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
         hrtimer_init_sleeper(&hrts, current);
+#endif
         if (rt_task(current)) {
                 slack = 0;
         } else {
@@ -544,9 +549,14 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
         }
         set_current_state(TASK_INTERRUPTIBLE);
         xwlib_bclst_add_tail(&cdt->wq, &waiter.node);
+
         expires = ktime_add_safe(*kt, hrts.timer.base->get_time());
         hrtimer_set_expires_range_ns(&hrts.timer, expires, slack);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
+        hrtimer_sleeper_start_expires(&hrts, HRTIMER_MODE_ABS);
+#else
         hrtimer_start_expires(&hrts.timer, HRTIMER_MODE_ABS);
+#endif
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
         rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
         if (OK == rc) {
@@ -584,7 +594,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
         hrtimer_cancel(&hrts.timer);
         *kt = ktime_sub(expires, hrts.timer.base->get_time());
-        /* destroy_hrtimer_on_stack(&hrts.timer); */
+        destroy_hrtimer_on_stack(&hrts.timer);
         xwsync_cdt_put(cdt);
         if (OK == rc) {
                 if (XWLK_STATE_UNLOCKED == *lkst) {

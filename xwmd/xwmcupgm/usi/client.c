@@ -65,7 +65,7 @@ ssize_t usi_xwmcupgmc_sysfs_state_store(struct xwsys_object * xwobj,
 /**
  * @brief /sys/xwosal/xwmcupgmc/state entry
  */
-static XWSYS_ATTR(state, 0644,
+static XWSYS_ATTR(file_xwmcupgmc_state, state, 0644,
                   usi_xwmcupgmc_sysfs_state_show,
                   usi_xwmcupgmc_sysfs_state_store);
 
@@ -282,7 +282,8 @@ xwer_t usi_xwmcupgmc_start(void)
         }
         xwmcupgmlogf(INFO, "Create \"/sys/xwosal/xwmcupgmc\" ... [OK]\n");
 
-        rc = xwsys_create_file(usi_xwmcupgmc_sysfs_kobj, &xwsys_attr_state);
+        rc = xwsys_create_file(usi_xwmcupgmc_sysfs_kobj,
+                               &xwsys_attr_file_xwmcupgmc_state);
         if (__unlikely(rc < 0)) {
                 xwmcupgmlogf(ERR,
                              "Create \"/sys/xwosal/xwmcupgmc/state\" ... [Failed], "
@@ -310,7 +311,8 @@ xwer_t usi_xwmcupgmc_start(void)
         return OK;
 
 err_xwmcupgmc_thread_create:
-        xwsys_remove_file(usi_xwmcupgmc_sysfs_kobj, &xwsys_attr_state);
+        xwsys_remove_file(usi_xwmcupgmc_sysfs_kobj,
+                          &xwsys_attr_file_xwmcupgmc_state);
 err_xwsys_create:
         xwsys_unregister(usi_xwmcupgmc_sysfs_kobj);
         usi_xwmcupgmc_sysfs_kobj = NULL;
@@ -337,7 +339,8 @@ xwer_t usi_xwmcupgmc_stop(void)
                 }
         }
 
-        xwsys_remove_file(usi_xwmcupgmc_sysfs_kobj, &xwsys_attr_state);
+        xwsys_remove_file(usi_xwmcupgmc_sysfs_kobj,
+                          &xwsys_attr_file_xwmcupgmc_state);
         xwsys_unregister(usi_xwmcupgmc_sysfs_kobj);
         usi_xwmcupgmc_sysfs_kobj = NULL;
         usi_xwmcupgmc_state = USI_XWMCUPGMC_STATE_STOP;
