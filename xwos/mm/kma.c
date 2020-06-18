@@ -129,7 +129,6 @@ xwer_t xwmm_dkma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
                 goto err_nomem;
         }
         *membuf = m;
-        module_put(THIS_MODULE);
         return OK;
 
 err_nomem:
