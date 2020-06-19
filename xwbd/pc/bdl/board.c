@@ -48,27 +48,27 @@ xwer_t board_init(void)
 
         rc = usi_xwpcp_init();
         if (__unlikely(rc < 0)) {
-                xwbdlogf(ERR, "Initialize XWPCP ... [FAILED], rc:%d\n",
+                xwbdlogf(ERR, "Init XWPCP ... [FAILED], rc:%d\n",
                          rc);
                 goto err_xwpcp_init;
         }
-        xwbdlogf(INFO, "Initialize XWPCP ... [OK]\n");
+        xwbdlogf(INFO, "Init XWPCP ... [OK]\n");
 
         rc = usi_xwscp_init();
         if (__unlikely(rc < 0)) {
-                xwbdlogf(ERR, "Initialize XWSCP ... [FAILED], rc:%d\n",
+                xwbdlogf(ERR, "Init XWSCP ... [FAILED], rc:%d\n",
                          rc);
                 goto err_xwscp_init;
         }
-        xwbdlogf(INFO, "Initialize XWSCP ... [OK]\n");
+        xwbdlogf(INFO, "Init XWSCP ... [OK]\n");
 
         rc = mcuc_init();
         if (__unlikely(rc < 0)) {
-                xwbdlogf(ERR, "Initialize MCU Controller ... [FAILED], rc:%d\n",
+                xwbdlogf(ERR, "Init MCU Controller ... [FAILED], rc:%d\n",
                          rc);
                 goto err_mcuc_init;
         }
-        xwbdlogf(INFO, "Initialize MCU Controller ... [OK]\n");
+        xwbdlogf(INFO, "Init MCU Controller ... [OK]\n");
         return OK;
 
 err_mcuc_init:

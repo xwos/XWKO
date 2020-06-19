@@ -43,45 +43,44 @@ struct xwlk_mtx {
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ********     internal function prototypes    ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
 xwer_t xwlk_mtx_cache_create(void);
 
-extern
 void xwlk_mtx_cache_destroy(void);
 
-extern
 xwer_t xwlk_mtx_xwfs_init(void);
 
-extern
 void xwlk_mtx_xwfs_exit(void);
 
-extern
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********       API function prototypes       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+__xwos_api
 xwer_t xwlk_mtx_init(struct xwlk_mtx * mtx, xwpr_t sprio);
 
-extern
+__xwos_api
 xwer_t xwlk_mtx_destroy(struct xwlk_mtx * mtx);
 
-extern
+__xwos_api
 xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio);
 
-extern
+__xwos_api
 xwer_t xwlk_mtx_delete(struct xwlk_mtx * mtx);
 
-extern
+__xwos_api
 xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx);
 
-extern
+__xwos_api
 xwer_t xwlk_mtx_lock(struct xwlk_mtx * mtx);
 
-extern
+__xwos_api
 xwer_t xwlk_mtx_trylock(struct xwlk_mtx * mtx);
 
-extern
+__xwos_api
 xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm);
 
-extern
+__xwos_api
 xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx);
 
 /******** ******** ******** ******** ******** ******** ******** ********

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：MCU的唤醒
+ * @brief MCU通讯模块：MCU的唤醒
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

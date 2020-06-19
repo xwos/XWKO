@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：MCU的唤醒
+ * @brief MCU通讯模块：MCU的唤醒
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -44,10 +44,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
 xwer_t mcuc_wkup_init(void);
 
-extern
 xwer_t mcuc_wkup_exit(void);
 
 #endif /* bm/mcuc/wkup.h */

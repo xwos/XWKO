@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：与MCU建立的会话
+ * @brief MCU通讯模块：与MCU建立的会话
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

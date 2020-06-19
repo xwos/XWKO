@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：MCU文件节点
+ * @brief MCU通讯模块：用户态文件节点
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -67,10 +67,8 @@ extern struct mcuc_msgnode_info mcuc_msgnode[MCUC_MSGNODE_NUM];
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
 xwer_t mcuc_msgnode_init(void);
 
-extern
 xwer_t mcuc_msgnode_exit(void);
 
 #endif /* bm/mcuc/msgnode.h */

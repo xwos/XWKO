@@ -80,7 +80,7 @@ void xwsync_cdt_construct(void * anon);
 xwer_t xwsync_cdt_activate(struct xwsync_cdt * cdt, xwobj_gc_f gcfunc);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ********       API function prototypes       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwos_api
 xwer_t xwsync_cdt_init(struct xwsync_cdt * cdt);

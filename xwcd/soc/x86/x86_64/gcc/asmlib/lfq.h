@@ -40,10 +40,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern __xwbsp_code
+__xwbsp_code
 void arch_lfq_push(__atomic xwlfq_t * h, __atomic xwlfq_t * n);
 
-extern __xwbsp_code
+__xwbsp_code
 xwlfq_t * arch_lfq_pop(__atomic xwlfq_t * h);
 
 #endif /* asmlib/lfq.h */

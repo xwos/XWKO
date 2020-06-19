@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：MCU Client初始化
+ * @brief MCU通讯模块：初始化
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -52,25 +52,18 @@ extern struct xwfs_dir * dir_mcuc;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
 xwer_t mcuc_start(const char * cmdstring);
 
-extern
 xwer_t mcuc_stop(void);
 
-extern
 xwsq_t mcuc_get_state(void);
 
-extern
 xwer_t mcuc_grab(void);
 
-extern
 xwer_t mcuc_put(void);
 
-extern
 xwer_t mcuc_init(void);
 
-extern
 void mcuc_exit(void);
 
 #endif /* bm/mcuc/init.h */

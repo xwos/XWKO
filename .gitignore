@@ -6,6 +6,7 @@
 modules.order
 Module.symvers
 XuanWuOS.symvers
+xwos.symvers
 *.o
 .tmp_versions
 wkspc

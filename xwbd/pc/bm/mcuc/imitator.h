@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：MCU模拟器
+ * @brief MCU通讯模块：MCU模拟器
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -67,20 +67,16 @@ extern bool mcuc_imitator;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
 xwer_t mcuc_imitator_init(void);
 
-extern
 xwer_t mcuc_imitator_exit(void);
 
-extern
 void mcuc_imitator_pulish_txmsg(struct mcuc_imitator_info * imi,
                                 struct mcuc_imitator_msg * imsg);
 
 xwer_t mcuc_imitator_get_txmsg(struct mcuc_imitator_info * imi,
                                struct mcuc_imitator_msg ** imsgbuf);
 
-extern
 void mcuc_imitator_pulish_rxmsg(struct mcuc_imitator_info * imi,
                                 struct mcuc_imitator_msg * imsg);
 

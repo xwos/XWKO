@@ -46,10 +46,8 @@ extern struct xwsys_object * xwsys_mcuc;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
 xwer_t board_init(void);
 
-extern
 void board_exit(void);
 
 #endif /* bdl/board.h */

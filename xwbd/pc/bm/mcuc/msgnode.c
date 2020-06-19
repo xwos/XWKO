@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：MCU文件节点
+ * @brief MCU通讯模块：用户态文件节点
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

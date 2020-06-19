@@ -57,10 +57,8 @@ extern struct xwfs_dir *dir_sysm;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
 xwer_t xwfs_create_skeleton(void);
 
-extern
 void xwfs_delete_skeleton(void);
 
 #endif /* xwmd/xwfs/bs.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：MCU Client初始化
+ * @brief MCU通讯模块：初始化
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

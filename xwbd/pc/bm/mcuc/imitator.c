@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：MCU模拟器
+ * @brief MCU通讯模块：MCU模拟器
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

@@ -51,7 +51,7 @@ struct xwsync_smr {
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ********     internal function prototypes    ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwsync_smr_cache_create(void);
 
@@ -61,32 +61,49 @@ xwer_t xwsync_smr_xwfs_init(void);
 
 void xwsync_smr_xwfs_exit(void);
 
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********       API function prototypes       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+__xwos_api
 xwer_t xwsync_smr_init(struct xwsync_smr * smr, xwssq_t val, xwssq_t max);
 
+__xwos_api
 xwer_t xwsync_smr_destroy(struct xwsync_smr * smr);
 
+__xwos_api
 xwer_t xwsync_smr_create(struct xwsync_smr ** ptrbuf, xwssq_t val, xwssq_t max);
 
+__xwos_api
 xwer_t xwsync_smr_delete(struct xwsync_smr * smr);
 
+__xwos_api
 xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t pos);
 
+__xwos_api
 xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt);
 
+__xwos_api
 xwer_t xwsync_smr_freeze(struct xwsync_smr * smr);
 
+__xwos_api
 xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max);
 
+__xwos_api
 xwer_t xwsync_smr_post(struct xwsync_smr * smr);
 
+__xwos_api
 xwer_t xwsync_smr_wait(struct xwsync_smr * smr);
 
+__xwos_api
 xwer_t xwsync_smr_trywait(struct xwsync_smr * smr);
 
+__xwos_api
 xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm);
 
+__xwos_api
 xwer_t xwsync_smr_wait_unintr(struct xwsync_smr * smr);
 
+__xwos_api
 xwer_t xwsync_smr_getvalue(struct xwsync_smr * smr, xwssq_t * sval);
 
 /******** ******** ******** ******** ******** ******** ******** ********
