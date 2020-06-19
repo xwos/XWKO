@@ -62,14 +62,11 @@ extern xwid_t usi_xwscp_thrd;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
+xwer_t usi_xwscp_init(void);
+
+void usi_xwscp_exit(void);
+
 xwsq_t usi_xwscp_get_state(void);
-
-extern
-xwer_t usi_xwscp_start(void);
-
-extern
-xwer_t usi_xwscp_stop(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  inline functions ******** ******** ********

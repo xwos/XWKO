@@ -43,22 +43,25 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            XWPCP resources            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** macros ******** ********/
 #define USI_XWPCP_TXTHRD_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 20)
 #define USI_XWPCP_RXTHRD_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 20)
 
-/******** ******** .data ******** ********/
 struct xwpcp usi_xwpcp;
 xwid_t usi_xwpcp_txthrd;
 xwid_t usi_xwpcp_rxthrd;
 xwu8_t __aligned(XWMMCFG_ALIGNMENT) usi_xwpcp_mempool[XWPCP_MEMPOOL_SIZE];
+xwsq_t usi_xwpcp_state = USI_XWPCP_STATE_STOP;
+
+xwsq_t usi_xwpcp_get_state(void)
+{
+        return usi_xwpcp_state;
+}
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********          xwfs/xwmd/isc/xwpcp          ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** types ******** ********/
 union usi_xwpcp_xwfs_port_data {
         struct {
                 uint8_t port;
@@ -67,7 +70,6 @@ union usi_xwpcp_xwfs_port_data {
         unsigned long word;
 };
 
-/******** ******** static function prototypes ******** ********/
 static
 ssize_t usi_xwpcp_xwfs_port_read(struct xwfs_node * xwfsnode,
                                  struct file * file,
@@ -82,7 +84,6 @@ ssize_t usi_xwpcp_xwfs_port_write(struct xwfs_node * xwfsnode,
                                   size_t count,
                                   loff_t * pos);
 
-/******** ******** .data ******** ********/
 struct xwfs_dir * usi_xwpcp_xwfs = NULL;
 struct xwfs_dir * usi_xwpcp_xwfs_portdir = NULL;
 struct xwfs_node * usi_xwpcp_xwfs_port[XWMDCFG_isc_xwpcp_PORT_NUM] = {
@@ -94,7 +95,6 @@ const struct xwfs_operations usi_xwpcp_xwfs_port_xwfsops = {
         .write = usi_xwpcp_xwfs_port_write,
 };
 
-/******** ******** function implementations ******** ********/
 static
 ssize_t usi_xwpcp_xwfs_port_read(struct xwfs_node * xwfsnode,
                                  struct file * file,
@@ -151,20 +151,19 @@ ssize_t usi_xwpcp_xwfs_port_write(struct xwfs_node * xwfsnode,
 }
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********           /sys/xwosal/xwpcp           ******** ********
+ ******** ********           /sys/xwos/xwpcp           ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** .data ******** ********/
 struct xwsys_object * usi_xwpcp_sysfs;
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         /sys/xwosal/xwpcp/cmd         ******** ********
+ ******** ********         /sys/xwos/xwpcp/cmd         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** macros ******** ********/
 #define USI_XWPCP_SYSFS_ARGBUFSIZE  32
 
-/******** ******** type ******** ********/
 enum usi_xwpcp_sysfs_cmd_em {
-        USI_XWPCP_SYSFS_CMD_UNEXPORT = 0,
+        USI_XWPCP_SYSFS_CMD_STOP = 0,
+        USI_XWPCP_SYSFS_CMD_START,
+        USI_XWPCP_SYSFS_CMD_UNEXPORT,
         USI_XWPCP_SYSFS_CMD_EXPORT,
         USI_XWPCP_SYSFS_CMD_NUM,
 };
@@ -176,27 +175,10 @@ enum usi_xwpcp_sysfs_cmd_arg_em {
         USI_XWPCP_SYSFS_CMD_ARG_NUM,
 };
 
-/******** ******** static function prototypes ******** ********/
-static
-xwer_t usi_xwpcp_sysfs_cmd_export_port(int port, int prio, char * portname);
-
-static
-xwer_t usi_xwpcp_sysfs_cmd_unexport_port(int port);
-
 static
 ssize_t usi_xwpcp_sysfs_cmd_show(struct xwsys_object * xwobj,
                                  struct xwsys_attribute * soattr,
                                  char * buf);
-
-static
-xwer_t usi_xwpcp_sysfs_cmd_parse_arg(const char * argstring,
-                                    int * port,
-                                    int * prio,
-                                    char portname[],
-                                    size_t bufsize);
-
-static
-xwer_t usi_xwpcp_sysfs_cmd_parse(const char * cmdstring);
 
 static
 ssize_t usi_xwpcp_sysfs_cmd_store(struct xwsys_object * xwobj,
@@ -204,25 +186,155 @@ ssize_t usi_xwpcp_sysfs_cmd_store(struct xwsys_object * xwobj,
                                  const char * buf,
                                  size_t count);
 
-/******** ******** .data ******** ********/
 static XWSYS_ATTR(file_xwpcp_cmd, cmd, 0644,
                   usi_xwpcp_sysfs_cmd_show,
                   usi_xwpcp_sysfs_cmd_store);
 
 static const match_table_t xwpcp_cmd_tokens = {
-        {USI_XWPCP_SYSFS_CMD_UNEXPORT, "unexport=%s"},
-        {USI_XWPCP_SYSFS_CMD_EXPORT, "export=%s"},
+        {USI_XWPCP_SYSFS_CMD_STOP, "stop"},
+        {USI_XWPCP_SYSFS_CMD_START, "start"},
+        {USI_XWPCP_SYSFS_CMD_UNEXPORT, "unexport(%s)"},
+        {USI_XWPCP_SYSFS_CMD_EXPORT, "export(%s)"},
         {USI_XWPCP_SYSFS_CMD_NUM, NULL},
 };
 
 static const match_table_t xwpcp_cmd_arg_tokens = {
-        {USI_XWPCP_SYSFS_CMD_ARG_PORT, "%u"},
-        {USI_XWPCP_SYSFS_CMD_ARG_PRIO, "(%u)"},
-        {USI_XWPCP_SYSFS_CMD_ARG_PORTNAME, "%s"},
+        {USI_XWPCP_SYSFS_CMD_ARG_PORT, "port=%u"},
+        {USI_XWPCP_SYSFS_CMD_ARG_PRIO, "prio=%u"},
+        {USI_XWPCP_SYSFS_CMD_ARG_PORTNAME, "name=%s"},
         {USI_XWPCP_SYSFS_CMD_ARG_NUM, NULL},
 };
 
-/******** ******** function implementations ******** ********/
+static
+xwer_t usi_xwpcp_start(void)
+{
+        xwer_t rc;
+        xwer_t trc;
+        xwid_t tid;
+
+        tid = 0;
+        if (USI_XWPCP_STATE_START == usi_xwpcp_state) {
+                rc = -EALREADY;
+                goto err_already;
+        }
+
+        rc = xwfs_holdon();
+        if (__unlikely(rc < 0)) {
+                rc = -EOWNERDEAD;
+                goto err_xwfs_not_ready;
+        }
+
+        rc = xwfs_mkdir("xwpcp", dir_isc, &usi_xwpcp_xwfs);
+        if (__unlikely(rc < 0)) {
+                goto err_mkdir_usi_xwpcp_xwfs;
+        }
+
+        rc = xwfs_mkdir("port", usi_xwpcp_xwfs, &usi_xwpcp_xwfs_portdir);
+        if (__unlikely(rc < 0)) {
+                goto err_mkdir_usi_xwpcp_xwfs_portdir;
+        }
+
+        xwpcp_init(&usi_xwpcp);
+        rc = xwpcp_start(&usi_xwpcp, "usi_xwpcp", &bdl_xwpcpif_ops,
+                         (xwptr_t)usi_xwpcp_mempool, XWPCP_MEMPOOL_SIZE);
+        if (__unlikely(rc < 0)) {
+                xwpcplogf(ERR, "Start XWPCP ... [rc:%d]\n", rc);
+                goto err_xwpcp_start;
+        }
+        xwpcplogf(INFO, "Start XWPCP ... [OK]\n");
+
+        rc = xwosal_thrd_create(&tid, "xwpcp_tx_thrd",
+                                (xwosal_thrd_f)xwpcp_txthrd,
+                                &usi_xwpcp, XWOS_UNUSED_ARGUMENT,
+                                USI_XWPCP_TXTHRD_PRIORITY,
+                                XWOS_UNUSED_ARGUMENT);
+        if (__unlikely(rc < 0)) {
+                xwpcplogf(ERR, "Create XWPCP TX thread ... [rc:%d]\n", rc);
+                goto err_xwpcp_txthrd_create;
+        }
+        usi_xwpcp_txthrd = tid;
+        xwpcplogf(INFO, "Create XWPCP TX thread ... [OK]\n");
+
+        rc = xwosal_thrd_create(&tid, "xwpcp_rx_thrd",
+                                (xwosal_thrd_f)xwpcp_rxthrd,
+                                &usi_xwpcp, XWOS_UNUSED_ARGUMENT,
+                                USI_XWPCP_RXTHRD_PRIORITY,
+                                XWOS_UNUSED_ARGUMENT);
+        if (__unlikely(rc < 0)) {
+                xwpcplogf(ERR, "Create XWPCP RX thread ... [rc:%d]\n", rc);
+                goto err_xwpcp_rxthrd_create;
+        }
+        usi_xwpcp_rxthrd = tid;
+        xwpcplogf(INFO, "Create XWPCP RX thread ... [OK]\n");
+
+        usi_xwpcp_state = USI_XWPCP_STATE_START;
+        return OK;
+
+err_xwpcp_rxthrd_create:
+        xwosal_thrd_terminate(usi_xwpcp_txthrd, &trc);
+        xwosal_thrd_delete(usi_xwpcp_txthrd);
+        usi_xwpcp_txthrd = 0;
+err_xwpcp_txthrd_create:
+        xwpcp_stop(&usi_xwpcp);
+err_xwpcp_start:
+        xwfs_rmdir(usi_xwpcp_xwfs_portdir);
+        usi_xwpcp_xwfs_portdir = NULL;
+err_mkdir_usi_xwpcp_xwfs_portdir:
+        xwfs_rmdir(usi_xwpcp_xwfs);
+        usi_xwpcp_xwfs = NULL;
+err_mkdir_usi_xwpcp_xwfs:
+        xwfs_giveup();
+err_xwfs_not_ready:
+err_already:
+        return rc;
+}
+
+static
+xwer_t usi_xwpcp_stop(void)
+{
+        xwer_t rc, trc;
+
+        if (USI_XWPCP_STATE_START != usi_xwpcp_state) {
+                rc = -EPERM;
+                goto err_notstart;
+        }
+
+        rc = xwosal_thrd_terminate(usi_xwpcp_rxthrd, &trc);
+        if (OK == rc) {
+                rc = xwosal_thrd_delete(usi_xwpcp_rxthrd);
+                if (OK == rc) {
+                        usi_xwpcp_rxthrd = 0;
+                        xwpcplogf(INFO, "Terminate XWPCP RX thread... [OK]\n");
+                }
+        }
+
+        rc = xwosal_thrd_terminate(usi_xwpcp_txthrd, &trc);
+        if (OK == rc) {
+                rc = xwosal_thrd_delete(usi_xwpcp_txthrd);
+                if (OK == rc) {
+                        usi_xwpcp_txthrd = 0;
+                        xwpcplogf(INFO, "Terminate XWPCP TX thread... [OK]\n");
+                }
+        }
+
+        rc = xwpcp_stop(&usi_xwpcp);
+        if (OK == rc) {
+                xwpcplogf(INFO, "Stop XWPCP ... [OK]\n");
+        }
+
+        xwfs_rmdir(usi_xwpcp_xwfs_portdir);
+        usi_xwpcp_xwfs_portdir = NULL;
+        xwfs_rmdir(usi_xwpcp_xwfs);
+        usi_xwpcp_xwfs = NULL;
+        xwfs_giveup();
+        usi_xwpcp_state = USI_XWPCP_STATE_STOP;
+
+        return OK;
+
+err_notstart:
+        return rc;
+}
+
 static
 xwer_t usi_xwpcp_sysfs_cmd_export_port(int port, int prio, char * portname)
 {
@@ -230,6 +342,10 @@ xwer_t usi_xwpcp_sysfs_cmd_export_port(int port, int prio, char * portname)
         struct xwfs_node * node;
         xwer_t rc;
 
+        if (USI_XWPCP_STATE_START != usi_xwpcp_state) {
+                rc = -EPERM;
+                goto err_notstart;
+        }
         if ((port > XWMDCFG_isc_xwpcp_PORT_NUM) || (port < 0)) {
                 xwpcplogf(INFO, "Port ID is out of range!\n");
                 rc = -ECHRNG;
@@ -256,6 +372,7 @@ xwer_t usi_xwpcp_sysfs_cmd_export_port(int port, int prio, char * portname)
 err_xwfs_mknod:
 err_prio:
 err_port:
+err_notstart:
         return rc;
 }
 
@@ -264,6 +381,11 @@ xwer_t usi_xwpcp_sysfs_cmd_unexport_port(int port)
 {
         struct xwfs_node *node;
         xwer_t rc;
+
+        if (USI_XWPCP_STATE_START != usi_xwpcp_state) {
+                rc = -EPERM;
+                goto err_notstart;
+        }
 
         if ((port > XWMDCFG_isc_xwpcp_PORT_NUM) || (port < 0)) {
                 xwpcplogf(ERR, "port port out of range\n");
@@ -290,6 +412,7 @@ xwer_t usi_xwpcp_sysfs_cmd_unexport_port(int port)
 err_rmnod:
 err_noport:
 err_port:
+err_notstart:
         return rc;
 }
 
@@ -314,7 +437,7 @@ xwer_t usi_xwpcp_sysfs_cmd_parse_arg(const char * argstring,
         xwer_t rc = -ENOSYS;
 
 	pos = (char *)argstring;
-	while ((p = strsep(&pos, ":")) != NULL) {
+	while ((p = strsep(&pos, ",")) != NULL) {
 		if (!*p) {
 			continue;
                 }
@@ -358,24 +481,31 @@ xwer_t usi_xwpcp_sysfs_cmd_parse(const char * cmdstring)
 
 	xwpcplogf(INFO, "cmd:\"%s\"\n", cmdstring);
 	pos = (char *)cmdstring;
-	while ((p = strsep(&pos, ",")) != NULL) {
-		if (!*p)
+	while ((p = strsep(&pos, ";")) != NULL) {
+		if (!*p) {
 			continue;
+                }
 		token = match_token(p, xwpcp_cmd_tokens, tmp);
 		switch (token) {
+                case USI_XWPCP_SYSFS_CMD_STOP:
+                        rc = usi_xwpcp_stop();
+                        break;
+                case USI_XWPCP_SYSFS_CMD_START:
+                        rc = usi_xwpcp_start();
+                        break;
 		case USI_XWPCP_SYSFS_CMD_EXPORT:
                         argsize = match_strlcpy(arg, &tmp[0],
                                                 USI_XWPCP_SYSFS_ARGBUFSIZE);
                         rc = usi_xwpcp_sysfs_cmd_parse_arg(arg, &port, &prio,
-                                                          portname,
-                                                          USI_XWPCP_SYSFS_ARGBUFSIZE);
+                                                           portname,
+                                                           USI_XWPCP_SYSFS_ARGBUFSIZE);
                         if (OK == rc) {
                                 xwpcplogf(INFO,
                                          "cmd:export; port:%d; prio:%d; portname:%s",
                                          port, prio, portname);
                                 rc = usi_xwpcp_sysfs_cmd_export_port(port,
-                                                                    prio,
-                                                                    portname);
+                                                                     prio,
+                                                                     portname);
                         }
 			break;
 		case USI_XWPCP_SYSFS_CMD_UNEXPORT:
@@ -410,13 +540,8 @@ ssize_t usi_xwpcp_sysfs_cmd_store(struct xwsys_object * xwobj,
 }
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********        /sys/xwosal/xwpcp/state        ******** ********
+ ******** ********        /sys/xwos/xwpcp/state        ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** macros ******** ********/
-
-/******** ******** type ******** ********/
-
-/******** ******** static function prototypes ******** ********/
 static
 ssize_t usi_xwpcp_sysfs_state_show(struct xwsys_object * xwobj,
                                    struct xwsys_attribute * soattr,
@@ -428,12 +553,10 @@ ssize_t usi_xwpcp_sysfs_state_store(struct xwsys_object * xwobj,
                                    const char * buf,
                                    size_t count);
 
-/******** ******** .data ******** ********/
 static XWSYS_ATTR(file_xwpcp_state, state, 0644,
                   usi_xwpcp_sysfs_state_show,
                   usi_xwpcp_sysfs_state_store);
 
-/******** ******** function implementations ******** ********/
 static
 ssize_t usi_xwpcp_sysfs_state_show(struct xwsys_object * xwobj,
                                    struct xwsys_attribute * soattr,
@@ -450,34 +573,40 @@ ssize_t usi_xwpcp_sysfs_state_show(struct xwsys_object * xwobj,
         /* Title */
         showcnt += sprintf(&buf[showcnt], "[XWPCP state]\n");
 
-        /* slot */
-        showcnt += sprintf(&buf[showcnt], "Slot Pool:\n");
-        blkcnt = usi_xwpcp.slot.pool->zone.size / usi_xwpcp.slot.pool->blksize;
-        for (i = 0; i < blkcnt; i++) {
-                showcnt += sprintf(&buf[showcnt], "0x%X,",
-                                   usi_xwpcp.slot.pool->bcbs[i].order);
-                if (i % 8 == 0) {
-                        showcnt += sprintf(&buf[showcnt], "\n");
+        if (USI_XWPCP_STATE_STOP == usi_xwpcp_state) {
+                showcnt += sprintf(&buf[showcnt], "State: OFF\n");
+        } else {
+                showcnt += sprintf(&buf[showcnt], "State: ON\n");
+                /* slot */
+                showcnt += sprintf(&buf[showcnt], "Slot Pool:\n");
+                blkcnt = usi_xwpcp.slot.pool->zone.size / usi_xwpcp.slot.pool->blksize;
+                for (i = 0; i < blkcnt; i++) {
+                        showcnt += sprintf(&buf[showcnt], "0x%X,",
+                                           usi_xwpcp.slot.pool->bcbs[i].order);
+                        if (i % 8 == 0) {
+                                showcnt += sprintf(&buf[showcnt], "\n");
+                        }
                 }
-        }
-        showcnt += sprintf(&buf[showcnt], "\n");
+                showcnt += sprintf(&buf[showcnt], "\n");
 
-        /* RXQ */
-        rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwpcp.txq.smr), &smrval);
-        if (OK == rc) {
-                showcnt += sprintf(&buf[showcnt],
-                                   "TX Queue: 0x%lX\n",
-                                   smrval);
-        }
-
-        /* TXQ */
-        for (i = 0; i < XWPCP_PORT_NUM; i++) {
-                rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwpcp.rxq.smr[i]),
+                /* TXQ */
+                rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwpcp.txq.smr),
                                          &smrval);
                 if (OK == rc) {
                         showcnt += sprintf(&buf[showcnt],
-                                           "RX Queue[%ld]: 0x%lX\n",
-                                           i, smrval);
+                                           "TX Queue: 0x%lX\n",
+                                           smrval);
+                }
+
+                /* RXQ */
+                for (i = 0; i < XWPCP_PORT_NUM; i++) {
+                        rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwpcp.rxq.smr[i]),
+                                                 &smrval);
+                        if (OK == rc) {
+                                showcnt += sprintf(&buf[showcnt],
+                                                   "RX Queue[%ld]: 0x%lX\n",
+                                                   i, smrval);
+                        }
                 }
         }
 
@@ -487,7 +616,7 @@ ssize_t usi_xwpcp_sysfs_state_show(struct xwsys_object * xwobj,
 }
 
 static
-ssize_t usi_xwpcp_sysfs_state_store(struct xwsys_object *xwobj,
+ssize_t usi_xwpcp_sysfs_state_store(struct xwsys_object * xwobj,
                                     struct xwsys_attribute * soattr,
                                     const char * buf,
                                     size_t count)
@@ -496,195 +625,57 @@ ssize_t usi_xwpcp_sysfs_state_store(struct xwsys_object *xwobj,
 }
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********            start & stop             ******** ********
+ ******** ******** ********    init & exit    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** macros ******** ********/
-
-/******** ******** .data ******** ********/
-xwsq_t usi_xwpcp_state = USI_XWPCP_STATE_STOP;
-
-xwer_t usi_xwpcp_start(const char * cmdstring)
+xwer_t usi_xwpcp_init(void)
 {
         xwer_t rc;
-        char * identifier, * arg;
-        xwer_t trc;
-        xwid_t tcbd;
-
-        tcbd = 0;
-        arg = (char *)cmdstring;
-        identifier = strsep(&arg, ",");
-        if (0 != strcmp(identifier, "xwpcp")) {
-                rc = -EINVAL;
-                goto err_badstring;
-        }
-
-        if (USI_XWPCP_STATE_START == usi_xwpcp_state) {
-                rc = -EALREADY;
-                goto err_already;
-        }
-
-        rc = xwfs_holdon();
-        if (__unlikely(rc < 0)) {
-                rc = -EOWNERDEAD;
-                goto err_xwfs_not_ready;
-        }
-
-        rc = xwfs_mkdir("xwpcp", dir_isc, &usi_xwpcp_xwfs);
-        if (__unlikely(rc < 0)) {
-                goto err_mkdir_usi_xwpcp_xwfs;
-        }
-
-        rc = xwfs_mkdir("port", usi_xwpcp_xwfs, &usi_xwpcp_xwfs_portdir);
-        if (__unlikely(rc < 0)) {
-                goto err_mkdir_usi_xwpcp_xwfs_portdir;
-        }
 
         usi_xwpcp_sysfs = xwsys_register("xwpcp", NULL, NULL);
         if (__unlikely(is_err_or_null(usi_xwpcp_sysfs))) {
                 rc = PTR_ERR(usi_xwpcp_sysfs);
                 xwpcplogf(ERR,
-                         "Create \"/sys/xwosal/xwpcp\" ... [rc:%d]\n",
-                         rc);
+                          "Create \"/sys/xwos/xwpcp\" ... [rc:%d]\n",
+                          rc);
                 goto err_usi_xwpcp_sysfs_create;
         }
-        xwpcplogf(INFO, "Create \"/sys/xwosal/xwpcp\" ... [OK]\n");
+        xwpcplogf(INFO, "Create \"/sys/xwos/xwpcp\" ... [OK]\n");
 
         rc = xwsys_create_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_cmd);
         if (__unlikely(rc < 0)) {
                 xwpcplogf(ERR,
-                         "Create \"/sys/xwosal/xwpcp/cmd\" ... [rc:%d]\n",
-                         rc);
+                          "Create \"/sys/xwos/xwpcp/cmd\" ... [rc:%d]\n",
+                          rc);
                 goto err_usi_xwpcp_sysfs_cmd_create;
         }
-        xwpcplogf(INFO, "Create \"/sys/xwosal/xwpcp/cmd\" ... [OK]\n");
+        xwpcplogf(INFO, "Create \"/sys/xwos/xwpcp/cmd\" ... [OK]\n");
 
         rc = xwsys_create_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_state);
         if (__unlikely(rc < 0)) {
                 xwpcplogf(ERR,
-                         "Create \"/sys/xwosal/xwpcp/state\" ... [rc:%d]\n",
-                         rc);
+                          "Create \"/sys/xwos/xwpcp/state\" ... [rc:%d]\n",
+                          rc);
                 goto err_usi_xwpcp_sysfs_state_create;
         }
-        xwpcplogf(INFO, "Create \"/sys/xwosal/xwpcp/state\" ... [OK]\n");
-
-        xwpcp_init(&usi_xwpcp);
-        rc = xwpcp_start(&usi_xwpcp, "usi_xwpcp", &bdl_xwpcpif_ops,
-                         (xwptr_t)usi_xwpcp_mempool, XWPCP_MEMPOOL_SIZE);
-        if (__unlikely(rc < 0)) {
-                xwpcplogf(ERR, "Start XWPCP ... [rc:%d]\n", rc);
-                goto err_xwpcp_start;
-        }
-        xwpcplogf(INFO, "Start XWPCP ... [OK]\n");
-
-        rc = xwosal_thrd_create(&tcbd, "xwpcp_tx_thrd",
-                                (xwosal_thrd_f)xwpcp_txthrd,
-                                &usi_xwpcp, XWOS_UNUSED_ARGUMENT,
-                                USI_XWPCP_TXTHRD_PRIORITY,
-                                XWOS_UNUSED_ARGUMENT);
-        if (__unlikely(rc < 0)) {
-                xwpcplogf(ERR, "Create XWPCP TX thread ... [rc:%d]\n", rc);
-                goto err_xwpcp_txthrd_create;
-        }
-        usi_xwpcp_txthrd = tcbd;
-        xwpcplogf(INFO, "Create XWPCP TX thread ... [OK]\n");
-
-        rc = xwosal_thrd_create(&tcbd, "xwpcp_rx_thrd",
-                                (xwosal_thrd_f)xwpcp_rxthrd,
-                                &usi_xwpcp, XWOS_UNUSED_ARGUMENT,
-                                USI_XWPCP_RXTHRD_PRIORITY,
-                                XWOS_UNUSED_ARGUMENT);
-        if (__unlikely(rc < 0)) {
-                xwpcplogf(ERR, "Create XWPCP RX thread ... [rc:%d]\n", rc);
-                goto err_xwpcp_rxthrd_create;
-        }
-        usi_xwpcp_rxthrd = tcbd;
-        xwpcplogf(INFO, "Create XWPCP RX thread ... [OK]\n");
-
-        usi_xwpcp_state = USI_XWPCP_STATE_START;
+        xwpcplogf(INFO, "Create \"/sys/xwos/xwpcp/state\" ... [OK]\n");
         return OK;
 
-err_xwpcp_rxthrd_create:
-        xwosal_thrd_terminate(usi_xwpcp_txthrd, &trc);
-        xwosal_thrd_delete(usi_xwpcp_txthrd);
-        usi_xwpcp_txthrd = 0;
-err_xwpcp_txthrd_create:
-        xwpcp_stop(&usi_xwpcp);
-err_xwpcp_start:
-        xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_state);
 err_usi_xwpcp_sysfs_state_create:
         xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_cmd);
 err_usi_xwpcp_sysfs_cmd_create:
         xwsys_unregister(usi_xwpcp_sysfs);
         usi_xwpcp_sysfs = NULL;
 err_usi_xwpcp_sysfs_create:
-        xwfs_rmdir(usi_xwpcp_xwfs_portdir);
-        usi_xwpcp_xwfs_portdir = NULL;
-err_mkdir_usi_xwpcp_xwfs_portdir:
-        xwfs_rmdir(usi_xwpcp_xwfs);
-        usi_xwpcp_xwfs = NULL;
-err_mkdir_usi_xwpcp_xwfs:
-        xwfs_giveup();
-err_xwfs_not_ready:
-err_already:
-err_badstring:
         return rc;
 }
 
-xwer_t usi_xwpcp_stop(void)
+void usi_xwpcp_exit(void)
 {
-        xwer_t rc, trc;
-
-        if (USI_XWPCP_STATE_START != usi_xwpcp_state) {
-                rc = -EPERM;
-                goto err_notstart;
-        }
-
-        rc = xwosal_thrd_terminate(usi_xwpcp_rxthrd, &trc);
-        if (OK == rc) {
-                rc = xwosal_thrd_delete(usi_xwpcp_rxthrd);
-                if (OK == rc) {
-                        usi_xwpcp_rxthrd = 0;
-                        xwpcplogf(INFO, "Terminate XWPCP RX thread... [OK]\n");
-                }
-        }
-
-        rc = xwosal_thrd_terminate(usi_xwpcp_txthrd, &trc);
-        if (OK == rc) {
-                rc = xwosal_thrd_delete(usi_xwpcp_txthrd);
-                if (OK == rc) {
-                        usi_xwpcp_txthrd = 0;
-                        xwpcplogf(INFO, "Terminate XWPCP TX thread... [OK]\n");
-                }
-        }
-
-        rc = xwpcp_stop(&usi_xwpcp);
-        if (OK == rc) {
-                xwpcplogf(INFO, "Stop XWPCP ... [OK]\n");
-        }
-
-        xwpcplogf(INFO, "destory \"/sys/xwosal/xwpcp/port\" ... [OK]\n");
         xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_state);
-        xwpcplogf(INFO, "destory \"/sys/xwosal/xwpcp/state\" ... [OK]\n");
+        xwpcplogf(INFO, "Destory \"/sys/xwos/xwpcp/state\" ... [OK]\n");
         xwsys_remove_file(usi_xwpcp_sysfs, &xwsys_attr_file_xwpcp_cmd);
-        xwpcplogf(INFO, "destory \"/sys/xwosal/xwpcp/cmd\" ... [OK]\n");
+        xwpcplogf(INFO, "Destory \"/sys/xwos/xwpcp/cmd\" ... [OK]\n");
         xwsys_unregister(usi_xwpcp_sysfs);
         usi_xwpcp_sysfs = NULL;
-        xwpcplogf(INFO, "destory \"/sys/xwosal/xwpcp\" ... [OK]\n");
-
-        xwfs_rmdir(usi_xwpcp_xwfs_portdir);
-        usi_xwpcp_xwfs_portdir = NULL;
-        xwfs_rmdir(usi_xwpcp_xwfs);
-        usi_xwpcp_xwfs = NULL;
-        xwfs_giveup();
-        usi_xwpcp_state = USI_XWPCP_STATE_STOP;
-
-        return OK;
-
-err_notstart:
-        return rc;
-}
-
-xwsq_t usi_xwpcp_get_state(void)
-{
-        return usi_xwpcp_state;
+        xwpcplogf(INFO, "Destory \"/sys/xwos/xwpcp\" ... [OK]\n");
 }

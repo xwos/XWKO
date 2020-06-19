@@ -72,13 +72,10 @@ extern xwid_t usi_xwpcp_rxthrd;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
-xwer_t usi_xwpcp_start(const char *cmdstring);
+xwer_t usi_xwpcp_init(void);
 
-extern
-xwer_t usi_xwpcp_stop(void);
+void usi_xwpcp_exit(void);
 
-extern
 xwsq_t usi_xwpcp_get_state(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********

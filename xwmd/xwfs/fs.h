@@ -68,16 +68,16 @@ struct xwfs_dir {
 struct xwfs_node;
 
 struct xwfs_operations {
-        loff_t (*llseek)(struct xwfs_node *, struct file *, loff_t, int);
-        ssize_t (*read)(struct xwfs_node *, struct file *, char __user *,
-                        size_t, loff_t *);
-        ssize_t (*write)(struct xwfs_node *, struct file *, const char __user *,
+        loff_t (* llseek)(struct xwfs_node *, struct file *, loff_t, int);
+        ssize_t (* read)(struct xwfs_node *, struct file *, char __user *,
                          size_t, loff_t *);
-        int (*mmap)(struct xwfs_node *, struct file *, struct vm_area_struct *);
-        int (*open)(struct xwfs_node *, struct file *);
-        int (*release)(struct xwfs_node *, struct file *);
-        long (*unlocked_ioctl)(struct xwfs_node *, struct file *,
-                               unsigned int, unsigned long);
+        ssize_t (* write)(struct xwfs_node *, struct file *, const char __user *,
+                          size_t, loff_t *);
+        int (* mmap)(struct xwfs_node *, struct file *, struct vm_area_struct *);
+        int (* open)(struct xwfs_node *, struct file *);
+        int (* release)(struct xwfs_node *, struct file *);
+        long (* unlocked_ioctl)(struct xwfs_node *, struct file *,
+                                unsigned int, unsigned long);
 };
 
 struct xwfs_node {
@@ -95,26 +95,17 @@ union xwfs_entry {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
 xwer_t xwfs_start(void);
 
-extern
 xwer_t xwfs_stop(void);
 
-extern
-bool xwfs_is_started(void);
-
-extern
 xwer_t xwfs_holdon(void);
 
-extern
 xwer_t xwfs_giveup(void);
 
-extern
 xwer_t xwfs_mkdir(const char *name, struct xwfs_dir *parent,
                   struct xwfs_dir **newdir);
 
-extern
 xwer_t xwfs_mknod(const char *name,
                   umode_t mode,
                   const struct xwfs_operations *xwfsops,
@@ -122,16 +113,12 @@ xwer_t xwfs_mknod(const char *name,
                   struct xwfs_dir *parent,
                   struct xwfs_node **newnode);
 
-extern
 xwer_t xwfs_rmdir(struct xwfs_dir *dir);
 
-extern
 xwer_t xwfs_rmnod(struct xwfs_node *node);
 
-extern
 xwer_t xwfs_init(void);
 
-extern
 void xwfs_exit(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********

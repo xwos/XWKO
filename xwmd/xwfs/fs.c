@@ -24,8 +24,9 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwaop.h>
-#include <linux/version.h> /* kernel version info */
-#include <linux/kconfig.h> /* kernel configures */
+#include <linux/version.h>
+#include <linux/kconfig.h>
+#include <linux/parser.h>
 #include <linux/vfs.h>
 #include <linux/fs.h>
 #include <linux/dcache.h>
@@ -33,12 +34,12 @@
 #include <linux/mount.h>
 #include <linux/file.h>
 #include <linux/fsnotify.h>
-#include <linux/parser.h>
 #include <linux/string.h>
 #include <linux/seq_file.h>
 #include <linux/slab.h>
 #include <linux/pagemap.h>
 #include <linux/uaccess.h>
+#include <xwmd/sysfs/core.h>
 #include <xwmd/xwfs/fs.h>
 #include <xwmd/xwfs/bs.h>
 #include <xwos/core/scheduler.h>
@@ -47,16 +48,13 @@
 #include <xwos/sync/condition.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macro       ******** ******** ********
+ ******** ******** ********        fs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWFS_DEFAULT_MODE       (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
 #define XWFS_MAGIC_NUM          0x6F736673  /* xwfs */
 
 #define VFS_INODE_TO_XWFS_ENTRY(ind) container_of(ind, union xwfs_entry, inode)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       type        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief mount options
  */
@@ -67,9 +65,6 @@ enum xwfs_option {
         OPT_ERR, /**< error option */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function declarations    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** mount operations ******** ********/
 static
 int xwfs_fill_superblock(struct super_block * sb, struct xwfs_mntopts * mntopts);
@@ -173,9 +168,6 @@ xwer_t xwfs_get_path_parent(struct xwfs_dir * parent, struct path * pathbuf);
 static
 void xwfs_put_path_parent(struct path * pathparent);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      .data        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** root path ******** ********/
 struct path xwfs_rootpath = {
         .mnt = NULL,
@@ -184,7 +176,6 @@ struct path xwfs_rootpath = {
 
 __atomic xwsq_t xwfs_mntcnt = 0;
 
-/******** ******** mount ******** ********/
 static const match_table_t xwfs_tokens = {
         {OPT_MODE, "mode=%o"},
         {OPT_UID, "uid=%u"},
@@ -236,7 +227,9 @@ static const struct inode_operations xwfs_node_iops = {
         .getattr = simple_getattr,
 };
 
-/******** ******** node file operations ******** ********/
+/**
+ * @brief node file operations
+ */
 static const struct file_operations xwfs_node_fops = {
         .llseek = xwfs_node_fops_llseek,
         .read = xwfs_node_fops_read,
@@ -248,10 +241,6 @@ static const struct file_operations xwfs_node_fops = {
         .fsync = noop_fsync,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** mount operations ******** ********/
 /**
  * @brief Initialize a new super block that is allocated by <i>sget()</i>
  * @param sb: (I) pointer of super block
@@ -407,7 +396,7 @@ struct dentry * xwfs_mount(struct file_system_type * fst,
 #endif
         } else {
                 /* mounted by syscall API: sys_mount() */
-                if (!xwfs_is_started()) {
+                if (xwfs_mntcnt < 1) {
                         rootd = err_ptr(-ENOENT);
                         goto err_notmnt;
                 }
@@ -1205,7 +1194,6 @@ err_nullparent:
         return rc;
 }
 
-/******** ******** sysfs cmd ******** ********/
 xwer_t xwfs_start(void)
 {
         struct vfsmount * mnt;
@@ -1296,14 +1284,6 @@ xwer_t xwfs_stop(void)
         return rc;
 }
 
-bool xwfs_is_started(void)
-{
-        xwsq_t res;
-
-        res = xwaop_load(xwsq_t, &xwfs_mntcnt, xwmb_modr_consume);
-        return (res >= 1);
-}
-
 xwer_t xwfs_holdon(void)
 {
         xwer_t rc;
@@ -1320,7 +1300,150 @@ xwer_t xwfs_giveup(void)
         return rc;
 }
 
-/******** ******** init & exit ******** ********/
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********           /sys/xwos/xwfs           ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+struct xwsys_object * xwfs_sysfs_obj;
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         /sys/xwos/xwfs/cmd         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define XWFS_SYSFS_ARGBUFSIZE  32
+
+enum xwfs_sysfs_cmd_em {
+        XWFS_SYSFS_CMD_STOP = 0,
+        XWFS_SYSFS_CMD_START,
+        XWFS_SYSFS_CMD_NUM,
+};
+
+static
+ssize_t xwfs_sysfs_cmd_show(struct xwsys_object * xwobj,
+                            struct xwsys_attribute * soattr,
+                            char * buf);
+
+static
+ssize_t xwfs_sysfs_cmd_store(struct xwsys_object * xwobj,
+                             struct xwsys_attribute * soattr,
+                             const char * buf,
+                             size_t count);
+
+static XWSYS_ATTR(file_xwfs_cmd, cmd, 0644,
+                  xwfs_sysfs_cmd_show,
+                  xwfs_sysfs_cmd_store);
+
+static const match_table_t xwfs_cmd_tokens = {
+        {XWFS_SYSFS_CMD_STOP, "stop"},
+        {XWFS_SYSFS_CMD_START, "start"},
+        {XWFS_SYSFS_CMD_NUM, NULL},
+};
+
+static
+ssize_t xwfs_sysfs_cmd_show(struct xwsys_object * xwobj,
+                            struct xwsys_attribute * soattr,
+                            char * buf)
+{
+        return -ENOSYS;
+}
+
+static
+xwer_t xwfs_sysfs_cmd_parse(const char * cmdstring)
+{
+	int token;
+	substring_t tmp[MAX_OPT_ARGS];
+	char * p, * pos;
+        xwer_t rc = -ENOSYS;
+
+	xwfslogf(INFO, "cmd:\"%s\"\n", cmdstring);
+	pos = (char *)cmdstring;
+	while ((p = strsep(&pos, ";")) != NULL) {
+		if (!*p) {
+			continue;
+                }
+		token = match_token(p, xwfs_cmd_tokens, tmp);
+		switch (token) {
+                case XWFS_SYSFS_CMD_STOP:
+                        rc = xwfs_stop();
+                        break;
+                case XWFS_SYSFS_CMD_START:
+                        rc = xwfs_start();
+                        break;
+		}
+	}
+        return rc;
+}
+
+static
+ssize_t xwfs_sysfs_cmd_store(struct xwsys_object * xwobj,
+                             struct xwsys_attribute * soattr,
+                             const char * buf,
+                             size_t count)
+{
+        xwer_t rc;
+
+        if ('\0' != buf[count - 1]) {
+                count = -EINVAL;
+        } else {
+                rc = xwfs_sysfs_cmd_parse(buf);
+                if (__unlikely(rc < 0)) {
+                        count = rc;
+                }
+        }
+        return count;
+}
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********        /sys/xwos/xwfs/state        ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+static
+ssize_t xwfs_sysfs_state_show(struct xwsys_object * xwobj,
+                              struct xwsys_attribute * soattr,
+                              char * buf);
+
+static
+ssize_t xwfs_sysfs_state_store(struct xwsys_object * xwobj,
+                               struct xwsys_attribute * soattr,
+                               const char * buf,
+                               size_t count);
+
+static XWSYS_ATTR(file_xwfs_state, state, 0644,
+                  xwfs_sysfs_state_show,
+                  xwfs_sysfs_state_store);
+
+static
+ssize_t xwfs_sysfs_state_show(struct xwsys_object * xwobj,
+                                   struct xwsys_attribute * soattr,
+                                   char * buf)
+{
+        ssize_t showcnt;
+
+        showcnt = 0;
+
+        /* Title */
+        showcnt += sprintf(&buf[showcnt], "[XWFS]\n");
+
+        if (xwfs_mntcnt < 1) {
+                showcnt += sprintf(&buf[showcnt], "State: OFF\n");
+        } else {
+                showcnt += sprintf(&buf[showcnt], "State: ON\n");
+        }
+
+        /* End flag */
+        buf[showcnt] = '\0';
+        return showcnt;
+}
+
+static
+ssize_t xwfs_sysfs_state_store(struct xwsys_object * xwobj,
+                               struct xwsys_attribute * soattr,
+                               const char * buf,
+                               size_t count)
+{
+        return -ENOSYS;
+}
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********    init & exit    ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwfs_init(void)
 {
         xwer_t rc;
@@ -1346,8 +1469,43 @@ xwer_t xwfs_init(void)
         }
         xwfslogf(INFO, "Register xwfs ... [OK]\n");
 
+        xwfs_sysfs_obj = xwsys_register("xwfs", NULL, NULL);
+        if (__unlikely(is_err_or_null(xwfs_sysfs_obj))) {
+                rc = PTR_ERR(xwfs_sysfs_obj);
+                xwfslogf(ERR,
+                         "Create \"/sys/xwos/xwfs\" ... [rc:%d]\n",
+                         rc);
+                goto err_xwfs_sysfs_obj_create;
+        }
+        xwfslogf(INFO, "Create \"/sys/xwos/xwfs\" ... [OK]\n");
+
+        rc = xwsys_create_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_cmd);
+        if (__unlikely(rc < 0)) {
+                xwfslogf(ERR,
+                         "Create \"/sys/xwos/xwfs/cmd\" ... [rc:%d]\n",
+                         rc);
+                goto err_xwfs_sysfs_attr_cmd_create;
+        }
+        xwfslogf(INFO, "Create \"/sys/xwos/xwfs/cmd\" ... [OK]\n");
+
+        rc = xwsys_create_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_state);
+        if (__unlikely(rc < 0)) {
+                xwfslogf(ERR,
+                         "Create \"/sys/xwos/xwfs/state\" ... [rc:%d]\n",
+                         rc);
+                goto err_xwfs_sysfs_attr_state_create;
+        }
+        xwfslogf(INFO, "Create \"/sys/xwos/xwfs/state\" ... [OK]\n");
+
         return OK;
 
+err_xwfs_sysfs_attr_state_create:
+        xwsys_remove_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_cmd);
+err_xwfs_sysfs_attr_cmd_create:
+        xwsys_unregister(xwfs_sysfs_obj);
+        xwfs_sysfs_obj = NULL;
+err_xwfs_sysfs_obj_create:
+        unregister_filesystem(&xwfs_fstype);
 err_reg_fs:
         kmem_cache_destroy(xwfs_entry_cache);
 err_xwfs_entry_cache:
@@ -1356,6 +1514,15 @@ err_xwfs_entry_cache:
 
 void xwfs_exit(void)
 {
+        xwsys_remove_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_state);
+        xwfslogf(INFO, "Destory \"/sys/xwos/xwfs/state\" ... [OK]\n");
+        xwsys_remove_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_cmd);
+        xwfslogf(INFO, "Destory \"/sys/xwos/xwfs/cmd\" ... [OK]\n");
+        xwsys_unregister(xwfs_sysfs_obj);
+        xwfs_sysfs_obj = NULL;
+        xwfslogf(INFO, "Destory \"/sys/xwos/xwfs\" ... [OK]\n");
+
         unregister_filesystem(&xwfs_fstype);
         kmem_cache_destroy(xwfs_entry_cache);
+        xwfslogf(INFO, "Unregister xwfs ... [OK]\n");
 }

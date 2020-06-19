@@ -26,8 +26,10 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
-#include <xwmd/sysfs/core.h>
+#include <xwmd/isc/xwpcp/usi.h>
+#include <xwmd/isc/xwscp/usi.h>
 #include <bm/mcuc/init.h>
+#include <bdl/board.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     static function declarations    ******** ********
@@ -44,21 +46,42 @@ xwer_t board_init(void)
 {
         xwer_t rc;
 
+        rc = usi_xwpcp_init();
+        if (__unlikely(rc < 0)) {
+                xwbdlogf(ERR, "Initialize XWPCP ... [FAILED], rc:%d\n",
+                         rc);
+                goto err_xwpcp_init;
+        }
+        xwbdlogf(INFO, "Initialize XWPCP ... [OK]\n");
+
+        rc = usi_xwscp_init();
+        if (__unlikely(rc < 0)) {
+                xwbdlogf(ERR, "Initialize XWSCP ... [FAILED], rc:%d\n",
+                         rc);
+                goto err_xwscp_init;
+        }
+        xwbdlogf(INFO, "Initialize XWSCP ... [OK]\n");
+
         rc = mcuc_init();
         if (__unlikely(rc < 0)) {
-                xwlogf(INFO,
-                       "board", "Initialize MCU Controller ... [FAILED], rc:%d\n",
-                       rc);
+                xwbdlogf(ERR, "Initialize MCU Controller ... [FAILED], rc:%d\n",
+                         rc);
                 goto err_mcuc_init;
         }
-        xwlogf(INFO, "board", "Initialize MCU Controller ... [OK]\n");
+        xwbdlogf(INFO, "Initialize MCU Controller ... [OK]\n");
         return OK;
 
 err_mcuc_init:
+        usi_xwscp_exit();
+err_xwscp_init:
+        usi_xwpcp_exit();
+err_xwpcp_init:
         return rc;
 }
 
 void board_exit(void)
 {
         mcuc_exit();
+        usi_xwscp_exit();
+        usi_xwpcp_exit();
 }

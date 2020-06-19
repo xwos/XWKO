@@ -50,9 +50,9 @@
 #define XWSYS_ATTR_RO(_sym, _name) \
         struct xwsys_attribute xwsys_attr_##_sym = __ATTR_RO(_name)
 
-#define TO_SOATTR(_attr) container_of(_attr, struct xwsys_attribute, attr)
+#define TO_XWATTR(_attr) container_of(_attr, struct xwsys_attribute, attr)
 
-#define TO_SOOBJ(obj) container_of(obj, struct xwsys_object, kset.kobj)
+#define TO_XWOBJ(obj) container_of(obj, struct xwsys_object, kset.kobj)
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
@@ -81,8 +81,8 @@ struct xwsys_object * xwsys_register(const char * name, struct xwsys_object * pa
 
 void xwsys_unregister(struct xwsys_object * xwobj);
 
-xwer_t xwsys_create_file(struct xwsys_object * xwobj, struct xwsys_attribute * soattr);
+xwer_t xwsys_create_file(struct xwsys_object * xwobj, struct xwsys_attribute * xwattr);
 
-void xwsys_remove_file(struct xwsys_object * xwobj, struct xwsys_attribute * soattr);
+void xwsys_remove_file(struct xwsys_object * xwobj, struct xwsys_attribute * xwattr);
 
 #endif /* xwmd/sysfs/core.h */
