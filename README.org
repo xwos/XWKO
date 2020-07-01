@@ -11,13 +11,14 @@
 
 * 简介
 
-玄武内核模块是[[https://gitee.com/starsoul/XuanWuOS][玄武操作系统]]在Linux内核中的实现。
+玄武内核模块是[[https://gitee.com/starsoul/XuanWuOS][玄武操作系统]]在
+Linux内核中的实现。
 
 + 简称：玄武KO
 + 英文名：XuanWuKO
 + 简称：XWKO
 
-支持的Linux内核版本范围：3.0.0 ~ 4.15.x 。
+支持的Linux内核版本范围：3.0.x ~ 5.4.x 。
 
 --------
 

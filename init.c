@@ -2,9 +2,9 @@
  * @file
  * @brief XuanWuKO的初始化
  * @author
- * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
- * + (c) 2015 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0 (the "MPL"). If a copy of the MPL was not distributed
  * > with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -49,7 +49,7 @@ void XuanWuKo_exit(void);
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 MODULE_LICENSE("Dual MPL/GPL");
-MODULE_AUTHOR("隐星魂(Roy.Sun) <https://www.starsoul.tech>");
+MODULE_AUTHOR("隐星魂(Roy.Sun) <https://https://xwos.tech>");
 MODULE_DESCRIPTION("XuanWuKO");
 module_init(XuanWuKo_init);
 module_exit(XuanWuKo_exit);
