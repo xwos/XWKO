@@ -144,18 +144,20 @@
 (defvar soc-cfg-h (concat cfgdir "/" "soc.h") "Path of cfg/soc.h")
 (defvar pp-cfg-h (concat cfgdir "/" "perpheral.h") "Path of cfg/perpheral.h")
 (defvar brd-cfg-h (concat cfgdir "/" "board.h") "Path of cfg/board.h")
-(defvar sokn-cfg-h (concat cfgdir "/" "xwos.h") "Path of cfg/xwos.h")
+(defvar xwkn-cfg-h (concat cfgdir "/" "xwos.h") "Path of cfg/xwos.h")
 (defvar xwmd-cfg-h (concat cfgdir "/" "xwmd.h") "Path of cfg/xwmd.h")
 (defvar xwem-cfg-h (concat cfgdir "/" "xwem.h") "Path of cfg/xwem.h")
+(defvar xwam-cfg-h (concat cfgdir "/" "xwam.h") "Path of cfg/xwam.h")
 (setq XuanWuOS-cfg-h-buffer (find-file-noselect XuanWuOS-cfg-h))
 (setq arch-cfg-h-buffer (find-file-noselect arch-cfg-h))
 (setq cpu-cfg-h-buffer (find-file-noselect cpu-cfg-h))
 (setq soc-cfg-h-buffer (find-file-noselect soc-cfg-h))
 (setq pp-cfg-h-buffer (find-file-noselect pp-cfg-h))
 (setq brd-cfg-h-buffer (find-file-noselect brd-cfg-h))
-(setq sokn-cfg-h-buffer (find-file-noselect sokn-cfg-h))
+(setq xwkn-cfg-h-buffer (find-file-noselect xwkn-cfg-h))
 (setq xwmd-cfg-h-buffer (find-file-noselect xwmd-cfg-h))
 (setq xwem-cfg-h-buffer (find-file-noselect xwem-cfg-h))
+(setq xwam-cfg-h-buffer (find-file-noselect xwam-cfg-h))
 
 ;; Get base Info
 (set-buffer XuanWuOS-cfg-h-buffer)
@@ -264,6 +266,15 @@
        (t "n")))
 (logi "external:%s" XuanWuOS-cfg-xwem)
 
+(goto-char (point-min))
+(re-search-forward
+ "^#define[ \t]+\\(XuanWuOS_CFG_XWAM\\)[\t ]+\\([10]\\)" nil t)
+(setq XuanWuOS-cfg-xwam
+      (cond
+       ((string= (match-string 2) "1") "y")
+       (t "n")))
+(logi "external:%s" XuanWuOS-cfg-xwam)
+
 ;; Get directories Info
 (setq xwos-kr-dir (concat "xwos"))
 (logi "xwos-kr-dir:%s" xwos-kr-dir)
@@ -271,6 +282,8 @@
 (logi "xwos-md-dir:%s" xwos-md-dir)
 (setq xwos-em-dir (concat "xwem"))
 (logi "xwos-em-dir:%s" xwos-em-dir)
+(setq xwos-am-dir (concat "xwam"))
+(logi "xwos-am-dir:%s" xwos-am-dir)
 (setq xwos-arch-dir (concat "xwcd/soc/" XuanWuOS-cfg-arch "/"
                             XuanWuOS-cfg-subarch "/" XuanWuOS-cfg-compiler))
 (logi "xwos-arch-dir:%s" xwos-arch-dir)
@@ -286,7 +299,9 @@
 (logi "xwos-bdl-dir:%s" xwos-bdl-dir)
 (setq xwos-bm-dir (concat xwos-brd-dir "/bm"))
 (logi "xwos-bm-dir:%s" xwos-bm-dir)
-(setq xwos-wkspc-dir (concat xwos-brd-dir "/" wkspc))
+(setq xwos-wkspc-dir (if (file-name-absolute-p wkspc)
+                         wkspc
+                         (concat xwos-brd-dir "/" wkspc)))
 (logi "xwos-wkspc-dir:%s" xwos-wkspc-dir)
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; generate XuanWuOS.cfg ;;;;;;;; ;;;;;;;; ;;;;;;;;
@@ -306,6 +321,7 @@
 (insert (concat "XuanWuOS_CFG_CORE := " XuanWuOS-cfg-core "\n"))
 (insert (concat "XuanWuOS_CFG_XWMD := " XuanWuOS-cfg-xwmd "\n"))
 (insert (concat "XuanWuOS_CFG_XWEM := " XuanWuOS-cfg-xwem "\n"))
+(insert (concat "XuanWuOS_CFG_XWAM := " XuanWuOS-cfg-xwam "\n"))
 (insert (concat "XuanWuOS_CFG_MK_RULE := " XuanWuOS-cfg-mk-rule "\n"))
 (insert (concat "XuanWuOS_CFG_ELF_MK := " XuanWuOS-cfg-elf-mk "\n"))
 (insert (concat "XuanWuOS_CFG_XWMO_MK := " XuanWuOS-cfg-xwmo-mk "\n"))
@@ -316,6 +332,7 @@
 (insert (concat "XWOS_KN_DIR := " xwos-kr-dir "\n"))
 (insert (concat "XWOS_MD_DIR := " xwos-md-dir "\n"))
 (insert (concat "XWOS_EM_DIR := " xwos-em-dir "\n"))
+(insert (concat "XWOS_AM_DIR := " xwos-am-dir "\n"))
 (insert (concat "XWOS_ARCH_DIR := " xwos-arch-dir "\n"))
 (insert (concat "XWOS_CPU_DIR := " xwos-cpu-dir "\n"))
 (insert (concat "XWOS_SOC_DIR := " xwos-soc-dir "\n"))
@@ -416,7 +433,7 @@
 (set-buffer XuanWuOS-cfg-buffer)
 (insert "## ******** ******** ******** ******** XWOS Kernel ******** ******** ******** ******** ##\n")
 (let (item cfg (loopflg t) (iterpoint 1))
-  (set-buffer sokn-cfg-h-buffer)
+  (set-buffer xwkn-cfg-h-buffer)
   (while loopflg
     (goto-char iterpoint)
     (setq iterpoint (re-search-forward
@@ -429,7 +446,7 @@
         (setq cfg (if (string= (match-string 2) "1") "y" "n"))
         (set-buffer XuanWuOS-cfg-buffer)
         (insert (concat item " := " cfg "\n"))
-        (set-buffer sokn-cfg-h-buffer))
+        (set-buffer xwkn-cfg-h-buffer))
       (setq loopflg nil))))
 (set-buffer XuanWuOS-cfg-buffer)
 (insert "## ******** ******** ******** ******** XWOS Middleware ******** ******** ******** ******** ##\n")
@@ -468,6 +485,25 @@
               (set-buffer XuanWuOS-cfg-buffer)
               (insert (concat item " := " cfg "\n"))
               (set-buffer xwem-cfg-h-buffer))
+          (setq loopflg nil)))))
+(set-buffer XuanWuOS-cfg-buffer)
+(insert "## ******** ******** ******** ******** APP Module ******** ******** ******** ******** ##\n")
+(if (string= XuanWuOS-cfg-xwam "y")
+    (let (item cfg (loopflg t) (iterpoint 1))
+      (set-buffer xwam-cfg-h-buffer)
+      (while loopflg
+        (goto-char iterpoint)
+        (setq iterpoint (re-search-forward
+                         "^#define[ \t]+\\([A-Za-z0-9_]+\\)[\t ]+\\([10]\\)" nil t))
+        (if (null iterpoint)
+            (setq iterpoint (point-max)))
+        (if (< iterpoint (point-max))
+            (progn
+              (setq item (match-string 1))
+              (setq cfg (if (string= (match-string 2) "1") "y" "n"))
+              (set-buffer XuanWuOS-cfg-buffer)
+              (insert (concat item " := " cfg "\n"))
+              (set-buffer xwam-cfg-h-buffer))
           (setq loopflg nil)))))
 (set-buffer XuanWuOS-cfg-buffer)
 
@@ -554,6 +590,7 @@ distclean:
 (insert (concat "export XuanWuOS_CFG_CORE=" XuanWuOS-cfg-core "\n"))
 (insert (concat "export XuanWuOS_CFG_XWMD=" XuanWuOS-cfg-xwmd "\n"))
 (insert (concat "export XuanWuOS_CFG_XWEM=" XuanWuOS-cfg-xwem "\n"))
+(insert (concat "export XuanWuOS_CFG_XWAM=" XuanWuOS-cfg-xwam "\n"))
 (insert (concat "export XuanWuOS_CFG_MK_RULE=" XuanWuOS-cfg-mk-rule "\n"))
 (insert (concat "export XuanWuOS_CFG_ELF_MK=" XuanWuOS-cfg-elf-mk "\n"))
 (insert (concat "export XuanWuOS_CFG_XWMO_MK=" XuanWuOS-cfg-xwmo-mk "\n"))
@@ -562,6 +599,7 @@ distclean:
 (insert (concat "export XWOS_KN_DIR=" xwos-kr-dir "\n"))
 (insert (concat "export XWOS_MD_DIR=" xwos-md-dir "\n"))
 (insert (concat "export XWOS_EM_DIR=" xwos-em-dir "\n"))
+(insert (concat "export XWOS_AM_DIR=" xwos-am-dir "\n"))
 (insert (concat "export XWOS_ARCH_DIR=" xwos-arch-dir "\n"))
 (insert (concat "export XWOS_CPU_DIR=" xwos-cpu-dir "\n"))
 (insert (concat "export XWOS_SOC_DIR=" xwos-soc-dir "\n"))

@@ -31,9 +31,9 @@
 #include <bm/mcuc/init.h>
 #include <bdl/board.h>
 
-#if defined(BMCFG_demo_hixwos) && (1 == BMCFG_demo_hixwos)
-#include <bm/demo/hixwos/xwmo.h>
-#endif /* BMCFG_demo_hixwos */
+#if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
+#include <xwam/example/hixwos/xwmo.h>
+#endif /* XWAMCFG_example_hixwos */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     static function declarations    ******** ********
@@ -46,34 +46,34 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t board_demo_init(void)
+xwer_t board_example_init(void)
 {
         xwer_t rc;
 
         rc = OK;
-#if defined(BMCFG_demo_hixwos) && (1 == BMCFG_demo_hixwos)
+#if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
         rc = hixwos_init();
         if (rc < 0) {
-                xwbdlogf(ERR, "Init demo hixwos ... [FAILED]! rc:%d\n",
+                xwbdlogf(ERR, "Init example hixwos ... [FAILED]! rc:%d\n",
                          rc);
                 goto err_hixwos_init;
         }
-        xwbdlogf(INFO, "Init demo hixwos ... [OK]\n");
-#endif /* BMCFG_demo_hixwos */
+        xwbdlogf(INFO, "Init example hixwos ... [OK]\n");
+#endif /* XWAMCFG_example_hixwos */
 
         return OK;
 
-#if defined(BMCFG_demo_hixwos) && (1 == BMCFG_demo_hixwos)
+#if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
 err_hixwos_init:
-#endif /* BMCFG_demo_hixwos */
+#endif /* XWAMCFG_example_hixwos */
         return rc;
 }
 
-void board_demo_exit(void)
+void board_example_exit(void)
 {
-#if defined(BMCFG_demo_hixwos) && (1 == BMCFG_demo_hixwos)
+#if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
         hixwos_exit();
-#endif /* BMCFG_demo_hixwos */
+#endif /* XWAMCFG_example_hixwos */
 }
 
 xwer_t board_init(void)
@@ -104,17 +104,17 @@ xwer_t board_init(void)
         }
         xwbdlogf(INFO, "Init MCU Communicator ... [OK]\n");
 
-        rc = board_demo_init();
+        rc = board_example_init();
         if (rc < 0) {
-                xwbdlogf(ERR, "Init demo ... [FAILED]! rc:%d\n",
+                xwbdlogf(ERR, "Init example ... [FAILED]! rc:%d\n",
                          rc);
-                goto err_demo_init;
+                goto err_example_init;
         }
-        xwbdlogf(INFO, "Init demo ... [OK]\n");
+        xwbdlogf(INFO, "Init example ... [OK]\n");
 
         return OK;
 
-err_demo_init:
+err_example_init:
         mcuc_exit();
 err_mcuc_init:
         usi_xwscp_exit();
@@ -126,7 +126,7 @@ err_xwpcp_init:
 
 void board_exit(void)
 {
-        board_demo_exit();
+        board_example_exit();
         mcuc_exit();
         usi_xwscp_exit();
         usi_xwpcp_exit();

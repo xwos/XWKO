@@ -144,6 +144,38 @@ $(TARGET)-y += $(XWBM_COBJS)
 EOBJS += $(XWBM_EOBJS)
 INCDIRS += $(XWBM_INCDIRS)
 
+######## ######## ######## ######## am ######## ######## ######## ########
+XWAM_INCDIRS :=
+XWAM_COBJS :=
+XWAM_EOBJS :=
+XWAM_LIST := $(shell test -d $(XWOS_PATH)/$(XWOS_AM_DIR) && \
+                     find $(XWOS_PATH)/$(XWOS_AM_DIR) -type f -name "xwmo.mk" \
+                     -exec dirname {} \;)
+
+define findXwamTarget
+ifeq ($$(XWAMCFG$(call xwmoPathToName,$(1),$(XWOS_PATH)/$(XWOS_AM_DIR))),y)
+    XWMO_INCDIRS :=
+    XWMO_ESRCS :=
+    XWMO_CSRCS :=
+    include $(1)/xwmo.mk
+    XWAM_NAME := $(call xwmoPathToName,$(1),$(XWOS_PATH)/$(XWOS_AM_DIR))
+    XWMO_INCDIRS := $$(addprefix -I$(1)/,$(strip $$(XWMO_INCDIRS)))
+    XWAM_INCDIRS += $$(XWMO_INCDIRS)
+    XWMO_CSRC := $$(addprefix $(subst $(XWOS_PATH)/,,$(1)/),$$(XWMO_CSRCS))
+    XWMO_COBJS := $$(addsuffix .o,$$(basename $$(XWMO_CSRC)))
+    XWAM_COBJS += $$(XWMO_COBJS)
+    XWMO_EOBJS := $$(addprefix $(1)/,$$(XWMO_EOBJS))
+    XWAM_EOBJS += $$(XWMO_EOBJS)
+endif
+# SHOULD add a blank line here
+
+endef
+
+$(eval $(foreach xwmo,$(XWAM_LIST),$(call findXwamTarget,$(xwmo))))
+$(TARGET)-y += $(XWAM_COBJS)
+EOBJS += $(XWAM_EOBJS)
+INCDIRS += $(XWAM_INCDIRS)
+
 ######## ######## ######## ######## rule ######## ######## ######## ########
 ccflags-y := -I$(XWOS_PATH) $(INCDIRS) $(ARCH_CFLAGS) -fno-pic -Wno-vla
 ldflags-y := $(ARCH_LDFLAGS) $(CPU_LDFLAGS) $(EOBJS)
@@ -185,6 +217,9 @@ clean:
 	@rm -f $(XWBM_COBJS)
 	@rm -f $(XWBM_COBJS:.o=.o.ur-safe)
 	@rm -f $(foreach O,$(XWBM_COBJS),$(addprefix $(dir $(O)),.$(notdir $(O)).cmd))
+	@rm -f $(XWAM_COBJS)
+	@rm -f $(XWAM_COBJS:.o=.o.ur-safe)
+	@rm -f $(foreach O,$(XWAM_COBJS),$(addprefix $(dir $(O)),.$(notdir $(O)).cmd))
 
 define evalstr
 $(strip $1)
@@ -199,5 +234,9 @@ debug:
 	@echo "XWBM_INCDIRS:$(XWBM_INCDIRS)"
 	@echo "XWBM_COBJS:$(XWBM_COBJS)"
 	@echo "XWBM_EOBJS:$(XWBM_EOBJS)"
+	@echo "XWAM_LIST:$(XWAM_LIST)"
+	@echo "XWAM_INCDIRS:$(XWAM_INCDIRS)"
+	@echo "XWAM_COBJS:$(XWAM_COBJS)"
+	@echo "XWAM_EOBJS:$(XWAM_EOBJS)"
 
 .PHONY: modules clean strip debug

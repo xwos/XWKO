@@ -17,6 +17,5 @@
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BMCFG_mcuc                      1
-#define BMCFG_demo_hixwos               1
 
 #endif /* cfg/board.h */

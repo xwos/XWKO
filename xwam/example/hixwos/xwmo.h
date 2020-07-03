@@ -21,12 +21,12 @@
  * > under either the MPL or the GPL.
  */
 
-#ifndef __bm_demo_hixwos_xwmo_h__
-#define __bm_demo_hixwos_xwmo_h__
+#ifndef __xwam_example_hixwos_xwmo_h__
+#define __xwam_example_hixwos_xwmo_h__
 
 #include <xwos/standard.h>
 
 xwer_t hixwos_init(void);
 void hixwos_exit(void);
 
-#endif /* bm/demo/hixwos/xwmo.h */
+#endif /* xwam/example/hixwos/xwmo.h */
