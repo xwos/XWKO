@@ -15,5 +15,5 @@ Makefile
 GTAGS
 GRTAGS
 GPATH
-xwbs/util/js/xwcommitlint/node_modules
-xwbs/util/js/xwcommitlint/package-lock.json
+xwbs/util/js/xwgitloglint/node_modules
+xwbs/util/js/xwgitloglint/package-lock.json
