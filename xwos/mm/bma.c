@@ -145,7 +145,7 @@ xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
                 xwosal_splk_init(&orderlists[j].lock);
         }
         xwmm_bma_orderlist_add(bma, &orderlists[odr], &bcbs[0]);
-        return OK;
+        return XWOK;
 
 err_odr2large:
 err_mem2small:
@@ -167,7 +167,7 @@ xwer_t xwmm_bma_destroy(struct xwmm_bma * bma)
         XWOS_VALIDATE((bma), "nullptr", -EFAULT);
 
         XWOS_UNUSED(bma);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -233,7 +233,7 @@ xwer_t xwmm_bma_create(struct xwmm_bma ** ptrbuf, const char * name,
                 goto err_bma_init;
         }
         *ptrbuf = bma;
-        return OK;
+        return XWOK;
 
 err_bma_init:
         xwmm_kma_free(bcbs);
@@ -265,7 +265,7 @@ xwer_t xwmm_bma_delete(struct xwmm_bma * bma)
         xwmm_kma_free(((struct xwmm_bma *)bma)->orderlists);
         xwmm_bma_destroy(bma);
         xwmm_kma_free(bma);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -371,7 +371,7 @@ xwer_t xwmm_bma_orderlist_remove(struct xwmm_bma * bma,
         if (odr != bcb->order) {
                 rc = -ESRCH;
         } else {
-                rc = OK;
+                rc = XWOK;
                 xwlib_bclst_del_init(n);
         }
         xwosal_splk_unlock_cpuirqrs(&ol->lock, flag);
@@ -489,7 +489,7 @@ xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf)
                      bcb->order);
         xwmm_bma_divide_block(bma, bcb, order, ol);
         *membuf = xwmm_bma_bcb_to_mem(bma, bcb);
-        return OK;
+        return XWOK;
 
 err_nomem:
         return rc;
@@ -546,7 +546,7 @@ void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param mem: (I) 内存块的首地址指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 参数错误
  * @retval -ERANGE: 内存块不属于指定的伙伴算法内存块分配器对象
  * @note
@@ -582,7 +582,7 @@ xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
                      (bcb - bma->bcbs)/sizeof(struct xwmm_bma_bcb),
                      bcb->order);
         xwmm_bma_combine(bma, bcb);
-        return OK;
+        return XWOK;
 
 err_invalmem:
 err_range:

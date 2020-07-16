@@ -111,7 +111,7 @@ xwer_t xwos_init(void)
         }
         xwoslogf(INFO, "Init xwos/mm/dkma ... [OK]\n");
 
-        return OK;
+        return XWOK;
 
 err_xwmm_dkma_init:
         xwlk_mtx_cache_destroy();

@@ -91,7 +91,7 @@ xwer_t bdl_xwscpif_open(struct xwscp * xwscp)
                 tty = ((struct tty_file_private *)filp->private_data)->tty;
                 /* set uart port attribute */
                 tty_set_termios(tty, &bdl_xwscpif_dev_termios);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -102,7 +102,7 @@ xwer_t bdl_xwscpif_close(struct xwscp * xwscp)
         filp_close(xwscp->hwifcb, current->files);
         xwscp->hwifcb = NULL;
         xwscplogf(INFO, "close <%s> OK!\n", modparam_ifdev);
-        return OK;
+        return XWOK;
 }
 
 static
@@ -116,7 +116,7 @@ xwer_t bdl_xwscpif_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size,
 
         XWOS_UNUSED(xwtm);
 
-        rc = OK;
+        rc = XWOK;
         fs = get_fs();
         filp = xwscp->hwifcb;
         rest = (xwssz_t)size;
@@ -142,7 +142,7 @@ xwer_t bdl_xwscpif_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size)
         xwssz_t ret, rxsize, rest;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         rxsize = 0;
         rest = (xwssz_t)*size;
         filp = xwscp->hwifcb;

@@ -96,7 +96,7 @@ xwer_t xwlk_sqlk_rdex_trylock(struct xwlk_sqlk *sql)
 
         acquired = spin_trylock(&sql->lsql.lock);
         if (acquired) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
@@ -123,7 +123,7 @@ xwer_t xwlk_sqlk_rdex_trylock_cpuirq(struct xwlk_sqlk *sql)
 
         acquired = spin_trylock_irq(&sql->lsql.lock);
         if (acquired) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
@@ -150,7 +150,7 @@ xwer_t xwlk_sqlk_rdex_trylock_cpuirqsv(struct xwlk_sqlk *sql, xwreg_t *flag)
 
         acquired = spin_trylock_irqsave(&sql->lsql.lock, (*flag));
         if (acquired)
-                rc = OK;
+                rc = XWOK;
         else
                 rc = -EAGAIN;
         return rc;
@@ -200,7 +200,7 @@ xwer_t xwlk_sqlk_rdex_trylock_bh(struct xwlk_sqlk *sql)
 
         acquired = spin_trylock_bh(&sql->lsql.lock);
         if (acquired)
-                rc = OK;
+                rc = XWOK;
         else
                 rc = -EAGAIN;
         return rc;
@@ -228,14 +228,14 @@ xwer_t xwlk_sqlk_wr_trylock(struct xwlk_sqlk *sql)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 12, 0)
         if (acquired) {
                 write_seqcount_begin(&sql->lsql.seqcount);
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
 #else
         if (acquired) {
                 sql->lsql.sequence ++;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
@@ -265,14 +265,14 @@ xwer_t xwlk_sqlk_wr_trylock_cpuirq(struct xwlk_sqlk *sql)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 12, 0)
         if (acquired) {
                 write_seqcount_begin(&sql->lsql.seqcount);
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
 #else
         if (acquired) {
                 sql->lsql.sequence ++;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
@@ -302,14 +302,14 @@ xwer_t xwlk_sqlk_wr_trylock_cpuirqsv(struct xwlk_sqlk *sql, xwreg_t *flag)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 12, 0)
         if (acquired) {
                 write_seqcount_begin(&sql->lsql.seqcount);
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
 #else
         if (acquired) {
                 sql->lsql.sequence ++;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
@@ -363,14 +363,14 @@ xwer_t xwlk_sqlk_wr_trylock_bh(struct xwlk_sqlk *sql)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 12, 0)
         if (acquired) {
                 write_seqcount_begin(&sql->lsql.seqcount);
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
 #else
         if (acquired) {
                 sql->lsql.sequence ++;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }

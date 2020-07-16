@@ -99,7 +99,7 @@ __xwos_init_code
 xwer_t xwmm_dkma_exit(void)
 {
         kfree((void *)xwmm_dkma.zone.origin);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -129,7 +129,7 @@ xwer_t xwmm_dkma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
                 goto err_nomem;
         }
         *membuf = m;
-        return OK;
+        return XWOK;
 
 err_nomem:
         module_put(THIS_MODULE);
@@ -141,7 +141,7 @@ err_modget:
  * @brief 释放内存到默认的内核内存分配器
  * @param mem: (I) 内存首地址指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  */
 static __xwos_code
@@ -150,7 +150,7 @@ xwer_t xwmm_dkma_free(void * mem)
         xwer_t rc;
 
         rc = xwmm_sma_free(&xwmm_dkma, mem);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 module_put(THIS_MODULE);
         }
         return rc;
@@ -176,7 +176,7 @@ xwer_t xwmm_kma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
  * @brief XWMM API：释放内核内存
  * @param mem: (I) 内存首地址指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  */
 __xwos_api

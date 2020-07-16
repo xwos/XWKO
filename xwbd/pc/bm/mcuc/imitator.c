@@ -94,7 +94,7 @@ xwer_t mcuc_imitator_get_txmsg(struct mcuc_imitator_info * imi,
 
         smrid = xwosal_smr_get_id(&imi->txq.smr);
         rc = xwosal_smr_wait(smrid);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwosal_splk_lock(&imi->txq.lock);
                 imsg = xwlib_bclst_first_entry(&imi->txq.head,
                                                struct mcuc_imitator_msg,
@@ -127,7 +127,7 @@ xwer_t mcuc_imitator_get_rxmsg(struct mcuc_imitator_info * imi,
 
         smrid = xwosal_smr_get_id(&imi->rxq.smr);
         rc = xwosal_smr_wait(smrid);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwosal_splk_lock(&imi->rxq.lock);
                 imsg = xwlib_bclst_first_entry(&imi->rxq.head,
                                                struct mcuc_imitator_msg,
@@ -205,7 +205,7 @@ ssize_t mcuc_imitator_read(struct xwfs_node * xwfsnode,
         rc = copy_from_user(&usrmsg, usbuf, sizeof(struct xwpcp_msg));
         portdata = xwfs_node_get_data(mcuc_msgnode[usrmsg.port].xwfsnode);
         rc = mcuc_imitator_get_rxmsg(&portdata->imitator, &imsg);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rdcnt = usrmsg.size > imsg->msg.size ? imsg->msg.size : usrmsg.size;
                 rc = copy_to_user(usrmsg.text, imsg->msg.text, rdcnt);
                 mcuc_imitator_free_msg(imsg);
@@ -228,7 +228,7 @@ xwer_t mcuc_imitator_init(void)
         }
         mcuc_imitator_node = node;
 
-        return OK;
+        return XWOK;
 
 err_mknod_imitator:
         return rc;
@@ -239,5 +239,5 @@ xwer_t mcuc_imitator_exit(void)
         xwfs_rmnod(mcuc_imitator_node);
         mcuc_imitator_node = NULL;
 
-        return OK;
+        return XWOK;
 }

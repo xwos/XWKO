@@ -36,7 +36,7 @@
 #define KSYM_CALL(sym, x...)    __ksym__##sym(x)
 #define KSYM_LOAD(sym)							        \
 	({                                                                      \
-                long rc = OK;                                                   \
+                long rc = XWOK;                                                   \
 		__ksym__##sym =	(typeof(sym) *)kallsyms_lookup_name(#sym);      \
 		if (IS_ERR_OR_NULL(__ksym__##sym))                              \
 			rc = PTR_ERR(__ksym__##sym);                            \

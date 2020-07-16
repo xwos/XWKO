@@ -300,7 +300,7 @@ int xwfs_fill_superblock(struct super_block * sb, struct xwfs_mntopts * mntopts)
                 goto err_make_rootd;
         }
         sb->s_root = rootd;
-        return OK;
+        return XWOK;
 
         /* xwfs_kill_sb will be called later, if failed. */
 err_make_rootd:
@@ -755,7 +755,7 @@ int xwfs_node_fops_open(struct inode * inode, struct file * file)
         if (xwfsops && xwfsops->open) {
                 rc = xwfsops->open(node, file);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -772,7 +772,7 @@ int xwfs_node_fops_release(struct inode * inode, struct file * file)
         if (xwfsops && xwfsops->release) {
                 rc = xwfsops->release(node, file);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -845,7 +845,7 @@ xwer_t xwfs_path_create(const char * name, struct xwfs_dir * parent,
                 goto err_exist;
         }
         *dptrbuf = newd;
-        return OK;
+        return XWOK;
 
 err_exist:
         dput(newd);
@@ -902,7 +902,7 @@ xwer_t xwfs_mknod_internal(struct xwfs_dir * parent,
                 iprnt->i_ctime = CURRENT_TIME;
 #endif
                 iprnt->i_mtime = iprnt->i_ctime;
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -945,7 +945,7 @@ xwer_t xwfs_mkdir(const char * name, struct xwfs_dir * parent,
         fsnotify_mkdir(&parent->inode, dnew);
         xwfs_done_path_create(&pathparent, dnew);
         *newdir = dir;
-        return OK;
+        return XWOK;
 
 err_mknod:
 err_maxlink:
@@ -994,7 +994,7 @@ xwer_t xwfs_mknod(const char * name,
         fsnotify_create(&parent->inode, dnew);
         xwfs_done_path_create(&pathparent, dnew);
         *newnode = n;
-        return OK;
+        return XWOK;
 
 err_mknod:
         xwfs_done_path_create(&pathparent, dnew);
@@ -1031,7 +1031,7 @@ xwer_t xwfs_get_path_parent(struct xwfs_dir * parent, struct path * pathbuf)
 #else
         mutex_lock_nested(&parent->inode.i_mutex, I_MUTEX_PARENT);
 #endif
-        return OK;
+        return XWOK;
 
 err_mnt_want_write:
         path_put(pathbuf);
@@ -1042,7 +1042,7 @@ err_not_mnt:
 /**
  * @brief Internal function to put the kernel path of parent directory
  * @param pathparent: kernel path
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval <0: error code
  */
 static
@@ -1110,7 +1110,7 @@ xwer_t xwfs_rmdir(struct xwfs_dir * dir)
         d_delete(d);
         dput(d);
         xwfs_put_path_parent(&pathparent);
-        return OK;
+        return XWOK;
 
 err_rmdir:
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
@@ -1178,7 +1178,7 @@ xwer_t xwfs_rmnod(struct xwfs_node * node)
         iput(&node->inode);
         dput(d);
         xwfs_put_path_parent(&pathparent);
-        return OK;
+        return XWOK;
 
 err_unlink:
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
@@ -1247,7 +1247,7 @@ xwer_t xwfs_start(void)
                 goto err_xwsync_cdt_xwfs_init;
         }
 
-        return OK;
+        return XWOK;
 
 err_xwsync_cdt_xwfs_init:
         xwsync_smr_xwfs_exit();
@@ -1271,7 +1271,7 @@ xwer_t xwfs_stop(void)
         xwer_t rc;
 
         rc = xwaop_teq_then_sub(xwsq_t, &xwfs_mntcnt, 1, 1, NULL, NULL);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwsync_cdt_xwfs_exit();
                 xwsync_smr_xwfs_exit();
                 xwlk_mtx_xwfs_exit();
@@ -1497,7 +1497,7 @@ xwer_t xwfs_init(void)
         }
         xwfslogf(INFO, "Create \"/sys/xwos/xwfs/state\" ... [OK]\n");
 
-        return OK;
+        return XWOK;
 
 err_xwfs_sysfs_attr_state_create:
         xwsys_remove_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_cmd);

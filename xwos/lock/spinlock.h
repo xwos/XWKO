@@ -69,7 +69,7 @@ xwer_t xwlk_splk_trylock(struct xwlk_splk * spl)
 
         acquired = spin_trylock(&spl->lspl);
         if (acquired) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
@@ -96,7 +96,7 @@ xwer_t xwlk_splk_trylock_cpuirq(struct xwlk_splk * spl)
 
         acquired = spin_trylock_irq(&spl->lspl);
         if (acquired) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
@@ -123,7 +123,7 @@ xwer_t xwlk_splk_trylock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * flag)
 
         acquired = spin_trylock_irqsave(&spl->lspl, (*flag));
         if (acquired) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }
@@ -174,7 +174,7 @@ xwer_t xwlk_splk_trylock_bh(struct xwlk_splk *spl)
 
         acquired = spin_trylock_bh(&spl->lspl);
         if (acquired) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EAGAIN;
         }

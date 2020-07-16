@@ -98,7 +98,7 @@ xwer_t xwaop__xws16_t__teq_then_write(__atomic xws16_t * a,
                                                  __ATOMIC_ACQ_REL,
                                                  __ATOMIC_CONSUME);
         if ((bool)rc) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EACCES;
         }
@@ -125,13 +125,13 @@ xwer_t xwaop__xws16_t__tne_then_write(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (ov) {
                 *ov = o;
         }
@@ -155,13 +155,13 @@ xwer_t xwaop__xws16_t__tgt_then_write(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (ov) {
                 *ov = o;
         }
@@ -185,13 +185,13 @@ xwer_t xwaop__xws16_t__tge_then_write(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (ov) {
                 *ov = o;
         }
@@ -215,13 +215,13 @@ xwer_t xwaop__xws16_t__tlt_then_write(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (ov) {
                 *ov = o;
         }
@@ -245,13 +245,13 @@ xwer_t xwaop__xws16_t__tle_then_write(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (ov) {
                 *ov = o;
         }
@@ -275,13 +275,13 @@ xwer_t xwaop__xws16_t__tgtlt_then_write(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (ov) {
                 *ov = o;
         }
@@ -305,13 +305,13 @@ xwer_t xwaop__xws16_t__tgelt_then_write(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (ov) {
                 *ov = o;
         }
@@ -335,13 +335,13 @@ xwer_t xwaop__xws16_t__tgtle_then_write(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (ov) {
                 *ov = o;
         }
@@ -365,13 +365,13 @@ xwer_t xwaop__xws16_t__tgele_then_write(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (ov) {
                 *ov = o;
         }
@@ -412,7 +412,7 @@ xwer_t xwaop__xws16_t__teq_then_add(__atomic xws16_t * a,
                                                  __ATOMIC_ACQ_REL,
                                                  __ATOMIC_CONSUME);
         if ((bool)rc) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EACCES;
                 n = o;
@@ -445,14 +445,14 @@ xwer_t xwaop__xws16_t__tne_then_add(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -481,14 +481,14 @@ xwer_t xwaop__xws16_t__tgt_then_add(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -517,14 +517,14 @@ xwer_t xwaop__xws16_t__tge_then_add(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -553,14 +553,14 @@ xwer_t xwaop__xws16_t__tlt_then_add(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -589,14 +589,14 @@ xwer_t xwaop__xws16_t__tle_then_add(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -625,14 +625,14 @@ xwer_t xwaop__xws16_t__tgtlt_then_add(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -661,14 +661,14 @@ xwer_t xwaop__xws16_t__tgelt_then_add(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -697,14 +697,14 @@ xwer_t xwaop__xws16_t__tgtle_then_add(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -733,14 +733,14 @@ xwer_t xwaop__xws16_t__tgele_then_add(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -784,7 +784,7 @@ xwer_t xwaop__xws16_t__teq_then_sub(__atomic xws16_t * a,
                                                  __ATOMIC_ACQ_REL,
                                                  __ATOMIC_CONSUME);
         if ((bool)rc) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EACCES;
                 n = o;
@@ -817,14 +817,14 @@ xwer_t xwaop__xws16_t__tne_then_sub(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -853,14 +853,14 @@ xwer_t xwaop__xws16_t__tgt_then_sub(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -889,14 +889,14 @@ xwer_t xwaop__xws16_t__tge_then_sub(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -925,14 +925,14 @@ xwer_t xwaop__xws16_t__tlt_then_sub(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -961,14 +961,14 @@ xwer_t xwaop__xws16_t__tle_then_sub(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -997,14 +997,14 @@ xwer_t xwaop__xws16_t__tgtlt_then_sub(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1033,14 +1033,14 @@ xwer_t xwaop__xws16_t__tgelt_then_sub(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1069,14 +1069,14 @@ xwer_t xwaop__xws16_t__tgtle_then_sub(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1105,14 +1105,14 @@ xwer_t xwaop__xws16_t__tgele_then_sub(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1167,14 +1167,14 @@ xwer_t xwaop__xws16_t__teq_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1203,14 +1203,14 @@ xwer_t xwaop__xws16_t__tne_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1239,14 +1239,14 @@ xwer_t xwaop__xws16_t__tgt_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1275,14 +1275,14 @@ xwer_t xwaop__xws16_t__tge_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1311,14 +1311,14 @@ xwer_t xwaop__xws16_t__tlt_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1347,14 +1347,14 @@ xwer_t xwaop__xws16_t__tle_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1383,14 +1383,14 @@ xwer_t xwaop__xws16_t__tgtlt_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1419,14 +1419,14 @@ xwer_t xwaop__xws16_t__tgelt_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1455,14 +1455,14 @@ xwer_t xwaop__xws16_t__tgtle_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1491,14 +1491,14 @@ xwer_t xwaop__xws16_t__tgele_then_rsb(__atomic xws16_t * a,
                                                                  __ATOMIC_ACQ_REL,
                                                                  __ATOMIC_CONSUME);
                         if ((bool)rc) {
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EACCES;
                         n = o;
                         break;
                 }
-        } while (rc != OK);
+        } while (rc != XWOK);
         if (nv) {
                 *nv = n;
         }
@@ -1580,7 +1580,7 @@ xwer_t xwaop__xws16_t__tst_then_op(__atomic xws16_t * a,
                                                 __ATOMIC_ACQ_REL,
                                                 __ATOMIC_CONSUME);
                                 } else {
-                                        rc = OK;
+                                        rc = XWOK;
                                         n = o;
                                         break;
                                 }
@@ -1598,7 +1598,7 @@ xwer_t xwaop__xws16_t__tst_then_op(__atomic xws16_t * a,
                                         __ATOMIC_ACQ_REL,
                                         __ATOMIC_CONSUME);
                         } else {
-                                rc = OK;
+                                rc = XWOK;
                                 n = o;
                                 break;
                         }

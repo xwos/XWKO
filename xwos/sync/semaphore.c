@@ -106,12 +106,12 @@ static
 xwer_t xwsync_smr_gc(void * obj)
 {
         kmem_cache_free(xwsync_smr_cache, obj);
-        return OK;
+        return XWOK;
 }
 
 xwer_t xwsync_smr_cache_create(void)
 {
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         xwsync_smr_cache = kmem_cache_create("xwsync_smr_slab",
                                              sizeof(struct xwsync_smr),
@@ -124,7 +124,7 @@ xwer_t xwsync_smr_cache_create(void)
         }
 
         xwoslogf(INFO, "Create semaphore slab ... [OK]\n");
-        return OK;
+        return XWOK;
 
 err_slab_create:
         return rc;
@@ -147,7 +147,7 @@ xwer_t xwsync_smr_activate(struct xwsync_smr * smr, xwssq_t val,
         }
         smr->count = val;
         smr->max = max;
-        return OK;
+        return XWOK;
 
 err_xwsyncobj_activate:
         return rc;
@@ -162,7 +162,7 @@ xwer_t xwsync_smr_init(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
         if (__unlikely(rc < 0)) {
                 goto err_smr_activate;
         }
-        return OK;
+        return XWOK;
 
 err_smr_activate:
         return rc;
@@ -195,7 +195,7 @@ xwer_t xwsync_smr_create(struct xwsync_smr ** ptrbuf, xwssq_t val, xwssq_t max)
                 goto err_smr_activate;
         }
         *ptrbuf = smr;
-        return OK;
+        return XWOK;
 
 err_smr_activate:
         kmem_cache_free(xwsync_smr_cache, smr);
@@ -223,7 +223,7 @@ xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t 
         xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         rc = xwsync_evt_obj_bind(evt, xwsyncobj, pos, true);
-        if ((OK == rc) && (smr->count > 0)) {
+        if ((XWOK == rc) && (smr->count > 0)) {
                 rc = xwsync_evt_obj_s1i(evt, xwsyncobj);
         }
         xwlk_splk_unlock_cpuirqrs(&smr->lock, cpuirq);
@@ -243,7 +243,7 @@ xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt)
         xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         rc = xwsync_evt_obj_unbind(evt, xwsyncobj, true);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwsync_evt_obj_c0i(evt, xwsyncobj);
         }
         xwlk_splk_unlock_cpuirqrs(&smr->lock, cpuirq);
@@ -311,7 +311,7 @@ xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
         }
         xwlk_splk_unlock_cpuirqrs(&smr->lock, cpuirq);
         xwsync_smr_put(smr);
-        return OK;
+        return XWOK;
 
 err_not_neg:
         xwlk_splk_unlock_cpuirqrs(&smr->lock, cpuirq);
@@ -363,7 +363,7 @@ xwer_t xwsync_smr_post(struct xwsync_smr * smr)
         }
         xwlk_splk_unlock_cpuirqrs(&smr->lock, cpuirq);
         xwsync_smr_put(smr);
-        return OK;
+        return XWOK;
 
 err_smr_range:
 err_smr_neg:
@@ -393,7 +393,7 @@ xwer_t xwsync_smr_wait(struct xwsync_smr * smr)
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (likely(smr->count > 0)) {
                 smr->count--;
-                rc = OK;
+                rc = XWOK;
                 if (0 == smr->count) {
                         xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
@@ -426,7 +426,7 @@ xwer_t xwsync_smr_wait(struct xwsync_smr * smr)
                         schedule();
                         xwlk_splk_lock_cpuirq(&smr->lock);
                         if (XWSYNC_SMR_F_UP == waiter.flags) {
-                                rc = OK;
+                                rc = XWOK;
                                 break;
                         }
                 }
@@ -456,7 +456,7 @@ xwer_t xwsync_smr_trywait(struct xwsync_smr * smr)
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (likely(smr->count > 0)) {
                 smr->count--;
-                rc = OK;
+                rc = XWOK;
                 if (0 == smr->count) {
                         xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
@@ -499,7 +499,7 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (__likely(smr->count > 0)) {
                 smr->count--;
-                rc = OK;
+                rc = XWOK;
                 if (0 == smr->count) {
                         xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
@@ -518,7 +518,7 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
                 xwlib_bclst_add_tail(&smr->wq, &waiter.node);
                 waiter.task = task;
                 waiter.flags = 0;
-                rc = OK;
+                rc = XWOK;
                 while (true) {
                         if (signal_pending_state(TASK_INTERRUPTIBLE, task)) {
                                 xwlib_bclst_del_init(&waiter.node);
@@ -561,13 +561,13 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
                                 schedule();
                         }
                         hrtimer_cancel(&hrts.timer);
-                        rc = !hrts.task ? -ETIMEDOUT : OK;
+                        rc = !hrts.task ? -ETIMEDOUT : XWOK;
                         *kt = ktime_sub(expires,
                                         hrts.timer.base->get_time());
                         destroy_hrtimer_on_stack(&hrts.timer);
                         xwlk_splk_lock_cpuirq(&smr->lock);
                         if (XWSYNC_SMR_F_UP == waiter.flags) {
-                                rc = OK;
+                                rc = XWOK;
                                 break;
                         }
                 }
@@ -598,7 +598,7 @@ xwer_t xwsync_smr_wait_unintr(struct xwsync_smr * smr)
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
         if (likely(smr->count > 0)) {
                 smr->count--;
-                rc = OK;
+                rc = XWOK;
                 if (0 == smr->count) {
                         xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
@@ -626,7 +626,7 @@ xwer_t xwsync_smr_wait_unintr(struct xwsync_smr * smr)
                         schedule();
                         xwlk_splk_lock_cpuirq(&smr->lock);
                         if (XWSYNC_SMR_F_UP == waiter.flags) {
-                                rc = OK;
+                                rc = XWOK;
                                 break;
                         }
                 }
@@ -642,7 +642,7 @@ EXPORT_SYMBOL(xwsync_smr_wait_unintr);
 xwer_t xwsync_smr_getvalue(struct xwsync_smr * smr, xwssq_t * sval)
 {
         *sval = smr->count;
-        return OK;
+        return XWOK;
 }
 EXPORT_SYMBOL(xwsync_smr_getvalue);
 
@@ -663,7 +663,7 @@ xwer_t xwsync_smr_xwfs_init(void)
         if (__unlikely(rc < 0)) {
                 goto err_mknod_xwfsdir;
         }
-        return OK;
+        return XWOK;
 
 err_mknod_xwfsdir:
         xwfs_rmnod(xwsync_smr_xwfsctrl);
@@ -684,5 +684,5 @@ static
 long xwsync_smr_xwfsnode_ioctl(struct xwfs_node * xwfsnode, struct file * file,
                                unsigned int cmd, unsigned long arg)
 {
-        return OK;
+        return XWOK;
 }

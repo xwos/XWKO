@@ -115,7 +115,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -133,7 +133,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -151,7 +151,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -169,7 +169,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -187,7 +187,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -205,7 +205,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -224,7 +224,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -243,7 +243,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -262,7 +262,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -281,7 +281,7 @@
  * @param v: (I) 新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -313,7 +313,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -332,7 +332,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -351,7 +351,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -370,7 +370,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -389,7 +389,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -408,7 +408,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -428,7 +428,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -448,7 +448,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -468,7 +468,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -488,7 +488,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -520,7 +520,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -539,7 +539,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -558,7 +558,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -577,7 +577,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -596,7 +596,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -615,7 +615,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -635,7 +635,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -655,7 +655,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -675,7 +675,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -695,7 +695,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -729,7 +729,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -749,7 +749,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -769,7 +769,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -789,7 +789,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -809,7 +809,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -829,7 +829,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -850,7 +850,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -871,7 +871,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -892,7 +892,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -913,7 +913,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -1016,7 +1016,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -1035,7 +1035,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -1053,7 +1053,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume
@@ -1072,7 +1072,7 @@
  * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
  * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume

@@ -107,12 +107,12 @@ static
 xwer_t xwsync_cdt_gc(void * obj)
 {
         kmem_cache_free(xwsync_cdt_cache, obj);
-        return OK;
+        return XWOK;
 }
 
 xwer_t xwsync_cdt_cache_create(void)
 {
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         xwsync_cdt_cache = kmem_cache_create("xwsync_cdt_slab",
                                              sizeof(struct xwsync_cdt),
@@ -125,7 +125,7 @@ xwer_t xwsync_cdt_cache_create(void)
         }
 
         xwoslogf(INFO, "Create condition slab ... [OK]\n");
-        return OK;
+        return XWOK;
 
 err_slab_create:
         return rc;
@@ -145,7 +145,7 @@ xwer_t xwsync_cdt_activate(struct xwsync_cdt * cdt, xwobj_gc_f gcfunc)
                 goto err_obj_activate;
         }
         cdt->count = 0;
-        return OK;
+        return XWOK;
 
 err_obj_activate:
         return rc;
@@ -179,7 +179,7 @@ xwer_t xwsync_cdt_create(struct xwsync_cdt ** ptrbuf)
                 goto err_cdt_activate;
         }
         *ptrbuf = cdt;
-        return OK;
+        return XWOK;
 
 err_cdt_activate:
         kmem_cache_free(xwsync_cdt_cache, cdt);
@@ -203,7 +203,7 @@ xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t 
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
                 rc = xwsync_evt_obj_bind(evt, &cdt->xwsyncobj, pos, false);
                 xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
@@ -223,7 +223,7 @@ xwer_t xwsync_cdt_unbind(struct xwsync_cdt * cdt, struct xwsync_evt * evt)
         xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
         rc = xwsync_evt_obj_unbind(evt, &cdt->xwsyncobj, false);
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwsync_cdt_put(cdt);
         }
         return rc;
@@ -276,7 +276,7 @@ xwer_t xwsync_cdt_thaw(struct xwsync_cdt * cdt)
         cdt->count = 0;
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
         xwsync_cdt_put(cdt);
-        return OK;
+        return XWOK;
 
 err_cdt_not_neg:
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
@@ -367,7 +367,7 @@ xwer_t xwsync_cdt_broadcast(struct xwsync_cdt * cdt)
         }
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
         xwsync_cdt_put(cdt);
-        return OK;
+        return XWOK;
 
 err_cdt_neg:
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
@@ -407,7 +407,7 @@ xwer_t xwsync_cdt_unicast(struct xwsync_cdt * cdt)
         }
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
         xwsync_cdt_put(cdt);
-        return OK;
+        return XWOK;
 
 err_cdt_neg:
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
@@ -441,7 +441,7 @@ xwer_t xwsync_cdt_do_wait(struct xwsync_cdt * cdt,
         xwlib_bclst_add_tail(&cdt->wq, &waiter.node);
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
         rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *lkst = XWLK_STATE_UNLOCKED;
         }
         xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
@@ -469,10 +469,10 @@ xwer_t xwsync_cdt_do_wait(struct xwsync_cdt * cdt,
         }
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
         xwsync_cdt_put(cdt);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 if (XWLK_STATE_UNLOCKED == *lkst) {
                         rc = xwos_thrd_do_lock(lock, lktype, NULL, lkdata);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 *lkst = XWLK_STATE_LOCKED;
                         }
                 }
@@ -541,7 +541,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
                 xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
                 xwsync_cdt_put(cdt);
                 rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         *lkst = XWLK_STATE_UNLOCKED;
                 }
                 rc = -ETIMEDOUT;
@@ -559,7 +559,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
 #endif
         xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
         rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *lkst = XWLK_STATE_UNLOCKED;
         }
         xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
@@ -596,10 +596,10 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
         *kt = ktime_sub(expires, hrts.timer.base->get_time());
         destroy_hrtimer_on_stack(&hrts.timer);
         xwsync_cdt_put(cdt);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 if (XWLK_STATE_UNLOCKED == *lkst) {
                         rc = xwos_thrd_do_lock(lock, lktype, xwtm, lkdata);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 *lkst = XWLK_STATE_LOCKED;
                         }
                 }
@@ -651,7 +651,7 @@ xwer_t xwsync_cdt_xwfs_init(void)
         if (__unlikely(rc < 0)) {
                 goto err_mknod_xwfsdir;
         }
-        return OK;
+        return XWOK;
 
 err_mknod_xwfsdir:
         xwfs_rmnod(xwsync_cdt_xwfsctrl);
@@ -672,5 +672,5 @@ static
 long xwsync_cdt_xwfsnode_ioctl(struct xwfs_node * xwfsnode, struct file * file,
                                unsigned int cmd, unsigned long arg)
 {
-        return OK;
+        return XWOK;
 }

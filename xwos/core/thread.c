@@ -61,14 +61,14 @@ KSYM_DCLR(find_task_by_vpid);
 xwer_t xwos_thrd_grab(struct xwos_tcb * tcb)
 {
         get_task_struct(tcb);
-        return OK;
+        return XWOK;
 }
 EXPORT_SYMBOL(xwos_thrd_grab);
 
 xwer_t xwos_thrd_put(struct xwos_tcb * tcb)
 {
         put_task_struct(tcb);
-        return OK;
+        return XWOK;
 }
 EXPORT_SYMBOL(xwos_thrd_put);
 
@@ -93,7 +93,7 @@ xwer_t xwos_thrd_create(xwid_t *tidbuf, const char *name,
         sched_setscheduler(ts, SCHED_FIFO, &schparam);
         wake_up_process(ts);
         *tidbuf = (xwid_t)task_pid_vnr(ts);
-        return OK;
+        return XWOK;
 
 err_kthread_create:
         return rc;
@@ -103,7 +103,7 @@ EXPORT_SYMBOL(xwos_thrd_create);
 xwer_t xwos_thrd_delete(xwid_t tid)
 {
         XWOS_UNUSED(tid);
-        return OK;
+        return XWOK;
 }
 EXPORT_SYMBOL(xwos_thrd_delete);
 
@@ -139,7 +139,7 @@ xwer_t xwos_thrd_terminate(xwid_t tid, xwer_t * trc)
                 rcu_read_unlock();
                 rc = -ESTALE;
         }
-        return OK;
+        return XWOK;
 }
 EXPORT_SYMBOL(xwos_thrd_terminate);
 
@@ -177,7 +177,7 @@ bool xwos_cthrd_frz_shld_stop(bool * frozen)
                 rc = xwos_cthrd_freeze();
         }
         if (frozen) {
-                if (OK == rc) {
+                if (XWOK == rc) {
                         *frozen = true;
                 } else {
                         *frozen = false;
@@ -211,7 +211,7 @@ xwer_t xwos_thrd_do_unlock(void * lock, xwid_t lktype, void * lkdata)
         } lk;
 
         lk.anon = lock;
-        rc = OK;
+        rc = XWOK;
         switch (lktype) {
         case XWLK_TYPE_MTX:
         case XWLK_TYPE_MTX_UNINTR:
@@ -249,7 +249,7 @@ xwer_t xwos_thrd_do_lock(void * lock, xwid_t lktype, xwtm_t * xwtm, void * lkdat
         } lk;
 
         lk.anon = lock;
-        rc = OK;
+        rc = XWOK;
         switch (lktype) {
         case XWLK_TYPE_MTX:
                 if (xwtm) {
@@ -371,7 +371,7 @@ xwer_t xwos_cthrd_freeze(void)
 
         frozen = __refrigerator(true);
         if (frozen) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EPERM;
         }
@@ -389,7 +389,7 @@ xwer_t xwos_thrd_intr(xwid_t tid)
         tcb = KSYM_CALL(find_task_by_vpid, tid);
         if (tcb) {
                 linux_thrd_fake_signal_wake_up(tcb);
-                rc = OK;
+                rc = XWOK;
         }
         rcu_read_unlock();
         return rc;
@@ -407,7 +407,7 @@ xwer_t xwos_thrd_get_tcb_by_tid(xwid_t tid, struct xwos_tcb ** ptrbuf)
                 xwos_thrd_grab(tcb);
                 rcu_read_unlock();
                 *ptrbuf = tcb;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rcu_read_unlock();
                 rc = -ESTALE;
@@ -500,7 +500,7 @@ xwer_t linux_thrd_ksym_load(void)
                 goto err_ksymload;
         }
 
-        return OK;
+        return XWOK;
 
 err_ksymload:
         return rc;
@@ -508,5 +508,5 @@ err_ksymload:
 
 xwer_t linux_thrd_ksym_unload(void)
 {
-        return OK;
+        return XWOK;
 }

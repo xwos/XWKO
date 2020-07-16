@@ -97,7 +97,7 @@ xwer_t mcuc_start(const char * cmdstring)
                 if (__unlikely(rc < 0))
                         goto err_mcuc_imitator_start;
         }
-        return OK;
+        return XWOK;
 
 err_mcuc_imitator_start:
         mcuc_wkup_exit();
@@ -143,7 +143,7 @@ xwer_t mcuc_stop(void)
 
         xwfs_giveup();
 
-        return OK;
+        return XWOK;
 
 err_state:
         return rc;
@@ -259,7 +259,7 @@ xwer_t mcuc_init(void)
                          rc);
                 goto err_xwsys_create_file_state;
         }
-        return OK;
+        return XWOK;
 
 err_xwsys_create_file_state:
         xwsys_unregister(xwsys_mcuc);

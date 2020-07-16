@@ -134,7 +134,7 @@ xwer_t mcuc_wkup_init(void)
         }
         mcuc_wkup = node;
 
-        return OK;
+        return XWOK;
 
 err_mknod_wkup:
         return rc;
@@ -144,5 +144,5 @@ xwer_t mcuc_wkup_exit(void)
 {
         xwfs_rmnod(mcuc_wkup);
         mcuc_wkup = NULL;
-        return OK;
+        return XWOK;
 }

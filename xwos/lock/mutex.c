@@ -78,14 +78,14 @@ static
 xwer_t xwlk_mtx_gc(void * obj)
 {
         kmem_cache_free(xwlk_mtx_cache, obj);
-        return OK;
+        return XWOK;
 }
 
 xwer_t xwlk_mtx_cache_create(void)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwlk_mtx_cache = kmem_cache_create("xwlk_mtx_slab",
                                            sizeof(struct xwlk_mtx),
                                            XWMMCFG_ALIGNMENT, SLAB_PANIC,
@@ -97,7 +97,7 @@ xwer_t xwlk_mtx_cache_create(void)
         }
 
         xwoslogf(INFO, "Create mutex slab ... [OK]\n");
-        return OK;
+        return XWOK;
 
 err_slab_create:
         return rc;
@@ -119,7 +119,7 @@ xwer_t xwlk_mtx_activate(struct xwlk_mtx * mtx, xwpr_t sprio, xwobj_gc_f gcfunc)
                 goto err_obj_activate;
         }
         rt_mutex_init(&mtx->lrtmtx);
-        return OK;
+        return XWOK;
 
 err_obj_activate:
         return rc;
@@ -153,7 +153,7 @@ xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
                 goto err_mtx_activate;
         }
         *ptrbuf = mtx;
-        return OK;
+        return XWOK;
 
 err_mtx_activate:
         kmem_cache_free(xwlk_mtx_cache, mtx);
@@ -172,7 +172,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
 {
         rt_mutex_unlock(&mtx->lrtmtx);
         xwlk_mtx_put(mtx);
-        return OK;
+        return XWOK;
 }
 EXPORT_SYMBOL(xwlk_mtx_unlock);
 
@@ -193,7 +193,7 @@ xwer_t xwlk_mtx_lock(struct xwlk_mtx * mtx)
         if (__unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
-        return OK;
+        return XWOK;
 
 err_mtx_lock:
         xwlk_mtx_put(mtx);
@@ -216,7 +216,7 @@ xwer_t xwlk_mtx_trylock(struct xwlk_mtx * mtx)
                 rc = -EAGAIN;
                 goto err_mtx_trylock;
         }
-        return OK;
+        return XWOK;
 
 err_mtx_trylock:
         xwlk_mtx_put(mtx);
@@ -264,7 +264,7 @@ xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm)
         if (__unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
-        return OK;
+        return XWOK;
 
 err_mtx_lock:
         xwlk_mtx_put(mtx);
@@ -283,7 +283,7 @@ xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx)
                 goto err_mtx_grab;
         }
         rt_mutex_lock(&mtx->lrtmtx);
-        return OK;
+        return XWOK;
 
 err_mtx_grab:
         return rc;
@@ -307,7 +307,7 @@ xwer_t xwlk_mtx_xwfs_init(void)
         if (__unlikely(rc < 0)) {
                 goto err_mknod_xwfsdir;
         }
-        return OK;
+        return XWOK;
 
 err_mknod_xwfsdir:
         xwfs_rmnod(xwlk_mtx_xwfsctrl);
@@ -328,5 +328,5 @@ static
 long xwlk_mtx_xwfsnode_ioctl(struct xwfs_node * xwfsnode, struct file * file,
                              unsigned int cmd, unsigned long arg)
 {
-        return OK;
+        return XWOK;
 }

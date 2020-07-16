@@ -92,7 +92,7 @@ int XuanWuKo_init(void)
         }
         xwkologf(INFO, "Init board... [OK]\n");
 
-        return OK;
+        return XWOK;
 
 err_board_init:
         xwfs_exit();

@@ -48,7 +48,7 @@
  * @param pos: (I) 内存区域的位置
  * @param name: (I) 分配器的名字
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 内存的大小无效
  * @note
  * - 同步/异步：同步
@@ -68,7 +68,7 @@ xwer_t xwmm_sma_init(struct xwmm_sma * sa,
         if (size < pos) {
                 rc = -EINVAL;
         } else {
-                rc = OK;
+                rc = XWOK;
                 sa->zone.origin = origin;
                 sa->zone.size = size;
                 sa->pos = pos;
@@ -131,7 +131,7 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
                 }
                 *membuf = (void *)tmp;
         } while (xwaop_teq_then_write(xwsq_t, &sa->pos, cpos, npos, NULL));
-        return OK;
+        return XWOK;
 
 err_nomem:
 err_inval:
@@ -155,5 +155,5 @@ xwer_t xwmm_sma_free(struct xwmm_sma * sa, void * mem)
 {
         XWOS_UNUSED(sa);
         XWOS_UNUSED(mem);
-        return OK;
+        return XWOK;
 }

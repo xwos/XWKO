@@ -76,7 +76,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwsync_evt_cache_create(void)
 {
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         xwsync_evt_cache = kmem_cache_create("xwsync_evt_slab",
                                              sizeof(struct xwsync_evt),
@@ -89,7 +89,7 @@ xwer_t xwsync_evt_cache_create(void)
         }
 
         xwoslogf(INFO, "Create condition slab ... [OK]\n");
-        return OK;
+        return XWOK;
 
 err_slab_create:
         return rc;
@@ -113,7 +113,7 @@ static
 xwer_t xwsync_evt_gc(void * obj)
 {
         kmem_cache_free(xwsync_evt_cache, obj);
-        return OK;
+        return XWOK;
 }
 
 static
@@ -125,7 +125,7 @@ xwer_t xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[],
 
         size = BITS_TO_BMPS(XWSYNC_EVT_MAXNUM);
         rc = xwsync_cdt_activate(&evt->cdt, gcfunc);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 evt->attr = attr;
                 switch (attr & XWSYNC_EVT_TYPE_MASK) {
                 case XWSYNC_EVT_TYPE_FLAG:
@@ -171,7 +171,7 @@ xwer_t xwsync_evt_create(struct xwsync_evt ** ptrbuf, xwbmp_t initval[], xwsq_t 
                 goto err_evt_activate;
         }
         *ptrbuf = evt;
-        return OK;
+        return XWOK;
 
 err_evt_activate:
         kmem_cache_free(xwsync_evt_cache, evt);
@@ -247,7 +247,7 @@ xwer_t xwsync_evt_s1m(struct xwsync_evt * evt, xwbmp_t msk[])
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -272,7 +272,7 @@ xwer_t xwsync_evt_s1i(struct xwsync_evt * evt, xwsq_t pos)
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -298,7 +298,7 @@ xwer_t xwsync_evt_c0m(struct xwsync_evt * evt, xwbmp_t msk[])
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -324,7 +324,7 @@ xwer_t xwsync_evt_c0i(struct xwsync_evt * evt, xwsq_t pos)
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -350,7 +350,7 @@ xwer_t xwsync_evt_x1m(struct xwsync_evt * evt, xwbmp_t msk[])
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -376,7 +376,7 @@ xwer_t xwsync_evt_x1i(struct xwsync_evt * evt, xwsq_t pos)
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -399,7 +399,7 @@ xwer_t xwsync_evt_read(struct xwsync_evt * evt, xwbmp_t out[])
         xwbmpop_assign(out, evt->bmp, XWSYNC_EVT_MAXNUM);
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -420,7 +420,7 @@ xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
         XWOS_VALIDATE((action < XWSYNC_EVT_ACTION_NUM),
                       "illegal-action", -EINVAL);
 
-        rc = OK;
+        rc = XWOK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
                 switch (trigger) {
@@ -499,7 +499,7 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                 cmprc = xwbmpop_cmp(tmp, msk, XWSYNC_EVT_MAXNUM);
                 if (0 == cmprc) {
                         triggered = true;
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         triggered = false;
                         rc = -ENODATA;
@@ -511,7 +511,7 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                         rc = -ENODATA;
                 } else {
                         triggered = true;
-                        rc = OK;
+                        rc = XWOK;
                 }
         } else {
                 triggered = true;
@@ -570,7 +570,7 @@ xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
         XWOS_VALIDATE((action < XWSYNC_EVT_ACTION_NUM),
                       "illegal-action", -EINVAL);
 
-        rc = OK;
+        rc = XWOK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
                 if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
@@ -627,7 +627,7 @@ xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
                         rc = xwsync_cdt_timedwait(&evt->cdt,
                                                   &evt->lock, XWLK_TYPE_SPLK, NULL,
                                                   xwtm, &lkst);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 if (XWLK_STATE_UNLOCKED == lkst) {
                                         xwlk_splk_lock(&evt->lock);
                                 }
@@ -669,7 +669,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                         cmprc = xwbmpop_cmp(tmp, msk, XWSYNC_EVT_MAXNUM);
                         if (0 == cmprc) {
                                 triggered = true;
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 triggered = false;
                         }
@@ -679,7 +679,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                                 triggered = false;
                         } else {
                                 triggered = true;
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         triggered = true;
@@ -693,7 +693,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                         rc = xwsync_cdt_timedwait(&evt->cdt,
                                                   &evt->lock, XWLK_TYPE_SPLK, NULL,
                                                   xwtm, &lkst);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 if (XWLK_STATE_UNLOCKED == lkst) {
                                         xwlk_splk_lock(&evt->lock);
                                 }
@@ -777,7 +777,7 @@ xwer_t xwsync_evt_obj_bind(struct xwsync_evt * evt,
         obj->selector.evt = evt;
         obj->selector.pos = pos;
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        return OK;
+        return XWOK;
 
 err_busy:
 err_already:
@@ -811,7 +811,7 @@ xwer_t xwsync_evt_obj_unbind(struct xwsync_evt * evt,
         obj->selector.pos = XWSYNC_EVT_MAXNUM;
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_notconn:
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -839,7 +839,7 @@ xwer_t xwsync_evt_obj_s1i(struct xwsync_evt * evt, struct xwsync_object * obj)
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_notconn:
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -868,7 +868,7 @@ xwer_t xwsync_evt_obj_c0i(struct xwsync_evt * evt, struct xwsync_object * obj)
         xwbmpop_c0i(evt->bmp, obj->selector.pos);
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_notconn:
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -907,7 +907,7 @@ xwer_t xwsync_evt_tryselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[
                         xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 }
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -ENODATA;
                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -955,7 +955,7 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
                                 xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         }
-                        rc = OK;
+                        rc = XWOK;
                         break;
                 } else {
                         /* Clear non-exclusive bits */
@@ -963,7 +963,7 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
                         rc = xwsync_cdt_timedwait(&evt->cdt,
                                                   &evt->lock, XWLK_TYPE_SPLK, NULL,
                                                   xwtm, &lkst);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 if (XWLK_STATE_UNLOCKED == lkst) {
                                         xwlk_splk_lock(&evt->lock);
                                 }
@@ -1017,7 +1017,7 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 xwsync_cdt_broadcast(&evt->cdt);
                 xwos_cthrd_yield();
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = xwsync_cdt_timedwait(&evt->cdt,
                                           &evt->lock, XWLK_TYPE_SPLK, NULL,

@@ -1482,7 +1482,7 @@ xwer_t xwaop__xws64_t__tst_then_op(__atomic xws64_t * a,
                                         xwmb_smp_mb();
                                         rc = strexd(a, (xwu64_t)n);
                                 } else {
-                                        rc = OK;
+                                        rc = XWOK;
                                         n = o;
                                         xwmb_smp_mb();
                                         break;
@@ -1499,7 +1499,7 @@ xwer_t xwaop__xws64_t__tst_then_op(__atomic xws64_t * a,
                                 xwmb_smp_mb();
                                 rc = strexd(a, (xwu64_t)n);
                         } else {
-                                rc = OK;
+                                rc = XWOK;
                                 n = o;
                                 xwmb_smp_mb();
                                 break;

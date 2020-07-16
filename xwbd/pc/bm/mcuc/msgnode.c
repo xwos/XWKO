@@ -167,7 +167,7 @@ ssize_t mcuc_msgnode_read(struct xwfs_node * xwfsnode,
                 struct mcuc_imitator_msg * imsg;
 
                 rc = mcuc_imitator_get_txmsg(&portdata->imitator, &imsg);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rdcnt = count > imsg->msg.size ? imsg->msg.size : count;
                         rc = copy_to_user(usbuf, imsg->msg.text, rdcnt);
                         mcuc_imitator_free_msg(imsg);
@@ -184,7 +184,7 @@ ssize_t mcuc_msgnode_read(struct xwfs_node * xwfsnode,
                 msg.text = buf;
                 time = XWTM_MAX;
                 rc = xwpcp_rx(&usi_xwpcp, &msg, &time);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rdcnt = msg.size;
                         rc = copy_to_user(usbuf, buf, rdcnt);
                 } else {
@@ -393,7 +393,7 @@ xwer_t mcuc_msgnode_init(void)
         xwlib_bclst_init_head(&mcuc_msgnode[MCUC_MSGNODE_MFG].imitator.rxq.head);
         xwosal_splk_init(&mcuc_msgnode[MCUC_MSGNODE_MFG].imitator.rxq.lock);
 
-        return OK;
+        return XWOK;
 
 err_mknod_mfg:
         xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_LOG].xwfsnode);
@@ -446,5 +446,5 @@ xwer_t mcuc_msgnode_exit(void)
         xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_SYS].xwfsnode);
         mcuc_msgnode[MCUC_MSGNODE_SYS].xwfsnode = NULL;
 
-        return OK;
+        return XWOK;
 }

@@ -119,7 +119,7 @@ xwer_t mcuc_session_init(void)
         }
         mcuc_session = node;
 
-        return OK;
+        return XWOK;
 
 err_mknod_session:
         return rc;
@@ -129,5 +129,5 @@ xwer_t mcuc_session_exit(void)
 {
         xwfs_rmnod(mcuc_session);
         mcuc_session = NULL;
-        return OK;
+        return XWOK;
 }

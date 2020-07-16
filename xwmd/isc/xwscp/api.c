@@ -79,7 +79,7 @@ void xwscp_init(struct xwscp * xwscp)
  * @param name: (I) XWSCP实例的名字
  * @param hwifops: (I) 数据链路层操作函数集合
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 __xwmd_api
 xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
@@ -140,7 +140,7 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
 
         xwscp->name = name;
         xwscp->hwifops = hwifops;
-        return OK;
+        return XWOK;
 
 err_rxqsmr_init:
         xwosal_smr_destroy(&xwscp->slot.smr);
@@ -158,7 +158,7 @@ err_txmtx_init:
  * @brief XWSCP API: 停止XWSCP
  * @param xwscp: (I) XWSCP对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 __xwmd_api
 xwer_t xwscp_stop(struct xwscp * xwscp)
@@ -170,7 +170,7 @@ xwer_t xwscp_stop(struct xwscp * xwscp)
         xwosal_cdt_destroy(&xwscp->cscdt);
         xwosal_mtx_destroy(&xwscp->csmtx);
         xwosal_mtx_destroy(&xwscp->txmtx);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -204,7 +204,7 @@ xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm, xwsq_t * cnt)
         rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&xwscp->cscdt),
                                   ulk, XWLK_TYPE_MTX, NULL,
                                   &time, &lockstate);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwosal_mtx_unlock(ulk.osal.id);
                 xwaop_add(xwu32_t, &xwscp->txi.cnt, 1, NULL, NULL);
         } else {
@@ -234,7 +234,7 @@ err_mtx_lock:
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOTCONN: 远程端无回应
  * @note
@@ -317,7 +317,7 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
         rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&xwscp->cscdt),
                                   ulk, XWLK_TYPE_MTX, NULL,
                                   &time, &lockstate);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 ack = xwscp->txi.ack;
                 xwscp->txi.frm = NULL;
                 xwosal_mtx_unlock(ulk.osal.id);
@@ -374,7 +374,7 @@ err_fmt_msg:
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -E2BIG: 数据太长
  * @retval -ENOTCONN: 远程端无回应
@@ -410,7 +410,7 @@ xwer_t xwscp_tx(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
                 rc = xwscp_tx_once(xwscp, msg, size, xwtm, &cnt);
                 if (-ENOLINK == rc) {
                         rc = xwscp_connect_once(xwscp, xwtm, &cnt);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 rc = -EAGAIN;
                         }/* else {} */
                 }/* else {} */
@@ -437,7 +437,7 @@ err_txmtx_timedlock:
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -466,7 +466,7 @@ xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t * xwtm
         memcpy(buf, pubfrm->frm.sdu, realsize);
         xwscp_free_frmslot(xwscp, pubfrm);
         *size = realsize;
-        return OK;
+        return XWOK;
 
 err_rxq_choose:
         return rc;

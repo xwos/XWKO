@@ -38,7 +38,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwos_scheduler_start_lc(void)
 {
-        return OK;
+        return XWOK;
 }
 EXPORT_SYMBOL(xwos_scheduler_start_lc);
 
@@ -99,7 +99,7 @@ xwer_t xwos_scheduler_init(void)
                          rc);
                 goto err_ksymload;
         }
-        return OK;
+        return XWOK;
 
 err_ksymload:
         return rc;
@@ -200,7 +200,7 @@ xwer_t xwos_scheduler_xwfs_init(void)
                 goto err_mknod_priority;
         }
         xwos_scheduler_xwfsnode_priority = node;
-        return OK;
+        return XWOK;
 
 err_mknod_priority:
         xwfs_rmdir(xwos_scheduler_xwfsdir);

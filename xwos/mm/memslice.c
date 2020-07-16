@@ -56,7 +56,7 @@
  * @param ctor: (I) 切片的构造函数
  * @param dtor: (I) 切片的析构函数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
  * @note
  * - 同步/异步：同步
@@ -115,7 +115,7 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
                 curr = next;
         }
 
-        return OK;
+        return XWOK;
 
 err_mem2small:
         return rc;
@@ -136,7 +136,7 @@ xwer_t xwmm_memslice_destroy(struct xwmm_memslice * msa)
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
 
         XWOS_UNUSED(msa);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -149,7 +149,7 @@ xwer_t xwmm_memslice_destroy(struct xwmm_memslice * msa)
  * @param dtor: (I) 切片的析构函数
  * @param name: (I) 名字
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
  * @note
  * - 同步/异步：同步
@@ -187,7 +187,7 @@ xwer_t xwmm_memslice_create(struct xwmm_memslice ** ptrbuf,
         }
 
         *ptrbuf = msa;
-        return OK;
+        return XWOK;
 
 err_msa_init:
         xwmm_kma_free(msa);
@@ -210,7 +210,7 @@ xwer_t xwmm_memslice_delete(struct xwmm_memslice * msa)
 {
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
         xwmm_kma_free(msa);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -243,7 +243,7 @@ xwer_t xwmm_memslice_alloc(struct xwmm_memslice * msa, void ** membuf)
         xwaop_sub(xwsz_t, &msa->num_free, 1, NULL, NULL);
         *(xwptr_t *)card = msa->backup; /* restore original data */
         *membuf = card;
-        return OK;
+        return XWOK;
 
 err_lfq_pop:
         return rc;
@@ -278,7 +278,7 @@ xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem)
                 card = (__atomic xwlfq_t *)mem;
                 xwlib_lfq_push(&msa->free_list, card);
                 xwaop_add(xwsz_t, &msa->num_free, 1, NULL, NULL);
-                rc = OK;
+                rc = XWOK;
         }
 
         return rc;

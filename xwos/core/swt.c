@@ -78,7 +78,7 @@ static
 xwer_t xwos_swt_gc(void *swt)
 {
         kmem_cache_free(xwos_swt_cache, swt);
-        return OK;
+        return XWOK;
 }
 
 xwer_t xwos_swt_cache_create(void)
@@ -96,7 +96,7 @@ xwer_t xwos_swt_cache_create(void)
         }
 
         xwoslogf(INFO, "Create swt slab ... [OK]\n");
-        return OK;
+        return XWOK;
 
 err_slab_create:
         return rc;
@@ -148,7 +148,7 @@ xwer_t xwos_swt_activate(struct xwos_swt *swt, const char *name, xwsq_t flag,
         swt->flag = flag;
         hrtimer_init(&swt->hrt, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
         swt->hrt.function = xwos_swt_hrtimer_cb;
-        return OK;
+        return XWOK;
 
 err_xwobj_activate:
         return rc;
@@ -186,7 +186,7 @@ xwer_t xwos_swt_create(struct xwos_swt ** ptrbuf, const char * name, xwsq_t flag
                 goto err_swt_activate;
         }
         *ptrbuf = (struct xwos_swt *)swt;
-        return OK;
+        return XWOK;
 
 err_swt_activate:
         kmem_cache_free(xwos_swt_cache, swt);
@@ -226,7 +226,7 @@ xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t base, xwtm_t period,
 #endif
                 hrtbase = ktime_add_safe(hrtbase, ktperiod);
                 hrtimer_start(&swt->hrt, hrtbase, HRTIMER_MODE_ABS);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -236,5 +236,5 @@ xwer_t xwos_swt_stop(struct xwos_swt *swt)
         if (hrtimer_active(&swt->hrt)) {
                 hrtimer_cancel(&swt->hrt);
         }
-        return OK;
+        return XWOK;
 }

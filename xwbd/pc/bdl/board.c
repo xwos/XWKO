@@ -50,7 +50,7 @@ xwer_t board_example_init(void)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
 #if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
         rc = hixwos_init();
         if (rc < 0) {
@@ -61,7 +61,7 @@ xwer_t board_example_init(void)
         xwbdlogf(INFO, "Init example hixwos ... [OK]\n");
 #endif /* XWAMCFG_example_hixwos */
 
-        return OK;
+        return XWOK;
 
 #if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
 err_hixwos_init:
@@ -112,7 +112,7 @@ xwer_t board_init(void)
         }
         xwbdlogf(INFO, "Init example ... [OK]\n");
 
-        return OK;
+        return XWOK;
 
 err_example_init:
         mcuc_exit();

@@ -61,7 +61,7 @@ xwer_t hixwos_producer_thrd(void * arg)
                 xwosal_smr_post(smrid); /* 发送信号量 */
         }
         hixwoslogf(INFO, "Producer exit.\n");
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -76,12 +76,12 @@ xwer_t hixwos_consumer_thrd(void * arg)
         hixwoslogf(INFO, "Hi, XuanWuOS! I'am consumer.\n");
         for (i = 0; i < 3; i++) { /* 循环3次 */
                 rc = xwosal_smr_wait(smrid); /* 等待信号量 */
-                if (OK == rc) {
+                if (XWOK == rc) {
                         hixwoslogf(INFO, "Consumer: Got! ID:%d\n", i);
                 }
         }
         hixwoslogf(INFO, "Consumer exit.\n");
-        return OK;
+        return XWOK;
 }
 
 xwer_t hixwos_start(void)
@@ -128,7 +128,7 @@ xwer_t hixwos_start(void)
                 goto err_create_hixwos_consumer_thrd;
         }
 
-        return OK;
+        return XWOK;
 
 err_create_hixwos_consumer_thrd:
         xwosal_thrd_terminate(hixwos_producer_thrd_tid, &trc);

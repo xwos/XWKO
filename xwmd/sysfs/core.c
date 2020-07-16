@@ -305,7 +305,7 @@ xwer_t xwsys_init(void)
                 xwsyslogf(ERR, "Can't create xwsys kset!\n");
                 goto err_out;
         }
-        return OK;
+        return XWOK;
 
 err_out:
         xwsys_kset = NULL;

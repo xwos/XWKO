@@ -89,7 +89,7 @@ xwer_t xwfs_create_skeleton(void)
                 goto err_mkdir_isc;
         }
 
-        return OK;
+        return XWOK;
 
 err_mkdir_isc:
         xwfs_rmdir(dir_xwmd);

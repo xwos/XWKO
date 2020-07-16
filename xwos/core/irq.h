@@ -77,7 +77,7 @@ xwer_t xwos_irq_get_id(xwirq_t * irqnbuf)
 
         if (in_interrupt()) {
                 if (in_irq()) {
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         rc = -EINBH;
                 }

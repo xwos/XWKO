@@ -101,7 +101,7 @@ ssize_t usi_xwscp_xwfs_port_read(struct xwfs_node * xwfsnode,
         desired = XWTM_MAX;
         bufcnt = count;
         rc = xwscp_rx(&usi_xwscp, buf, &bufcnt, &desired);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rdcnt = bufcnt;
                 rc = copy_to_user(usbuf, buf, rdcnt);
         } else {
@@ -233,7 +233,7 @@ xwer_t usi_xwscp_start(void)
         xwscplogf(INFO, "Create xwscp daemon thread ... [OK]\n");
 
         usi_xwscp_state = USI_XWSCP_STATE_START;
-        return OK;
+        return XWOK;
 
 err_xwscp_thread_create:
         xwscp_hwifal_close(&usi_xwscp);
@@ -259,21 +259,21 @@ xwer_t usi_xwscp_stop(void)
         }
 
         rc = xwosal_thrd_terminate(usi_xwscp_thrd, &rc);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwosal_thrd_delete(usi_xwscp_thrd);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         usi_xwscp_thrd = 0;
                         xwscplogf(INFO, "Terminate xwscp thread... [OK]\n");
                 }
         }
 
         rc = xwscp_hwifal_close(&usi_xwscp);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwscplogf(INFO, "close xwscp hwifal ... [OK]\n");
         }
 
         rc = xwscp_stop(&usi_xwscp);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwscplogf(INFO, "stop xwscp ... [OK]\n");
         }
 
@@ -283,7 +283,7 @@ xwer_t usi_xwscp_stop(void)
         usi_xwscp_xwfs = NULL;
         xwfs_giveup();
         usi_xwscp_state = USI_XWSCP_STATE_STOP;
-        return OK;
+        return XWOK;
 
 err_notstart:
         return rc;
@@ -305,7 +305,7 @@ xwer_t usi_xwscp_sysfs_cmd_export_port(void)
                 xwscplogf(ERR, "Fail to mknod(\"port\"), rc: %d\n", rc);
                 goto err_xwfs_mknod;
         }
-        return OK;
+        return XWOK;
 
 err_xwfs_mknod:
 err_notstart:
@@ -326,7 +326,7 @@ xwer_t usi_xwscp_sysfs_cmd_unexport_port(void)
                 goto err_xwfs_rmnod;
         }
         usi_xwscp_xwfs_port = NULL;
-        return OK;
+        return XWOK;
 
 err_xwfs_rmnod:
 err_notstart:
@@ -432,7 +432,7 @@ ssize_t usi_xwscp_sysfs_state_show(struct xwsys_object * xwobj,
                 /* Slot */
                 rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwscp.slot.smr),
                                          &smrval);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         showcnt += sprintf(&buf[showcnt],
                                            "Slot Pool: 0x%lX\n",
                                            smrval);
@@ -441,7 +441,7 @@ ssize_t usi_xwscp_sysfs_state_show(struct xwsys_object * xwobj,
                 /* RXQ */
                 rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwscp.rxq.smr),
                                          &smrval);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         showcnt += sprintf(&buf[showcnt],
                                            "RX Queue: 0x%lX\n", smrval);
                 }
@@ -495,7 +495,7 @@ xwer_t usi_xwscp_init(void)
                 goto err_usi_xwscp_sysfs_state_create;
         }
         xwscplogf(INFO, "Create \"/sys/xwos/xwscp/state\" ... [OK]\n");
-        return OK;
+        return XWOK;
 
 err_usi_xwscp_sysfs_state_create:
         xwsys_remove_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_cmd);
