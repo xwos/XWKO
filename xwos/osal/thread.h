@@ -34,19 +34,19 @@
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层：线程控制块
+ * @brief XWOSAL：线程控制块
  */
 struct xwosal_tcb {
         struct xwosdl_tcb ostcb; /**< 操作系统的线程控制块 */
 };
 
 /**
- * @brief 操作系统抽象层：线程函数指针类型
+ * @brief XWOSAL：线程函数指针类型
  */
 typedef xwosdl_thrd_f xwosal_thrd_f;
 
 /**
- * @brief 操作系统抽象层：线程描述结构
+ * @brief XWOSAL：线程描述结构
  */
 struct xwosal_thrd_desc {
         const char * name; /**< 线程的名字 */
@@ -431,7 +431,7 @@ xwer_t xwosal_cthrd_freeze(void)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个tid，不可重入
  */
-static __xw_inline
+static __xwos_inline_api
 xwer_t xwosal_thrd_migrate(xwid_t tid, xwid_t dstcpu)
 {
         return xwosdl_thrd_migrate(tid, dstcpu);
