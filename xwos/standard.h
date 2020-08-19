@@ -38,7 +38,7 @@
 #include <xwos/compiler.h>
 #include <xwos/version.h>
 #include <xwos/type.h>
-#include <xwos/err.h>
+#include <xwos/lib/error.h>
 #include <linux/kernel.h>
 #include <linux/version.h>
 #include <linux/stringify.h>
@@ -66,7 +66,7 @@
 
 #if defined(XWKNCFG_BUG) && (1 == XWKNCFG_BUG)
   #define XWOS_BUG()            do {} while (1)
-  #define XWOS_BUG_ON(x)        if (__unlikely(x)) XWOS_BUG()
+  #define XWOS_BUG_ON(x)        if (__xwcc_unlikely(x)) XWOS_BUG()
 #else
   #define XWOS_BUG()
   #define XWOS_BUG_ON(x)
@@ -77,9 +77,9 @@
 #define XWOS_UNUSED(x)          ((void)(x))     /**< 去除未使用变量的警告 */
 
 #if defined(XWKNCFG_CHECK_PARAMETERS) && (1 == XWKNCFG_CHECK_PARAMETERS)
-  #define XWOS_VALIDATE(exp, errstr, ...) \
-          if (__unlikely((!(exp)))) {     \
-              return __VA_ARGS__; \
+  #define XWOS_VALIDATE(exp, errstr, ...)       \
+          if (__xwcc_unlikely((!(exp)))) {      \
+              return __VA_ARGS__;               \
           }
 #else /* XWKNCFG_CHECK_PARAMETERS */
   #define XWOS_VALIDATE(exp, errstr, ...)

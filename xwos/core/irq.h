@@ -46,31 +46,31 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 void xwos_cpuirq_enable_lc(void)
 {
         local_irq_enable();
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwos_cpuirq_disable_lc(void)
 {
         local_irq_disable();
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwos_cpuirq_restore_lc(xwreg_t flag)
 {
         local_irq_restore(flag);
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwos_cpuirq_save_lc(xwreg_t * flag)
 {
         local_irq_save(*flag);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_irq_get_id(xwirq_t * irqnbuf)
 {
         xwer_t rc;

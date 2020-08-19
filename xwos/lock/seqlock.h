@@ -50,25 +50,25 @@ struct xwos_irq_resource;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_init(struct xwlk_sqlk *sql)
 {
         seqlock_init(&sql->lsql);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwsq_t xwlk_sqlk_rd_begin(struct xwlk_sqlk *sql)
 {
         return read_seqbegin(&sql->lsql);
 }
 
-static __xw_inline
+static __xwcc_inline
 bool xwlk_sqlk_rd_retry(struct xwlk_sqlk *sql, xwsq_t start)
 {
         return read_seqretry(&sql->lsql, start);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwsq_t xwlk_sqlk_get_seq(struct xwlk_sqlk *sql)
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0)
@@ -82,13 +82,13 @@ xwsq_t xwlk_sqlk_get_seq(struct xwlk_sqlk *sql)
 #endif
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_rdex_lock(struct xwlk_sqlk *sql)
 {
         spin_lock(&sql->lsql.lock);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_sqlk_rdex_trylock(struct xwlk_sqlk *sql)
 {
         int acquired;
@@ -103,19 +103,19 @@ xwer_t xwlk_sqlk_rdex_trylock(struct xwlk_sqlk *sql)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_rdex_unlock(struct xwlk_sqlk *sql)
 {
         spin_unlock(&sql->lsql.lock);
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_rdex_lock_cpuirq(struct xwlk_sqlk *sql)
 {
         spin_lock_irq(&sql->lsql.lock);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_sqlk_rdex_trylock_cpuirq(struct xwlk_sqlk *sql)
 {
         int acquired;
@@ -130,19 +130,19 @@ xwer_t xwlk_sqlk_rdex_trylock_cpuirq(struct xwlk_sqlk *sql)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_rdex_unlock_cpuirq(struct xwlk_sqlk *sql)
 {
         spin_unlock_irq(&sql->lsql.lock);
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_rdex_lock_cpuirqsv(struct xwlk_sqlk *sql, xwreg_t *flag)
 {
         spin_lock_irqsave(&sql->lsql.lock, (*flag));
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_sqlk_rdex_trylock_cpuirqsv(struct xwlk_sqlk *sql, xwreg_t *flag)
 {
         int acquired;
@@ -156,7 +156,7 @@ xwer_t xwlk_sqlk_rdex_trylock_cpuirqsv(struct xwlk_sqlk *sql, xwreg_t *flag)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_rdex_unlock_cpuirqrs(struct xwlk_sqlk *sql, xwreg_t flag)
 {
         spin_unlock_irqrestore(&sql->lsql.lock, flag);
@@ -186,13 +186,13 @@ void xwlk_sqlk_rdex_unlock_irqsrs(struct xwlk_sqlk *sql,
                                   const struct xwos_irq_resource *irqs,
                                   xwreg_t flags[], xwsz_t num);
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_rdex_lock_bh(struct xwlk_sqlk *sql)
 {
         spin_lock_bh(&sql->lsql.lock);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_sqlk_rdex_trylock_bh(struct xwlk_sqlk *sql)
 {
         int acquired;
@@ -206,19 +206,19 @@ xwer_t xwlk_sqlk_rdex_trylock_bh(struct xwlk_sqlk *sql)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_rdex_unlock_bh(struct xwlk_sqlk *sql)
 {
         spin_unlock_bh(&sql->lsql.lock);
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_wr_lock(struct xwlk_sqlk *sql)
 {
         write_seqlock(&sql->lsql);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_sqlk_wr_trylock(struct xwlk_sqlk *sql)
 {
         int acquired;
@@ -243,19 +243,19 @@ xwer_t xwlk_sqlk_wr_trylock(struct xwlk_sqlk *sql)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_wr_unlock(struct xwlk_sqlk *sql)
 {
         write_sequnlock(&sql->lsql);
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_wr_lock_cpuirq(struct xwlk_sqlk *sql)
 {
         write_seqlock_irq(&sql->lsql);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_sqlk_wr_trylock_cpuirq(struct xwlk_sqlk *sql)
 {
         int acquired;
@@ -280,19 +280,19 @@ xwer_t xwlk_sqlk_wr_trylock_cpuirq(struct xwlk_sqlk *sql)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_wr_unlock_cpuirq(struct xwlk_sqlk *sql)
 {
         write_sequnlock_irq(&sql->lsql);
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_wr_lock_cpuirqsv(struct xwlk_sqlk *sql, xwreg_t *flag)
 {
         write_seqlock_irqsave(&sql->lsql, (*flag));
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_sqlk_wr_trylock_cpuirqsv(struct xwlk_sqlk *sql, xwreg_t *flag)
 {
         int acquired;
@@ -317,7 +317,7 @@ xwer_t xwlk_sqlk_wr_trylock_cpuirqsv(struct xwlk_sqlk *sql, xwreg_t *flag)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_wr_unlock_cpuirqrs(struct xwlk_sqlk *sql, xwreg_t flag)
 {
         write_sequnlock_irqrestore(&sql->lsql, flag);
@@ -347,13 +347,13 @@ void xwlk_sqlk_wr_unlock_irqsrs(struct xwlk_sqlk *sql,
                                 const struct xwos_irq_resource *irqs,
                                 xwreg_t flags[], xwsz_t num);
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_wr_lock_bh(struct xwlk_sqlk *sql)
 {
         write_seqlock_bh(&sql->lsql);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_sqlk_wr_trylock_bh(struct xwlk_sqlk *sql)
 {
         int acquired;
@@ -378,7 +378,7 @@ xwer_t xwlk_sqlk_wr_trylock_bh(struct xwlk_sqlk *sql)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_sqlk_wr_unlock_bh(struct xwlk_sqlk *sql)
 {
         write_sequnlock_bh(&sql->lsql);

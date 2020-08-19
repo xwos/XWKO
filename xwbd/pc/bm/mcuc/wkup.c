@@ -128,7 +128,7 @@ xwer_t mcuc_wkup_init(void)
 
         rc = xwfs_mknod("wkup", 0660, &mcuc_wkup_xwfsops, NULL,
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"wkup\"), rc: %d\n", rc);
                 goto err_mknod_wkup;
         }

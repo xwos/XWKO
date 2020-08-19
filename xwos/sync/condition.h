@@ -52,13 +52,13 @@ struct xwsync_cdt {
 /******** ******** ******** ******** ******** ******** ******** ********
  ********       internal inline function implementations        ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_cdt_grab(struct xwsync_cdt * cdt)
 {
         return xwsync_object_grab(&cdt->xwsyncobj);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_cdt_put(struct xwsync_cdt * cdt)
 {
         return xwsync_object_put(&cdt->xwsyncobj);

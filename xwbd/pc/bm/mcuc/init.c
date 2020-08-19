@@ -47,7 +47,7 @@ struct xwfs_dir * dir_mcuc = NULL;
  ******** ******** ********    start & stop   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** .data ******** ********/
-__atomic xwsq_t mcuc_state = MCUC_STATE_STOP;
+__xwcc_atomic xwsq_t mcuc_state = MCUC_STATE_STOP;
 
 /******** ******** function implementations ******** ********/
 xwer_t mcuc_start(const char * cmdstring)
@@ -57,7 +57,7 @@ xwer_t mcuc_start(const char * cmdstring)
 
         rc = xwaop_teq_then_add(xwsq_t, &mcuc_state, MCUC_STATE_STOP, 1,
                                 NULL, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_perm;
         }
@@ -71,30 +71,30 @@ xwer_t mcuc_start(const char * cmdstring)
         }
 
         rc = xwfs_holdon();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EOWNERDEAD;
                 goto err_xwfs_not_ready;
         }
 
         rc = xwfs_mkdir("mcuc", NULL, &dir_mcuc);
-        if (__unlikely(rc < 0))
+        if (__xwcc_unlikely(rc < 0))
                 goto err_mkdir_mcuc;
 
         rc = mcuc_msgnode_init();
-        if (__unlikely(rc < 0))
+        if (__xwcc_unlikely(rc < 0))
                 goto err_msgnode_init;
 
         rc = mcuc_session_init();
-        if (__unlikely(rc < 0))
+        if (__xwcc_unlikely(rc < 0))
                 goto err_session_init;
 
         rc = mcuc_wkup_init();
-        if (__unlikely(rc < 0))
+        if (__xwcc_unlikely(rc < 0))
                 goto err_wkup_init;
 
         if (mcuc_imitator) {
                 rc = mcuc_imitator_init();
-                if (__unlikely(rc < 0))
+                if (__xwcc_unlikely(rc < 0))
                         goto err_mcuc_imitator_start;
         }
         return XWOK;
@@ -253,7 +253,7 @@ xwer_t mcuc_init(void)
         xwsys_mcuc = xwsysobj;
 
         rc = xwsys_create_file(xwsys_mcuc, &xwsys_attr_file_mcuc_state);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR,
                          "Create /sys/xwos/mcuc/state ... [FAILED], rc:%d\n",
                          rc);

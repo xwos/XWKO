@@ -142,7 +142,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
         do {
                 rxsize = 1;
                 rc = xwscp->hwifops->rx(xwscp, &delimiter, &rxsize);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_sof_ifrx;
                 }
         } while (XWSCP_HWIFAL_SOF != delimiter);
@@ -156,7 +156,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
                         rc = xwscp->hwifops->rx(xwscp,
                                                 &stream.data[total - rxsize],
                                                 &rxsize);
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 goto err_head_ifrx;
                         }
                         rest -= (xwssz_t)rxsize;
@@ -185,7 +185,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
                 rc = xwscp->hwifops->rx(xwscp,
                                         &stream.data[total - rxsize],
                                         &rxsize);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_head_ifrx;
                 }
                 rest -= (xwssz_t)rxsize;
@@ -201,7 +201,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
 
         /* 申请接收帧槽 */
         rc = xwscp_alloc_frmslot(xwscp, &frmslot);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_alloc_frmslot;
         }
         xwlib_bclst_init_node(&frmslot->node);
@@ -215,7 +215,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
                 rc = xwscp->hwifops->rx(xwscp,
                                         &frmslot->frm.sdu[total - rxsize],
                                         &rxsize);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_body_ifrx;
                 }
                 rest -= (xwssz_t)rxsize;
@@ -224,7 +224,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
         /* 接收帧尾定界符 */
         rxsize = 1;
         xwscp->hwifops->rx(xwscp, &delimiter, &rxsize);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_eof_ifrx;
         }
         if (XWSCP_HWIFAL_EOF != delimiter) {

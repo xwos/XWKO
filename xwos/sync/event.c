@@ -63,7 +63,7 @@ xwer_t xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[],
 static
 xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
                                   xwsq_t trigger, xwsq_t action,
-                                  xwbmp_t msk[],
+                                  xwbmp_t origin[], xwbmp_t msk[],
                                   xwtm_t * xwtm);
 
 static
@@ -125,7 +125,7 @@ xwer_t xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[],
 
         size = BITS_TO_BMPS(XWSYNC_EVT_MAXNUM);
         rc = xwsync_cdt_activate(&evt->cdt, gcfunc);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 evt->attr = attr;
                 switch (attr & XWSYNC_EVT_TYPE_MASK) {
                 case XWSYNC_EVT_TYPE_FLAG:
@@ -162,12 +162,12 @@ xwer_t xwsync_evt_create(struct xwsync_evt ** ptrbuf, xwbmp_t initval[], xwsq_t 
 
         *ptrbuf = NULL;
         evt = kmem_cache_alloc(xwsync_evt_cache, GFP_KERNEL);
-        if (__unlikely(is_err_or_null(evt))) {
+        if (__xwcc_unlikely(is_err_or_null(evt))) {
                 rc = -ENOMEM;
                 goto err_evt_alloc;
         }
         rc = xwsync_evt_activate(evt, initval, attr, xwsync_evt_gc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_evt_activate;
         }
         *ptrbuf = evt;
@@ -409,7 +409,7 @@ EXPORT_SYMBOL(xwsync_evt_read);
 static
 xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
                                 xwsq_t trigger, xwsq_t action,
-                                xwbmp_t msk[])
+                                xwbmp_t origin[], xwbmp_t msk[])
 {
         xwreg_t cpuirq;
         bool triggered;
@@ -422,6 +422,9 @@ xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
 
         rc = XWOK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        if (origin) {
+                xwbmpop_assign(origin, evt->bmp, XWSYNC_EVT_MAXNUM);
+        }
         if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
                 switch (trigger) {
                 case XWSYNC_EVT_TRIGGER_SET_ALL:
@@ -543,7 +546,8 @@ xwer_t xwsync_evt_trywait(struct xwsync_evt * evt,
                 goto err_evt_grab;
         }
         if (trigger <= XWSYNC_EVT_TRIGGER_CLR_ANY) {
-                rc = xwsync_evt_trywait_level(evt, trigger, action, msk);
+                rc = xwsync_evt_trywait_level(evt, trigger, action,
+                                              origin, msk);
         } else {
                 rc = xwsync_evt_trywait_edge(evt, trigger, origin, msk);
         }
@@ -557,7 +561,7 @@ EXPORT_SYMBOL(xwsync_evt_trywait);
 static
 xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
                                   xwsq_t trigger, xwsq_t action,
-                                  xwbmp_t msk[],
+                                  xwbmp_t origin[], xwbmp_t msk[],
                                   xwtm_t * xwtm)
 {
         xwreg_t cpuirq;
@@ -573,6 +577,9 @@ xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
         rc = XWOK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
+                if (origin) {
+                        xwbmpop_assign(origin, evt->bmp, XWSYNC_EVT_MAXNUM);
+                }
                 if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
                         switch (trigger) {
                         case XWSYNC_EVT_TRIGGER_SET_ALL:
@@ -729,7 +736,8 @@ xwer_t xwsync_evt_timedwait(struct xwsync_evt * evt,
                 goto err_evt_grab;
         }
         if (trigger <= XWSYNC_EVT_TRIGGER_CLR_ANY) {
-                rc = xwsync_evt_timedwait_level(evt, trigger, action, msk, xwtm);
+                rc = xwsync_evt_timedwait_level(evt, trigger, action,
+                                                origin, msk, xwtm);
         } else {
                 rc = xwsync_evt_timedwait_edge(evt, trigger, origin, msk, xwtm);
         }
@@ -1005,7 +1013,7 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
                       "not-in-thrd", -ENOTINTHRD);
 
         rc = xwsync_evt_grab(evt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_evt_grab;
         }
 

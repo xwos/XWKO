@@ -59,7 +59,7 @@ struct notifier_block xwos_pm_notifier = {
         .priority = 0,
 };
 
-__atomic xwssq_t xwos_pm_state = XWOS_PM_STATE_ACTIVE;
+__xwcc_atomic xwssq_t xwos_pm_state = XWOS_PM_STATE_ACTIVE;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********

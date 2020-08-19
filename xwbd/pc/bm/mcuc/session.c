@@ -113,7 +113,7 @@ xwer_t mcuc_session_init(void)
 
         rc = xwfs_mknod("session", 0660, &mcuc_session_xwfsops, NULL,
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"session\"), rc: %d\n", rc);
                 goto err_mknod_session;
         }

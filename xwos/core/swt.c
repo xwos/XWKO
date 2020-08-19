@@ -114,7 +114,7 @@ enum hrtimer_restart xwos_swt_hrtimer_cb(struct hrtimer * hrt)
         enum hrtimer_restart ret;
         ktime_t kt;
 
-        swt = container_of(hrt, struct xwos_swt, hrt);
+        swt = xwcc_baseof(hrt, struct xwos_swt, hrt);
         swt->cb(swt, swt->arg);
         if (XWOS_SWT_FLAG_RESTART & swt->flag) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)
@@ -140,7 +140,7 @@ xwer_t xwos_swt_activate(struct xwos_swt *swt, const char *name, xwsq_t flag,
         xwer_t rc;
 
         rc = xwos_object_activate(&swt->xwobj, gcfunc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwobj_activate;
         }
 
@@ -177,12 +177,12 @@ xwer_t xwos_swt_create(struct xwos_swt ** ptrbuf, const char * name, xwsq_t flag
         xwer_t rc;
 
         swt = kmem_cache_alloc(xwos_swt_cache, GFP_KERNEL);
-        if (__unlikely(is_err_or_null(swt))) {
+        if (__xwcc_unlikely(is_err_or_null(swt))) {
                 rc = -ENOMEM;
                 goto err_swt_alloc;
         }
         rc = xwos_swt_activate(swt, name, flag, xwos_swt_gc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_swt_activate;
         }
         *ptrbuf = (struct xwos_swt *)swt;
@@ -207,7 +207,7 @@ xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t base, xwtm_t period,
         ktime_t hrtbase, ktperiod;
         xwer_t rc;
 
-        if (__unlikely((xwtm_cmp(base, 0) < 0) ||
+        if (__xwcc_unlikely((xwtm_cmp(base, 0) < 0) ||
                        (xwtm_cmp(period, 0) <= 0) ||
                        (is_err_or_null(cb)))) {
                 rc = -EINVAL;

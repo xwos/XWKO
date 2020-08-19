@@ -64,10 +64,10 @@ ssize_t xwsys_attr_store(struct kobject * kobj,
 static
 void xwsys_release(struct kobject * kobj);
 
-static __xw_inline
+static __xwcc_inline
 struct xwsys_object * xwsys_get(struct xwsys_object * xwobj);
 
-static __xw_inline
+static __xwcc_inline
 void xwsys_put(struct xwsys_object * xwobj);
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -149,11 +149,11 @@ ssize_t xwsys_attr_store(struct kobject * kobj,
 static
 void xwsys_release(struct kobject * kobj)
 {
-        struct xwsys_object * xwobj = container_of(kobj, typeof(*xwobj), kset.kobj);
+        struct xwsys_object * xwobj = xwcc_baseof(kobj, typeof(*xwobj), kset.kobj);
         kfree(xwobj);
 }
 
-static __xw_inline
+static __xwcc_inline
 struct xwsys_object * xwsys_get(struct xwsys_object *xwobj)
 {
         if (xwobj) {
@@ -163,7 +163,7 @@ struct xwsys_object * xwsys_get(struct xwsys_object *xwobj)
         return xwobj;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwsys_put(struct xwsys_object * xwobj)
 {
         if (xwobj) {

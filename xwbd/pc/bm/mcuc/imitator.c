@@ -222,7 +222,7 @@ xwer_t mcuc_imitator_init(void)
 
         rc = xwfs_mknod("imitator", 0660, &mcuc_imitator_xwfsops, NULL,
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"imitator\"), rc: %d\n", rc);
                 goto err_mknod_imitator;
         }

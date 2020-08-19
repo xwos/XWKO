@@ -46,7 +46,7 @@
  * @param n: (I) 被测试的位的序号
  */
 __xwlib_code
-bool xwbmpaop_t1i(__atomic xwbmp_t * bmp, xwsq_t idx)
+bool xwbmpaop_t1i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx)
 {
         bool ret;
         xwbmp_t value;
@@ -63,7 +63,7 @@ bool xwbmpaop_t1i(__atomic xwbmp_t * bmp, xwsq_t idx)
  * @param n: (I) 被置1的位的序号
  */
 __xwlib_code
-void xwbmpaop_s1i(__atomic xwbmp_t * bmp, xwsq_t idx)
+void xwbmpaop_s1i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx)
 {
         xwsq_t i = BIT_BMP(idx);
         xwbmp_t m = BIT_BMP_MASK(idx);
@@ -77,7 +77,7 @@ void xwbmpaop_s1i(__atomic xwbmp_t * bmp, xwsq_t idx)
  * @param n: (I) 被清0的位的序号
  */
 __xwlib_code
-void xwbmpaop_c0i(__atomic xwbmp_t * bmp, xwsq_t idx)
+void xwbmpaop_c0i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx)
 {
         xwsq_t i = BIT_BMP(idx);
         xwbmp_t m = BIT_BMP_MASK(idx);
@@ -91,7 +91,7 @@ void xwbmpaop_c0i(__atomic xwbmp_t * bmp, xwsq_t idx)
  * @param n: (I) 被翻转的位的序号
  */
 __xwlib_code
-void xwbmpaop_x1i(__atomic xwbmp_t * bmp, xwsq_t idx)
+void xwbmpaop_x1i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx)
 {
         xwsq_t i = BIT_BMP(idx);
         xwbmp_t m = BIT_BMP_MASK(idx);
@@ -107,7 +107,7 @@ void xwbmpaop_x1i(__atomic xwbmp_t * bmp, xwsq_t idx)
  * @retval -EACCES: 测试失败
  */
 __xwlib_code
-xwer_t xwbmpaop_t0i_then_s1i(__atomic xwbmp_t * bmp, xwsq_t idx)
+xwer_t xwbmpaop_t0i_then_s1i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx)
 {
         xwsq_t i = BIT_BMP(idx);
         xwbmp_t m = BIT_BMP_MASK(idx);
@@ -135,7 +135,7 @@ xwer_t xwbmpaop_t0i_then_s1i(__atomic xwbmp_t * bmp, xwsq_t idx)
  * @retval -EACCES: 测试失败
  */
 __xwlib_code
-xwer_t xwbmpaop_t1i_then_c0i(__atomic xwbmp_t * bmp, xwsq_t idx)
+xwer_t xwbmpaop_t1i_then_c0i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx)
 {
         xwsq_t i = BIT_BMP(idx);
         xwbmp_t m = BIT_BMP_MASK(idx);
@@ -163,7 +163,7 @@ xwer_t xwbmpaop_t1i_then_c0i(__atomic xwbmp_t * bmp, xwsq_t idx)
  * @retval -ENODATA: 没有任何一个位为1
  */
 __xwlib_code
-xwssq_t xwbmpaop_fls_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_fls_then_c0i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;
@@ -208,7 +208,7 @@ xwssq_t xwbmpaop_fls_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
  * @retval -ENODATA: 没有任何一个位为0
  */
 __xwlib_code
-xwssq_t xwbmpaop_flz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_flz_then_s1i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;
@@ -253,7 +253,7 @@ xwssq_t xwbmpaop_flz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
  * @retval -ENODATA: 没有任何一个位为1
  */
 __xwlib_code
-xwssq_t xwbmpaop_ffs_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_ffs_then_c0i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;
@@ -302,7 +302,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
  * @retval -ENODATA: 没有任何一个位为0
  */
 __xwlib_code
-xwssq_t xwbmpaop_ffz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_ffz_then_s1i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;

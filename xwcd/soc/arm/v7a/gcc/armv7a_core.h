@@ -44,7 +44,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********          inline functions           ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 void clrex(void)
 {
         __asm__ volatile(
@@ -55,7 +55,7 @@ void clrex(void)
         );
 }
 
-static __xw_inline
+static __xwcc_inline
 xwu8_t ldrexb(volatile xwu8_t *addr)
 {
         xwu8_t tmp;
@@ -69,7 +69,7 @@ xwu8_t ldrexb(volatile xwu8_t *addr)
         return tmp;
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t strexb(volatile xwu8_t *addr, xwu8_t value)
 {
         xwer_t rc;
@@ -84,7 +84,7 @@ xwer_t strexb(volatile xwu8_t *addr, xwu8_t value)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 xwu16_t ldrexh(volatile xwu16_t *addr)
 {
         xwu16_t tmp;
@@ -98,7 +98,7 @@ xwu16_t ldrexh(volatile xwu16_t *addr)
         return tmp;
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t strexh(volatile xwu16_t *addr, xwu16_t value)
 {
         xwer_t rc;
@@ -113,7 +113,7 @@ xwer_t strexh(volatile xwu16_t *addr, xwu16_t value)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 xwu32_t ldrex(volatile xwu32_t *addr)
 {
         xwu32_t tmp;
@@ -127,7 +127,7 @@ xwu32_t ldrex(volatile xwu32_t *addr)
         return tmp;
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t strex(volatile xwu32_t *addr, xwu32_t value)
 {
         xwer_t rc;
@@ -142,7 +142,7 @@ xwer_t strex(volatile xwu32_t *addr, xwu32_t value)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 xwu64_t ldrexd(volatile xwu64_t *addr)
 {
         xwu64_t tmp;
@@ -156,7 +156,7 @@ xwu64_t ldrexd(volatile xwu64_t *addr)
         return tmp;
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t strexd(volatile xwu64_t *addr, xwu64_t value)
 {
         xwer_t rc;

@@ -142,7 +142,7 @@ xwer_t xwsync_smr_activate(struct xwsync_smr * smr, xwssq_t val,
         xwer_t rc;
 
         rc = xwsync_object_activate(&smr->xwsyncobj, gcfunc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwsyncobj_activate;
         }
         smr->count = val;
@@ -159,7 +159,7 @@ xwer_t xwsync_smr_init(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
 
         xwsync_smr_construct(smr);
         rc = xwsync_smr_activate(smr, val, max, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_activate;
         }
         return XWOK;
@@ -180,18 +180,18 @@ xwer_t xwsync_smr_create(struct xwsync_smr ** ptrbuf, xwssq_t val, xwssq_t max)
         struct xwsync_smr * smr;
         xwer_t rc;
 
-        if (__unlikely((val < 0) || (max < 0) || (val > max))) {
+        if (__xwcc_unlikely((val < 0) || (max < 0) || (val > max))) {
                 rc = -EINVAL;
                 goto err_invald_args;
         }
 
         smr = kmem_cache_alloc(xwsync_smr_cache, GFP_KERNEL);
-        if (__unlikely(is_err_or_null(smr))) {
+        if (__xwcc_unlikely(is_err_or_null(smr))) {
                 rc = -ENOMEM;
                 goto err_smr_alloc;
         }
         rc = xwsync_smr_activate(smr, val, max, xwsync_smr_gc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_activate;
         }
         *ptrbuf = smr;
@@ -260,12 +260,12 @@ xwer_t xwsync_smr_freeze(struct xwsync_smr * smr)
         xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
         } else {
                 xwsyncobj = &smr->xwsyncobj;
                 xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
-                if (__unlikely(smr->count < 0)) {
+                if (__xwcc_unlikely(smr->count < 0)) {
                         rc = -EALREADY;
                 } else {
                         smr->count = XWSYNC_SMR_NEGATIVE;
@@ -289,14 +289,14 @@ xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
         xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EINVAL;
                 goto err_smr_grab;
         }
 
         xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
-        if (__unlikely(smr->count >= 0)) {
+        if (__xwcc_unlikely(smr->count >= 0)) {
                 rc = -EPERM;
                 goto err_not_neg;
         }
@@ -330,7 +330,7 @@ xwer_t xwsync_smr_post(struct xwsync_smr * smr)
         xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_smr_grab;
         }
@@ -340,7 +340,7 @@ xwer_t xwsync_smr_post(struct xwsync_smr * smr)
         if (smr->count < 0) {
                 rc = -ENEGATIVE;
                 goto err_smr_neg;
-        } else if (__likely(xwlib_bclst_tst_empty(&smr->wq))) {
+        } else if (__xwcc_likely(xwlib_bclst_tst_empty(&smr->wq))) {
                 if (smr->count >= smr->max) {
                         rc = -ERANGE;
                         goto err_smr_range;
@@ -384,7 +384,7 @@ xwer_t xwsync_smr_wait(struct xwsync_smr * smr)
         xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_smr_grab;
         }
@@ -447,7 +447,7 @@ xwer_t xwsync_smr_trywait(struct xwsync_smr * smr)
         struct xwsync_evt * evt;
 
         rc = xwsync_smr_grab(smr);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_smr_grab;
         }
@@ -490,14 +490,14 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
         kt = (ktime_t *)xwtm;
 
         rc = xwsync_smr_grab(smr);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_smr_grab;
         }
 
         xwsyncobj = &smr->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&smr->lock, &cpuirq);
-        if (__likely(smr->count > 0)) {
+        if (__xwcc_likely(smr->count > 0)) {
                 smr->count--;
                 rc = XWOK;
                 if (0 == smr->count) {
@@ -529,7 +529,7 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
                                 xwlib_bclst_del_init(&waiter.node);
                                 rc = -EINTR;
                                 break;
-                        } else if (__unlikely(-ETIMEDOUT == rc)) {
+                        } else if (__xwcc_unlikely(-ETIMEDOUT == rc)) {
                                 xwlib_bclst_del_init(&waiter.node);
                                 break;
                         }
@@ -557,7 +557,7 @@ xwer_t xwsync_smr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
                         hrtimer_init_sleeper(&hrts, task);
                         hrtimer_start_expires(&hrts.timer, HRTIMER_MODE_ABS);
 #endif
-                        if (__likely(hrts.task)) {
+                        if (__xwcc_likely(hrts.task)) {
                                 schedule();
                         }
                         hrtimer_cancel(&hrts.timer);
@@ -589,7 +589,7 @@ xwer_t xwsync_smr_wait_unintr(struct xwsync_smr * smr)
         struct task_struct * task;
 
         rc = xwsync_smr_grab(smr);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_smr_grab;
         }
@@ -654,13 +654,13 @@ xwer_t xwsync_smr_xwfs_init(void)
 
         rc = xwfs_mknod("smr_ctrl", 0660, &xwsync_smr_xwfsnode_ops, NULL,
                         dir_sync, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod_xwfsctrl;
         }
         xwsync_smr_xwfsctrl = node;
         rc = xwfs_mkdir("smr_info", dir_sync, &dir);
         xwsync_smr_xwfsdir = dir;
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod_xwfsdir;
         }
         return XWOK;

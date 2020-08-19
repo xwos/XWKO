@@ -303,7 +303,7 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
         hrtimer_set_expires_range_ns(&hrts.timer, expires, 0);
         hrtimer_start_expires(&hrts.timer, HRTIMER_MODE_ABS);
 #endif
-        if (__likely(hrts.task)) {
+        if (__xwcc_likely(hrts.task)) {
                 schedule();
         }
         hrtimer_cancel(&hrts.timer);
@@ -479,21 +479,21 @@ xwer_t linux_thrd_ksym_load(void)
         xwer_t rc;
 
         rc = KSYM_LOAD(__lock_task_sighand);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwoslogf(ERR,
                          "Failed to load kernel symbol: __lock_task_sighand. rc: %d\n",
                          rc);
                 goto err_ksymload;
         }
         rc = KSYM_LOAD(signal_wake_up_state);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwoslogf(ERR,
                          "Failed to load kernel symbol: signal_wake_up_state. rc: %d\n",
                          rc);
                 goto err_ksymload;
         }
         rc = KSYM_LOAD(find_task_by_vpid);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwoslogf(ERR,
                          "Failed to load kernel symbol: find_task_by_vpid. rc: %d\n",
                          rc);

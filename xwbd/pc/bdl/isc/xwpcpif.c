@@ -148,7 +148,7 @@ xwer_t bdl_xwpcpif_rx(struct xwpcp * xwpcp, xwu8_t * buf, xwsz_t * size)
         set_fs(KERNEL_DS);
         do {
                 ret = vfs_read(filp, &buf[rxsize], (xwsz_t)rest, &filp->f_pos);
-                if (__unlikely(ret < 0)) {
+                if (__xwcc_unlikely(ret < 0)) {
                         rc = (xwer_t)ret;
                         xwpcplogf(INFO, "Failed to vfs_read()! rc:%d", rc);
                         linux_thrd_clear_fake_signal(current);

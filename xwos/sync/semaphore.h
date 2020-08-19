@@ -109,13 +109,13 @@ xwer_t xwsync_smr_getvalue(struct xwsync_smr * smr, xwssq_t * sval);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_smr_grab(struct xwsync_smr * smr)
 {
         return xwsync_object_grab(&smr->xwsyncobj);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_smr_put(struct xwsync_smr * smr)
 {
         return xwsync_object_put(&smr->xwsyncobj);

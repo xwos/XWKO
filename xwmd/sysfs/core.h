@@ -50,9 +50,9 @@
 #define XWSYS_ATTR_RO(_sym, _name) \
         struct xwsys_attribute xwsys_attr_##_sym = __ATTR_RO(_name)
 
-#define TO_XWATTR(_attr) container_of(_attr, struct xwsys_attribute, attr)
+#define TO_XWATTR(_attr) xwcc_baseof(_attr, struct xwsys_attribute, attr)
 
-#define TO_XWOBJ(obj) container_of(obj, struct xwsys_object, kset.kobj)
+#define TO_XWOBJ(obj) xwcc_baseof(obj, struct xwsys_object, kset.kobj)
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/

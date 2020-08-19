@@ -109,7 +109,7 @@
 #endif
 
 #ifndef __xwos_inline_api
-  #define __xwos_inline_api     __xw_inline
+  #define __xwos_inline_api     __xwcc_inline
 #endif
 
 #ifndef __xwos_rodata
@@ -125,7 +125,7 @@
 #endif
 
 #ifndef __xwlib_inline
-  #define __xwlib_inline        __xw_inline
+  #define __xwlib_inline        __xwcc_inline
 #endif
 
 #ifndef __xwlib_data
@@ -165,7 +165,7 @@
 #endif
 
 #ifndef __xwbsp_inline
-  #define __xwbsp_inline        __xw_inline
+  #define __xwbsp_inline        __xwcc_inline
 #endif
 
 #ifndef __xwbsp_data
@@ -185,7 +185,7 @@
 #endif
 
 #ifndef __xwmd_inline
-  #define __xwmd_inline         __xw_inline
+  #define __xwmd_inline         __xwcc_inline
 #endif
 
 #ifndef __xwmd_inline_api
@@ -211,89 +211,93 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#ifndef __section
-  #define __section(s)          __attribute__((__section__(#s)))
+#ifndef __xwcc_section
+  #define __xwcc_section(s)     __attribute__((__section__(#s)))
 #endif
 
-#ifndef __aligned
-  #define __aligned(x)          __attribute__((aligned(x)))
+#ifndef __xwcc_aligned
+  #define __xwcc_aligned(x)     __attribute__((aligned(x)))
 #endif
 
-#ifndef __weak
-  #define __weak                __attribute__((weak))
+#ifndef __xwcc_weak
+  #define __xwcc_weak           __attribute__((weak))
 #endif
 
-#ifndef __alias
-  #define __alias(s)            __attribute__((alias(#s)))
+#ifndef __xwcc_alias
+  #define __xwcc_alias(s)       __attribute__((alias(#s)))
 #endif
 
-#ifndef __always_unused
-  #define __always_unused       __attribute__((unused))
+#ifndef __xwcc_inline
+  #define __xwcc_inline         inline __attribute__((always_inline))
 #endif
 
-#ifndef __xw_inline
-  #define __xw_inline           inline __attribute__((always_inline))
+#ifndef __xwcc_pure
+  #define __xwcc_pure           __attribute__((pure))
 #endif
 
-#ifndef __pure
-  #define __pure                __attribute__((pure))
+#ifndef __xwcc_packed
+  #define __xwcc_packed         __attribute__((packed))
 #endif
 
-#ifndef __packed
-  #define __packed              __attribute__((packed))
+#ifndef __xwcc_must_check
+  #define __xwcc_must_check     __attribute__((warn_unused_result))
 #endif
 
-#ifndef __must_check
-  #define __must_check          __attribute__((warn_unused_result))
+#ifndef __xwcc_naked
+  #define __xwcc_naked          __attribute__((naked))
 #endif
 
-#ifndef __force
-  #define __force
+#ifndef __xwcc_unused
+  #define __xwcc_unused         __attribute__((unused))
 #endif
 
-#ifndef __naked
-  #define __naked               __attribute__((naked))
+#ifndef __xwcc_used
+  #define __xwcc_used           __attribute__((used))
 #endif
 
-#ifndef __maybe_unused
-  #define __maybe_unused        __attribute__((unused))
+#ifndef __xwcc_noreturn
+  #define __xwcc_noreturn       __attribute__((noreturn))
 #endif
 
-#ifndef __always_unused
-  #define __always_unused       __attribute__((unused))
+#ifndef __xwcc_hot
+  #define __xwcc_hot            __attribute__((hot))
 #endif
 
-#ifndef __used
-  #define __used                __attribute__((used))
+#ifndef __xwcc_atomic
+  #define __xwcc_atomic         volatile
 #endif
 
-#ifndef __noreturn
-  #define __noreturn            __attribute__((noreturn))
+#ifndef __xwcc_likely
+  #define __xwcc_likely(x)      __builtin_expect(!!(x), 1)
 #endif
 
-#ifndef __hot
-  #define __hot                 __attribute__((hot))
+#ifndef __xwcc_unlikely
+  #define __xwcc_unlikely(x)    __builtin_expect(!!(x), 0)
 #endif
 
-#ifndef __atomic
-  #define __atomic              volatile
-#endif
-
-#ifndef __likely
-  #define __likely(x)           __builtin_expect(!!(x), 1)
-#endif
-
-#ifndef __unlikely
-  #define __unlikely(x)         __builtin_expect(!!(x), 0)
-#endif
-
-#ifndef __aligned_l1cacheline
-  #define __aligned_l1cacheline \
+#ifndef __xwcc_aligned_l1cacheline
+  #define __xwcc_aligned_l1cacheline \
           __attribute__((aligned(CPU_CONFIG_L1_CACHELINE_SIZE)))
 #endif
 
-#ifndef offsetof
-  #define offsetof(type, member) __builtin_offsetof(type, member)
+#ifndef xwcc_offsetof
+/**
+ * @brief 计算某个成员在结构体中偏移量
+ * @param type: (I) 结构体类型
+ * @param member: (I) 成员在结构体中符号名
+ */
+  #define xwcc_offsetof(type, member) __builtin_offsetof(type, member)
+#endif
+
+#ifndef xwcc_baseof
+/**
+ * @brief 从结构体的某个成员的地址计算出结构体的首地址
+ * @param ptr: (I) 结构体某个成员的地址
+ * @param type: (I) 结构体类型
+ * @param member: (I) 成员在结构体中符号名
+ */
+  #define xwcc_baseof(ptr, type, member) \
+          ((type *)(((xwptr_t)(ptr)) - xwcc_offsetof(type, member)))
 #endif
 
 #define xwmb_smp_mb()           smp_mb()

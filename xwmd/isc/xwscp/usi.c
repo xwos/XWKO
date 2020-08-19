@@ -127,7 +127,7 @@ ssize_t usi_xwscp_xwfs_port_write(struct xwfs_node *xwfsnode,
                 datasz = count;
                 desired = XWTM_MAX;
                 rc = xwscp_tx(&usi_xwscp, data, &datasz, &desired);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         count = (ssize_t)rc;
                 }
         } else {
@@ -194,27 +194,27 @@ xwer_t usi_xwscp_start(void)
         }
 
         rc = xwfs_holdon();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EOWNERDEAD;
                 goto err_xwfs_not_ready;
         }
 
         rc = xwfs_mkdir("xwscp", dir_isc, &usi_xwscp_xwfs);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Fail to mkdir(\"xwscp\"), rc: %d\n", rc);
                 goto err_mkdir_usi_xwscp_xwfs;
         }
 
         xwscp_init(&usi_xwscp);
         rc = xwscp_start(&usi_xwscp, "usi_xwscp", &bdl_xwscpif_ops);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Activate xwscp ... [Failed], errno: %d\n", rc);
                 goto err_xwscp_start;
         }
         xwscplogf(INFO, "Activate xwscp ... [OK]\n");
 
         rc = xwscp_hwifal_open(&usi_xwscp);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Open xwscp hwifal ... [Failed], errno: %d\n", rc);
                 goto err_xwscp_ifopen;
         }
@@ -225,7 +225,7 @@ xwer_t usi_xwscp_start(void)
                                 &usi_xwscp, XWOS_UNUSED_ARGUMENT,
                                 USI_XWSCP_THRD_PRIORITY,
                                 XWOS_UNUSED_ARGUMENT);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Create xwscp tx thread ... [Failed], errno %d\n", rc);
                 goto err_xwscp_thread_create;
         }
@@ -301,7 +301,7 @@ xwer_t usi_xwscp_sysfs_cmd_export_port(void)
 
         rc = xwfs_mknod("port", 0660, &usi_xwscp_xwfs_port_xwfsops,
                         NULL, usi_xwscp_xwfs, &usi_xwscp_xwfs_port);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Fail to mknod(\"port\"), rc: %d\n", rc);
                 goto err_xwfs_mknod;
         }
@@ -386,7 +386,7 @@ ssize_t usi_xwscp_sysfs_cmd_store(struct xwsys_object *xwobj,
                 count = -EINVAL;
         } else {
                 rc = usi_xwscp_sysfs_cmd_parse(buf);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         count = rc;
                 }
         }
@@ -469,7 +469,7 @@ xwer_t usi_xwscp_init(void)
         xwer_t rc;
 
         usi_xwscp_sysfs = xwsys_register("xwscp", NULL, NULL);
-        if (__unlikely(is_err_or_null(usi_xwscp_sysfs))) {
+        if (__xwcc_unlikely(is_err_or_null(usi_xwscp_sysfs))) {
                 rc = PTR_ERR(usi_xwscp_sysfs);
                 xwscplogf(ERR,
                           "Create \"/sys/xwos/xwscp\" ... [rc:%d]\n",
@@ -479,7 +479,7 @@ xwer_t usi_xwscp_init(void)
         xwscplogf(INFO, "Create \"/sys/xwos/xwscp\" ... [OK]\n");
 
         rc = xwsys_create_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_cmd);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR,
                           "Create \"/sys/xwos/xwscp/cmd\" ... [rc:%d]\n",
                           rc);
@@ -488,7 +488,7 @@ xwer_t usi_xwscp_init(void)
         xwscplogf(INFO, "Create \"/sys/xwos/xwscp/cmd\" ... [OK]\n");
 
         rc = xwsys_create_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_state);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR,
                           "Create \"/sys/xwos/xwscp/state\" ... [rc:%d]\n",
                           rc);

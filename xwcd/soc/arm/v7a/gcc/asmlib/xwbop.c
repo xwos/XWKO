@@ -90,7 +90,7 @@ xwu16_t arch_xwbop_rbit16(xwu16_t x)
 }
 EXPORT_SYMBOL(arch_xwbop_rbit16);
 
-xwu16_t arch_xwbop_re16(__maybe_unused xwu16_t x)
+xwu16_t arch_xwbop_re16(__xwcc_unused xwu16_t x)
 {
         xwu16_t r;
 

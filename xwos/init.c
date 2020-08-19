@@ -57,25 +57,25 @@ xwer_t xwos_init(void)
 
         /******** KAL ********/
         rc = xwos_scheduler_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwos_scheduler_init;
         }
 
         rc = xwos_pm_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwos_pm_init;
         }
 
         /******** object cache ********/
         rc = xwos_swt_cache_create();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwoslogf(ERR, "Create xwos/core/swt cache ... [FAILED], rc:%d\n", rc);
                 goto err_swt_cache_create;
         }
         xwoslogf(INFO, "Create xwos/core/swt cache ... [OK]\n");
 
         rc = xwsync_smr_cache_create();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwoslogf(ERR,
                          "Create xwos/sync/smr cache ... [FAILED], rc:%d\n",
                          rc);
@@ -84,7 +84,7 @@ xwer_t xwos_init(void)
         xwoslogf(INFO, "Create xwos/sync/smr cache ... [OK]\n");
 
         rc = xwsync_cdt_cache_create();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwoslogf(ERR,
                          "Create xwos/sync/cdt cache ... [FAILED], rc:%d\n",
                          rc);
@@ -93,7 +93,7 @@ xwer_t xwos_init(void)
         xwoslogf(INFO, "create xwos/sync/cdt cache ... [OK]\n");
 
         rc = xwlk_mtx_cache_create();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwoslogf(ERR,
                          "Create xwos/lock/mutex cache ... [FAILED], rc:%d\n",
                          rc);
@@ -103,7 +103,7 @@ xwer_t xwos_init(void)
 
         /******** MM ********/
         rc = xwmm_dkma_init(XWMMCFG_DKMA_SIZE);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwoslogf(ERR,
                          "Init xwos/mm/dkma ... [FAILED], rc:%d\n",
                          rc);

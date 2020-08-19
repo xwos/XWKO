@@ -53,7 +53,7 @@
 #define XWFS_DEFAULT_MODE       (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
 #define XWFS_MAGIC_NUM          0x6F736673  /* xwfs */
 
-#define VFS_INODE_TO_XWFS_ENTRY(ind) container_of(ind, union xwfs_entry, inode)
+#define VFS_INODE_TO_XWFS_ENTRY(ind) xwcc_baseof(ind, union xwfs_entry, inode)
 
 /**
  * @brief mount options
@@ -174,7 +174,7 @@ struct path xwfs_rootpath = {
         .dentry = NULL,
 };
 
-__atomic xwsq_t xwfs_mntcnt = 0;
+__xwcc_atomic xwsq_t xwfs_mntcnt = 0;
 
 static const match_table_t xwfs_tokens = {
         {OPT_MODE, "mode=%o"},
@@ -261,7 +261,7 @@ int xwfs_fill_superblock(struct super_block * sb, struct xwfs_mntopts * mntopts)
         /* Round up to L1_CACHE_BYTES to resist false sharing */
         newmi = kzalloc(max((int)sizeof(struct xwfs_mnt_info), L1_CACHE_BYTES),
                         GFP_KERNEL);
-        if (__unlikely(NULL == newmi)) {
+        if (__xwcc_unlikely(NULL == newmi)) {
                 rc = -ENOMEM;
                 xwfslogf(ERR,
                          "kmalloc() struct xwfs_mnt_info ... [FAILED], rc:%d\n",
@@ -291,7 +291,7 @@ int xwfs_fill_superblock(struct super_block * sb, struct xwfs_mntopts * mntopts)
         }
         rooti->i_uid = mntopts->kuid;
         rooti->i_gid = mntopts->kgid;
-        root = container_of(rooti, struct xwfs_dir, inode);
+        root = xwcc_baseof(rooti, struct xwfs_dir, inode);
         root->parent = NULL;
 
         rootd = d_make_root(rooti);
@@ -379,12 +379,12 @@ struct dentry * xwfs_mount(struct file_system_type * fst,
 #endif
                 /* mounted by kernel */
                 sb = sget(fst, NULL, xwfs_set_super, flags, data);
-                if (__unlikely(is_err(sb))) {
+                if (__xwcc_unlikely(is_err(sb))) {
                         rootd = (void *)sb;
                         goto err_sget;
                 }
                 rc = xwfs_fill_superblock(sb, &mntopts);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         deactivate_locked_super(sb);
                         rootd = err_ptr(rc);
                         goto err_fill_sb;
@@ -401,7 +401,7 @@ struct dentry * xwfs_mount(struct file_system_type * fst,
                         goto err_notmnt;
                 }
                 sb = sget(fst, xwfs_test_super, xwfs_set_super, flags, data);
-                if (__unlikely(is_err(sb))) {
+                if (__xwcc_unlikely(is_err(sb))) {
                         rootd = (void *)sb;
                         goto err_sget;
                 }
@@ -453,7 +453,7 @@ struct inode * xwfs_sops_alloc_inode(struct super_block * sb)
         struct inode * ind;
 
         oe = kmem_cache_alloc(xwfs_entry_cache, GFP_KERNEL);
-        if (__likely(oe)) {
+        if (__xwcc_likely(oe)) {
                 ind = &oe->inode;
         } else {
                 ind = NULL;
@@ -527,7 +527,7 @@ void xwfs_sops_destroy_callback(struct rcu_head * head)
 {
         union xwfs_entry * oe;
 
-        oe = container_of(head, union xwfs_entry, inode.i_rcu);
+        oe = xwcc_baseof(head, union xwfs_entry, inode.i_rcu);
         kmem_cache_free(xwfs_entry_cache, oe);
 }
 
@@ -680,7 +680,7 @@ loff_t xwfs_node_fops_llseek(struct file * file, loff_t offset, int origin)
         struct xwfs_node * node;
         const struct xwfs_operations * xwfsops;
 
-        node = container_of(file->f_inode, struct xwfs_node, inode);
+        node = xwcc_baseof(file->f_inode, struct xwfs_node, inode);
         xwfsops = node->xwfsops;
         if (xwfsops && xwfsops->llseek) {
                 rc = xwfsops->llseek(node, file, offset, origin);
@@ -698,7 +698,7 @@ ssize_t xwfs_node_fops_read(struct file * file, char __user * buf,
         struct xwfs_node * node;
         const struct xwfs_operations * xwfsops;
 
-        node = container_of(file->f_inode, struct xwfs_node, inode);
+        node = xwcc_baseof(file->f_inode, struct xwfs_node, inode);
         xwfsops = node->xwfsops;
         if (xwfsops && xwfsops->read) {
                 rc = xwfsops->read(node, file, buf, len, pos);
@@ -716,7 +716,7 @@ ssize_t xwfs_node_fops_write(struct file * file, const char __user * buf,
         struct xwfs_node * node;
         const struct xwfs_operations * xwfsops;
 
-        node = container_of(file->f_inode, struct xwfs_node, inode);
+        node = xwcc_baseof(file->f_inode, struct xwfs_node, inode);
         xwfsops = node->xwfsops;
         if (xwfsops && xwfsops->write) {
                 rc = xwfsops->write(node, file, buf, len, pos);
@@ -733,7 +733,7 @@ int xwfs_node_fops_mmap(struct file * file, struct vm_area_struct * vma)
         struct xwfs_node * node;
         const struct xwfs_operations * xwfsops;
 
-        node = container_of(file->f_inode, struct xwfs_node, inode);
+        node = xwcc_baseof(file->f_inode, struct xwfs_node, inode);
         xwfsops = node->xwfsops;
         if (xwfsops && xwfsops->mmap) {
                 rc = xwfsops->mmap(node, file, vma);
@@ -750,7 +750,7 @@ int xwfs_node_fops_open(struct inode * inode, struct file * file)
         struct xwfs_node * node;
         const struct xwfs_operations * xwfsops;
 
-        node = container_of(inode, struct xwfs_node, inode);
+        node = xwcc_baseof(inode, struct xwfs_node, inode);
         xwfsops = node->xwfsops;
         if (xwfsops && xwfsops->open) {
                 rc = xwfsops->open(node, file);
@@ -767,7 +767,7 @@ int xwfs_node_fops_release(struct inode * inode, struct file * file)
         struct xwfs_node * node;
         const struct xwfs_operations * xwfsops;
 
-        node = container_of(inode, struct xwfs_node, inode);
+        node = xwcc_baseof(inode, struct xwfs_node, inode);
         xwfsops = node->xwfsops;
         if (xwfsops && xwfsops->release) {
                 rc = xwfsops->release(node, file);
@@ -785,7 +785,7 @@ long xwfs_node_fops_unlocked_ioctl(struct file * file, unsigned int cmd,
         struct xwfs_node * node;
         const struct xwfs_operations * xwfsops;
 
-        node = container_of(file->f_inode, struct xwfs_node, inode);
+        node = xwcc_baseof(file->f_inode, struct xwfs_node, inode);
         xwfsops = node->xwfsops;
         if (xwfsops && xwfsops->unlocked_ioctl) {
                 rc = xwfsops->unlocked_ioctl(node, file, cmd, args);
@@ -828,7 +828,7 @@ xwer_t xwfs_path_create(const char * name, struct xwfs_dir * parent,
         nlen = strlen(name);
         path_get(pathbuf);
         rc = mnt_want_write(pathbuf->mnt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mnt_want_write;
         }
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
@@ -837,7 +837,7 @@ xwer_t xwfs_path_create(const char * name, struct xwfs_dir * parent,
         mutex_lock_nested(&pathbuf->dentry->d_inode->i_mutex, I_MUTEX_PARENT);
 #endif
         newd = lookup_one_len(name, pathbuf->dentry, nlen);
-        if (__unlikely(is_err(newd))) {
+        if (__xwcc_unlikely(is_err(newd))) {
                 goto err_lookup;
         }
         if (d_is_positive(newd)) {
@@ -924,10 +924,10 @@ xwer_t xwfs_mkdir(const char * name, struct xwfs_dir * parent,
         xwer_t rc;
 
         rc = xwfs_path_create(name, parent, &dnew, &pathparent);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwfs_path_create;
         }
-        parent = container_of(pathparent.dentry->d_inode, struct xwfs_dir, inode);
+        parent = xwcc_baseof(pathparent.dentry->d_inode, struct xwfs_dir, inode);
         max_links = pathparent.mnt->mnt_sb->s_max_links;
         if (max_links && parent->inode.i_nlink >= max_links) {
                 rc = -EMLINK;
@@ -936,11 +936,11 @@ xwer_t xwfs_mkdir(const char * name, struct xwfs_dir * parent,
         rc = xwfs_mknod_internal(parent, dnew,
                                  S_IFDIR | XWFS_DEFAULT_MODE,
                                  0);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod;
         }
         inc_nlink(&parent->inode);
-        dir = container_of(dnew->d_inode, struct xwfs_dir, inode);
+        dir = xwcc_baseof(dnew->d_inode, struct xwfs_dir, inode);
         dir->parent = parent;
         fsnotify_mkdir(&parent->inode, dnew);
         xwfs_done_path_create(&pathparent, dnew);
@@ -977,17 +977,17 @@ xwer_t xwfs_mknod(const char * name,
         xwer_t rc;
 
         rc = xwfs_path_create(name, parent, &dnew, &pathparent);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwfs_path_create;
         }
-        parent = container_of(pathparent.dentry->d_inode, struct xwfs_dir, inode);
+        parent = xwcc_baseof(pathparent.dentry->d_inode, struct xwfs_dir, inode);
         rc = xwfs_mknod_internal(parent, dnew,
                                  S_IFREG | (mode & 07777),
                                  0);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod;
         }
-        n = container_of(dnew->d_inode, struct xwfs_node, inode);
+        n = xwcc_baseof(dnew->d_inode, struct xwfs_node, inode);
         n->xwfsops = xwfsops;
         n->inode.i_private = data;
         n->parent = parent;
@@ -1023,7 +1023,7 @@ xwer_t xwfs_get_path_parent(struct xwfs_dir * parent, struct path * pathbuf)
                                       d_u.d_alias);
         path_get(pathbuf);
         rc = mnt_want_write(pathbuf->mnt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mnt_want_write;
         }
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
@@ -1070,14 +1070,14 @@ xwer_t xwfs_rmdir(struct xwfs_dir * dir)
         xwer_t rc;
 
         parent = dir->parent;
-        if (__unlikely(NULL == parent)) {
+        if (__xwcc_unlikely(NULL == parent)) {
                 BUG();
                 rc = -EPERM;
                 goto err_nullparent;
         }
 
         rc = xwfs_get_path_parent(parent, &pathparent);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_get_path_parent;
         }
 
@@ -1094,7 +1094,7 @@ xwer_t xwfs_rmdir(struct xwfs_dir * dir)
 #endif
         shrink_dcache_parent(d);
         rc = simple_rmdir(&parent->inode, d);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_rmdir;
         }
         dir->inode.i_flags |= S_DEAD;
@@ -1138,14 +1138,14 @@ xwer_t xwfs_rmnod(struct xwfs_node * node)
         xwer_t rc;
 
         parent = node->parent;
-        if (__unlikely(NULL == parent)) {
+        if (__xwcc_unlikely(NULL == parent)) {
                 BUG();
                 rc = -EPERM;
                 goto err_nullparent;
         }
 
         rc = xwfs_get_path_parent(parent, &pathparent);
-        if (__unlikely(rc < 0))
+        if (__xwcc_unlikely(rc < 0))
                 goto err_get_path_parent;
 
         /* XWFS forbids hard link. So, there is only
@@ -1161,7 +1161,7 @@ xwer_t xwfs_rmnod(struct xwfs_node * node)
         mutex_lock(&node->inode.i_mutex);
 #endif
         rc = simple_unlink(&parent->inode, d);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_unlink;
         }
         /* FIXME: dont_mount(d); */
@@ -1209,7 +1209,7 @@ xwer_t xwfs_start(void)
 #else
         mnt = kern_mount_data(&xwfs_fstype, NULL);
 #endif
-        if (__unlikely(is_err(mnt))) {
+        if (__xwcc_unlikely(is_err(mnt))) {
                 rc = ptr_err(mnt);
                 xwfslogf(ERR,
                          "kernel mount xwfs ... [FAILED], rc:%d\n",
@@ -1223,27 +1223,27 @@ xwer_t xwfs_start(void)
         xwfslogf(INFO, "kernel mount xwfs ... [OK]\n");
 
         rc = xwfs_create_skeleton();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_create_skeleton;
         }
 
         rc = xwos_scheduler_xwfs_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwos_scheduler_xwfs_init;
         }
 
         rc = xwlk_mtx_xwfs_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_oslk_mtx_xwfs_init;
         }
 
         rc = xwsync_smr_xwfs_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwsync_smr_xwfs_init;
         }
 
         rc = xwsync_cdt_xwfs_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwsync_cdt_xwfs_init;
         }
 
@@ -1384,7 +1384,7 @@ ssize_t xwfs_sysfs_cmd_store(struct xwsys_object * xwobj,
                 count = -EINVAL;
         } else {
                 rc = xwfs_sysfs_cmd_parse(buf);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         count = rc;
                 }
         }
@@ -1455,7 +1455,7 @@ xwer_t xwfs_init(void)
                                               SLAB_MEM_SPREAD |
                                               SLAB_PANIC),
                                              xwfs_entry_construct);
-        if (__unlikely(NULL == xwfs_entry_cache)) {
+        if (__xwcc_unlikely(NULL == xwfs_entry_cache)) {
                 rc = -ENOMEM;
                 xwfslogf(ERR,
                          "Create slab xwfs_entry_cache ... [FAILED], rc:%d\n",
@@ -1463,14 +1463,14 @@ xwer_t xwfs_init(void)
                 goto err_xwfs_entry_cache;
         }
         rc = register_filesystem(&xwfs_fstype);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwfslogf(ERR, "Register xwfs ... [FAILED], rc:%d\n", rc);
                 goto err_reg_fs;
         }
         xwfslogf(INFO, "Register xwfs ... [OK]\n");
 
         xwfs_sysfs_obj = xwsys_register("xwfs", NULL, NULL);
-        if (__unlikely(is_err_or_null(xwfs_sysfs_obj))) {
+        if (__xwcc_unlikely(is_err_or_null(xwfs_sysfs_obj))) {
                 rc = PTR_ERR(xwfs_sysfs_obj);
                 xwfslogf(ERR,
                          "Create \"/sys/xwos/xwfs\" ... [rc:%d]\n",
@@ -1480,7 +1480,7 @@ xwer_t xwfs_init(void)
         xwfslogf(INFO, "Create \"/sys/xwos/xwfs\" ... [OK]\n");
 
         rc = xwsys_create_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_cmd);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwfslogf(ERR,
                          "Create \"/sys/xwos/xwfs/cmd\" ... [rc:%d]\n",
                          rc);
@@ -1489,7 +1489,7 @@ xwer_t xwfs_init(void)
         xwfslogf(INFO, "Create \"/sys/xwos/xwfs/cmd\" ... [OK]\n");
 
         rc = xwsys_create_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_state);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwfslogf(ERR,
                          "Create \"/sys/xwos/xwfs/state\" ... [rc:%d]\n",
                          rc);

@@ -49,19 +49,19 @@ struct xwos_irq_resource;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     functions     ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 void xwlk_splk_init(struct xwlk_splk * spl)
 {
         spin_lock_init(&spl->lspl);
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_splk_lock(struct xwlk_splk * spl)
 {
         spin_lock(&spl->lspl);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_splk_trylock(struct xwlk_splk * spl)
 {
         int acquired;
@@ -76,19 +76,19 @@ xwer_t xwlk_splk_trylock(struct xwlk_splk * spl)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_splk_unlock(struct xwlk_splk * spl)
 {
         spin_unlock(&spl->lspl);
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_splk_lock_cpuirq(struct xwlk_splk * spl)
 {
         spin_lock_irq(&spl->lspl);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_splk_trylock_cpuirq(struct xwlk_splk * spl)
 {
         int acquired;
@@ -103,19 +103,19 @@ xwer_t xwlk_splk_trylock_cpuirq(struct xwlk_splk * spl)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_splk_unlock_cpuirq(struct xwlk_splk * spl)
 {
         spin_unlock_irq(&spl->lspl);
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_splk_lock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * flag)
 {
         spin_lock_irqsave(&spl->lspl, (*flag));
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_splk_trylock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * flag)
 {
         int acquired;
@@ -130,7 +130,7 @@ xwer_t xwlk_splk_trylock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * flag)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_splk_unlock_cpuirqrs(struct xwlk_splk *spl, xwreg_t flag)
 {
         spin_unlock_irqrestore(&spl->lspl, flag);
@@ -160,13 +160,13 @@ void xwlk_splk_unlock_irqsrs(struct xwlk_splk *sl,
                              const struct xwos_irq_resource *irqs,
                              xwreg_t flags[], xwsz_t num);
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_splk_lock_bh(struct xwlk_splk *spl)
 {
         spin_lock_bh(&spl->lspl);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_splk_trylock_bh(struct xwlk_splk *spl)
 {
         int acquired;
@@ -181,7 +181,7 @@ xwer_t xwlk_splk_trylock_bh(struct xwlk_splk *spl)
         return rc;
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwlk_splk_unlock_bh(struct xwlk_splk *spl)
 {
         spin_unlock_bh(&spl->lspl);

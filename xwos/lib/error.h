@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS的错误码
+ * @brief XWOS通用库：错误码
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,8 +21,8 @@
  * > under either the MPL or the GPL.
  */
 
-#ifndef __xwos_err_h__
-#define __xwos_err_h__
+#ifndef __xwos_lib_error_h__
+#define __xwos_lib_error_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -43,8 +43,8 @@
  * @param errno: (I) 错误码
  * @return 值为错误码的指针
  */
-static __xw_inline
-void * __must_check err_ptr(xwer_t errno)
+static __xwcc_inline
+void * __xwcc_must_check err_ptr(xwer_t errno)
 {
         return ERR_PTR(errno);
 }
@@ -54,8 +54,8 @@ void * __must_check err_ptr(xwer_t errno)
  * @param ptr: (I) 指针
  * @return 错误码
  */
-static __xw_inline
-xwer_t __must_check ptr_err(__force const void *ptr)
+static __xwcc_inline
+xwer_t __xwcc_must_check ptr_err(const void *ptr)
 {
         return (xwer_t)PTR_ERR(ptr);
 }
@@ -66,8 +66,8 @@ xwer_t __must_check ptr_err(__force const void *ptr)
  * @retval true: 是
  * @retval false: 否
  */
-static __xw_inline
-bool __must_check is_err(__force const void *ptr)
+static __xwcc_inline
+bool __xwcc_must_check is_err(const void *ptr)
 {
         return IS_ERR(ptr);
 }
@@ -78,10 +78,10 @@ bool __must_check is_err(__force const void *ptr)
  * @retval true: 是
  * @retval false: 否
  */
-static __xw_inline
-bool __must_check is_err_or_null(__force const void *ptr)
+static __xwcc_inline
+bool __xwcc_must_check is_err_or_null(const void *ptr)
 {
         return IS_ERR_OR_NULL(ptr);
 }
 
-#endif /* xwos/err.h */
+#endif /* xwos/lib/error.h */

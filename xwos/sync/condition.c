@@ -141,7 +141,7 @@ xwer_t xwsync_cdt_activate(struct xwsync_cdt * cdt, xwobj_gc_f gcfunc)
         xwer_t rc;
 
         rc = xwsync_object_activate(&cdt->xwsyncobj, gcfunc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_obj_activate;
         }
         cdt->count = 0;
@@ -170,12 +170,12 @@ xwer_t xwsync_cdt_create(struct xwsync_cdt ** ptrbuf)
         struct xwsync_cdt * cdt;
 
         cdt = kmem_cache_alloc(xwsync_cdt_cache, GFP_KERNEL);
-        if (__unlikely(is_err_or_null(cdt))) {
+        if (__xwcc_unlikely(is_err_or_null(cdt))) {
                 rc = -ENOMEM;
                 goto err_cdt_alloc;
         }
         rc = xwsync_cdt_activate(cdt, xwsync_cdt_gc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_cdt_activate;
         }
         *ptrbuf = cdt;
@@ -203,7 +203,7 @@ xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t 
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
                 rc = xwsync_evt_obj_bind(evt, &cdt->xwsyncobj, pos, false);
                 xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
@@ -238,11 +238,11 @@ xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
         } else {
                 xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
-                if (__unlikely(cdt->count < 0)) {
+                if (__xwcc_unlikely(cdt->count < 0)) {
                         rc = -EALREADY;
                 } else {
                         cdt->count = XWSYNC_CDT_NEGATIVE;
@@ -262,12 +262,12 @@ xwer_t xwsync_cdt_thaw(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_cdt_grab;
         }
         xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
-        if (__unlikely(cdt->count >= 0)) {
+        if (__xwcc_unlikely(cdt->count >= 0)) {
                 rc = -EPERM;
                 goto err_cdt_not_neg;
         }
@@ -295,7 +295,7 @@ xwer_t xwsync_cdt_intr_all(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
         } else {
                 xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
@@ -333,14 +333,14 @@ xwer_t xwsync_cdt_broadcast(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_cdt_grab;
         }
 
         xwsyncobj = &cdt->xwsyncobj;
         xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
-        if (__unlikely(cdt->count < 0)) {
+        if (__xwcc_unlikely(cdt->count < 0)) {
                 rc = -ENEGATIVE;
                 goto err_cdt_neg;
         } else {
@@ -386,12 +386,12 @@ xwer_t xwsync_cdt_unicast(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_cdt_grab;
         }
         xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
-        if (__unlikely(cdt->count < 0)) {
+        if (__xwcc_unlikely(cdt->count < 0)) {
                 rc = -ENEGATIVE;
                 goto err_cdt_neg;
         }
@@ -428,7 +428,7 @@ xwer_t xwsync_cdt_do_wait(struct xwsync_cdt * cdt,
 
         *lkst = XWLK_STATE_LOCKED;
         rc = xwsync_cdt_grab(cdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_cdt_grab;
         }
@@ -510,12 +510,12 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
 
         kt = (ktime_t *)xwtm;
         *lkst = XWLK_STATE_LOCKED;
-        if (__unlikely(is_err_or_null(xwtm))) {
+        if (__xwcc_unlikely(is_err_or_null(xwtm))) {
                 rc = -EINVAL;
                 goto err_inval;
         }
         rc = xwsync_cdt_grab(cdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_cdt_grab;
         }
@@ -537,7 +537,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
         }
 
         xwlk_splk_lock_cpuirqsv(&cdt->lock, &cpuirq);
-        if (__unlikely(0 == *xwtm)) {
+        if (__xwcc_unlikely(0 == *xwtm)) {
                 xwlk_splk_unlock_cpuirqrs(&cdt->lock, cpuirq);
                 xwsync_cdt_put(cdt);
                 rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
@@ -581,7 +581,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
                 } else {
                         set_current_state(TASK_INTERRUPTIBLE);
                 }
-                if (__likely(hrts.task)) {
+                if (__xwcc_likely(hrts.task)) {
                         xwlk_splk_unlock_cpuirq(&cdt->lock);
                         schedule();
                         xwlk_splk_lock_cpuirq(&cdt->lock);
@@ -642,13 +642,13 @@ xwer_t xwsync_cdt_xwfs_init(void)
 
         rc = xwfs_mknod("cdt_ctrl", 0660, &xwsync_cdt_xwfsnode_ops, NULL,
                         dir_sync, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod_xwfsctrl;
         }
         xwsync_cdt_xwfsctrl = node;
         rc = xwfs_mkdir("cdt_info", dir_sync, &dir);
         xwsync_cdt_xwfsdir = dir;
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod_xwfsdir;
         }
         return XWOK;

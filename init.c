@@ -65,28 +65,28 @@ int XuanWuKo_init(void)
         xwkologf(INFO, "V%s\n", XWOS_VER_STR);
 
         rc = xwos_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwkologf(ERR, "Init xwos ... [FAILED], rc:%d\n", rc);
                 goto err_xwos_init;
         }
         xwkologf(INFO, "Init xwos ... [OK]\n");
 
         rc = xwsys_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwkologf(ERR, "Init xwmd/xwsys ... [FAILED], rc:%d\n", rc);
                 goto err_xwsys_init;
         }
         xwkologf(INFO, "Init xwmd/xwsys ... [OK]\n");
 
         rc = xwfs_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwkologf(ERR, "Init xwmd/xwfs ... [FAILED], rc:%d\n", rc);
                 goto err_xwfs_init;
         }
         xwkologf(INFO, "Init xwmd/xwfs ... [OK]\n");
 
         rc = board_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwkologf(ERR, "Init board ... [FAILED], rc:%d\n", rc);
                 goto err_board_init;
         }

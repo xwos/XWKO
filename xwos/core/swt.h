@@ -83,13 +83,13 @@ xwer_t xwos_swt_stop(struct xwos_swt * swt);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_swt_grab(struct xwos_swt * swt)
 {
         return xwos_object_grab(&swt->xwobj);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_swt_put(struct xwos_swt * swt)
 {
         return xwos_object_put(&swt->xwobj);

@@ -115,7 +115,7 @@ xwer_t xwlk_mtx_activate(struct xwlk_mtx * mtx, xwpr_t sprio, xwobj_gc_f gcfunc)
 
         XWOS_UNUSED(sprio);
         rc = xwos_object_activate(&mtx->xwobj, gcfunc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_obj_activate;
         }
         rt_mutex_init(&mtx->lrtmtx);
@@ -144,12 +144,12 @@ xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
         xwer_t rc;
 
         mtx = kmem_cache_alloc(xwlk_mtx_cache, GFP_KERNEL);
-        if (__unlikely(is_err_or_null(mtx))) {
+        if (__xwcc_unlikely(is_err_or_null(mtx))) {
                 rc = -ENOMEM;
                 goto err_mtx_alloc;
         }
         rc = xwlk_mtx_activate(mtx, sprio, xwlk_mtx_gc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_activate;
         }
         *ptrbuf = mtx;
@@ -181,7 +181,7 @@ xwer_t xwlk_mtx_lock(struct xwlk_mtx * mtx)
         xwer_t rc;
 
         rc = xwlk_mtx_grab(mtx);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_mtx_grab;
         }
@@ -190,7 +190,7 @@ xwer_t xwlk_mtx_lock(struct xwlk_mtx * mtx)
 #else
         rc = rt_mutex_lock_interruptible(&mtx->lrtmtx, true);
 #endif
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
         return XWOK;
@@ -207,7 +207,7 @@ xwer_t xwlk_mtx_trylock(struct xwlk_mtx * mtx)
         xwer_t rc;
 
         rc = xwlk_mtx_grab(mtx);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_mtx_grab;
         }
@@ -235,7 +235,7 @@ xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm)
 
         kt = (ktime_t *)xwtm;
         rc = xwlk_mtx_grab(mtx);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_mtx_grab;
         }
@@ -261,7 +261,7 @@ xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm)
         *kt = ktime_sub(expires, hrts.timer.base->get_time());
         destroy_hrtimer_on_stack(&hrts.timer);
         linux_thrd_clear_fake_signal(current);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
         return XWOK;
@@ -278,7 +278,7 @@ xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx)
         xwer_t rc;
 
         rc = xwlk_mtx_grab(mtx);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_mtx_grab;
         }
@@ -298,13 +298,13 @@ xwer_t xwlk_mtx_xwfs_init(void)
 
         rc = xwfs_mknod("mtx_ctrl", 0660, &xwlk_mtx_xwfsnode_ops, NULL,
                         dir_locks, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod_xwfsctrl;
         }
         xwlk_mtx_xwfsctrl = node;
         rc = xwfs_mkdir("mtx_info", dir_locks, &dir);
         xwlk_mtx_xwfsdir = dir;
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod_xwfsdir;
         }
         return XWOK;

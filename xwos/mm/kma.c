@@ -120,7 +120,7 @@ xwer_t xwmm_dkma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
         xwer_t rc;
 
         ret = try_module_get(THIS_MODULE);
-        if (__unlikely(!ret)) {
+        if (__xwcc_unlikely(!ret)) {
                 rc = -EOWNERDEAD;
                 goto err_modget;
         }

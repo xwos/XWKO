@@ -93,7 +93,7 @@ xwer_t xwos_scheduler_init(void)
         xwer_t rc;
 
         rc = linux_thrd_ksym_load();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwoslogf(ERR,
                          "linux_thrd_ksym_load(): faild! <rc:%d>\n",
                          rc);
@@ -153,18 +153,18 @@ ssize_t xwos_scheduler_xwfsnode_priority_write(struct xwfs_node * xwfsnode,
         }
 
         rc = (xwer_t)kstrtoint(tidstr, 0, &tid);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 ret = (ssize_t)rc;
                 goto err_invalcmd;
         }
 
         rc = (xwer_t)kstrtoint(prstr, 0, &pr);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 ret = (ssize_t)rc;
                 goto err_invalcmd;
         }
         rc = xwos_thrd_get_tcb_by_tid((xwid_t)tid, &tcb);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 ret = (ssize_t)rc;
                 goto err_nosuchtid;
         }
@@ -190,13 +190,13 @@ xwer_t xwos_scheduler_xwfs_init(void)
 
         rc = xwfs_mkdir("scheduler", dir_core, &dir);
         xwos_scheduler_xwfsdir = dir;
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod_scheduler;
         }
 
         rc = xwfs_mknod("pr", 0666, &xwos_scheduler_xwfsnode_priority_ops, NULL,
                         xwos_scheduler_xwfsdir, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mknod_priority;
         }
         xwos_scheduler_xwfsnode_priority = node;

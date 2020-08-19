@@ -236,7 +236,7 @@ ssize_t mcuc_msgnode_write(struct xwfs_node * xwfsnode,
                 msg.text = data;
                 time = XWTM_MAX;
                 rc = xwpcp_tx(&usi_xwpcp, &msg, portdata->attr.prio, &time);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         count = (ssize_t)rc;
                 }
         } else {
@@ -260,7 +260,7 @@ xwer_t mcuc_msgnode_init(void)
         rc = xwfs_mknod("sys", 0666, &mcuc_msgnode_xwfsops,
                         (void *)&mcuc_msgnode[MCUC_MSGNODE_SYS],
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"sys\"), rc: %d\n", rc);
                 goto err_mknod_sys;
         }
@@ -277,7 +277,7 @@ xwer_t mcuc_msgnode_init(void)
         rc = xwfs_mknod("pwr", 0666, &mcuc_msgnode_xwfsops,
                         (void *)&mcuc_msgnode[MCUC_MSGNODE_PWR],
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"pwr\"), rc: %d\n", rc);
                 goto err_mknod_pwr;
         }
@@ -294,7 +294,7 @@ xwer_t mcuc_msgnode_init(void)
         rc = xwfs_mknod("vhc", 0666, &mcuc_msgnode_xwfsops,
                         (void *)&mcuc_msgnode[MCUC_MSGNODE_VHC],
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"vhc\"), rc: %d\n", rc);
                 goto err_mknod_vhc;
         }
@@ -311,7 +311,7 @@ xwer_t mcuc_msgnode_init(void)
         rc = xwfs_mknod("diag", 0666, &mcuc_msgnode_xwfsops,
                         (void *)&mcuc_msgnode[MCUC_MSGNODE_DIAG],
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"diag\"), rc: %d\n", rc);
                 goto err_mknod_diag;
         }
@@ -328,7 +328,7 @@ xwer_t mcuc_msgnode_init(void)
         rc = xwfs_mknod("misc", 0666, &mcuc_msgnode_xwfsops,
                         (void *)&mcuc_msgnode[MCUC_MSGNODE_MISC],
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"button\"), rc: %d\n", rc);
                 goto err_mknod_button;
         }
@@ -345,7 +345,7 @@ xwer_t mcuc_msgnode_init(void)
         rc = xwfs_mknod("sensor", 0666, &mcuc_msgnode_xwfsops,
                         (void *)&mcuc_msgnode[MCUC_MSGNODE_SENSOR],
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"sensor\"), rc: %d\n", rc);
                 goto err_mknod_sensor;
         }
@@ -362,7 +362,7 @@ xwer_t mcuc_msgnode_init(void)
         rc = xwfs_mknod("log", 0666, &mcuc_msgnode_xwfsops,
                         (void *)&mcuc_msgnode[MCUC_MSGNODE_LOG],
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"log\"), rc: %d\n", rc);
                 goto err_mknod_log;
         }
@@ -379,7 +379,7 @@ xwer_t mcuc_msgnode_init(void)
         rc = xwfs_mknod("mfg", 0666, &mcuc_msgnode_xwfsops,
                         (void *)&mcuc_msgnode[MCUC_MSGNODE_MFG],
                         dir_mcuc, &node);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"mfg\"), rc: %d\n", rc);
                 goto err_mknod_mfg;
         }

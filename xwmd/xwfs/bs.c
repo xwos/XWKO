@@ -60,32 +60,32 @@ xwer_t xwfs_create_skeleton(void)
         xwer_t rc;
 
         rc = xwfs_mkdir("xwos", NULL, &dir_xwos);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mkdir_xwos;
         }
 
         rc = xwfs_mkdir("core", dir_xwos, &dir_core);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mkdir_core;
         }
 
         rc = xwfs_mkdir("sync", dir_core, &dir_sync);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mkdir_sync;
         }
 
         rc = xwfs_mkdir("locks", dir_core, &dir_locks);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mkdir_locks;
         }
 
         rc = xwfs_mkdir("xwmd", NULL, &dir_xwmd);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mkdir_xwmd;
         }
 
         rc = xwfs_mkdir("isc", dir_xwmd, &dir_isc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mkdir_isc;
         }
 

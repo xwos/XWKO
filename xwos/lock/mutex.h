@@ -86,13 +86,13 @@ xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_mtx_grab(struct xwlk_mtx * mtx)
 {
         return xwos_object_grab(&mtx->xwobj);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_mtx_put(struct xwlk_mtx * mtx)
 {
         return xwos_object_put(&mtx->xwobj);
