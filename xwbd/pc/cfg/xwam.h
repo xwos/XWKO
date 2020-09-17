@@ -21,6 +21,6 @@
 #ifndef __cfg_xwam_h__
 #define __cfg_xwam_h__
 
-#define XWAMCFG_example_hixwos          1
+#define XWAMCFG_example_hixwos          0
 
 #endif /* cfg/xwam.h */

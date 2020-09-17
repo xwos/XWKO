@@ -141,29 +141,29 @@ ssize_t usi_xwscp_xwfs_port_write(struct xwfs_node *xwfsnode,
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********           /sys/xwosal/xwscp           ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwsys_object * usi_xwscp_sysfs;
+struct xwsys_object * usi_xwscp_xwsys;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         /sys/xwosal/xwscp/cmd         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define USI_XWSCP_SYSFS_ARGBUFSIZE  32
+#define USI_XWSCP_XWSYS_ARGBUFSIZE  32
 
-enum usi_xwscp_sysfs_cmd_em {
-        USI_XWSCP_SYSFS_CMD_STOP = 0,
-        USI_XWSCP_SYSFS_CMD_START,
-        USI_XWSCP_SYSFS_CMD_UNEXPORT,
-        USI_XWSCP_SYSFS_CMD_EXPORT,
-        USI_XWSCP_SYSFS_CMD_NUM,
+enum usi_xwscp_xwsys_cmd_em {
+        USI_XWSCP_XWSYS_CMD_STOP = 0,
+        USI_XWSCP_XWSYS_CMD_START,
+        USI_XWSCP_XWSYS_CMD_UNEXPORT,
+        USI_XWSCP_XWSYS_CMD_EXPORT,
+        USI_XWSCP_XWSYS_CMD_NUM,
 };
 
 static
-ssize_t usi_xwscp_sysfs_cmd_show(struct xwsys_object * xwobj,
-                                 struct xwsys_attribute * soattr,
+ssize_t usi_xwscp_xwsys_cmd_show(struct xwsys_object * xwobj,
+                                 struct xwsys_attribute * xwattr,
                                  char * buf);
 
 static
-ssize_t usi_xwscp_sysfs_cmd_store(struct xwsys_object * xwobj,
-                                  struct xwsys_attribute * soattr,
+ssize_t usi_xwscp_xwsys_cmd_store(struct xwsys_object * xwobj,
+                                  struct xwsys_attribute * xwattr,
                                   const char * buf,
                                   size_t count);
 
@@ -171,15 +171,15 @@ ssize_t usi_xwscp_sysfs_cmd_store(struct xwsys_object * xwobj,
  * @brief file entry: /sys/xwos/xwscp/cmd
  */
 static XWSYS_ATTR(file_xwscp_cmd, cmd, 0644,
-                  usi_xwscp_sysfs_cmd_show,
-                  usi_xwscp_sysfs_cmd_store);
+                  usi_xwscp_xwsys_cmd_show,
+                  usi_xwscp_xwsys_cmd_store);
 
 static const match_table_t xwscp_cmd_tokens = {
-        {USI_XWSCP_SYSFS_CMD_STOP, "stop"},
-        {USI_XWSCP_SYSFS_CMD_START, "start"},
-        {USI_XWSCP_SYSFS_CMD_UNEXPORT, "unexport %s"},
-        {USI_XWSCP_SYSFS_CMD_EXPORT, "export %s"},
-        {USI_XWSCP_SYSFS_CMD_NUM, NULL},
+        {USI_XWSCP_XWSYS_CMD_STOP, "stop"},
+        {USI_XWSCP_XWSYS_CMD_START, "start"},
+        {USI_XWSCP_XWSYS_CMD_UNEXPORT, "unexport %s"},
+        {USI_XWSCP_XWSYS_CMD_EXPORT, "export %s"},
+        {USI_XWSCP_XWSYS_CMD_NUM, NULL},
 };
 
 xwer_t usi_xwscp_start(void)
@@ -290,7 +290,7 @@ err_notstart:
 }
 
 static
-xwer_t usi_xwscp_sysfs_cmd_export_port(void)
+xwer_t usi_xwscp_xwsys_cmd_export_port(void)
 {
         xwer_t rc;
 
@@ -313,7 +313,7 @@ err_notstart:
 }
 
 static
-xwer_t usi_xwscp_sysfs_cmd_unexport_port(void)
+xwer_t usi_xwscp_xwsys_cmd_unexport_port(void)
 {
         xwer_t rc;
 
@@ -334,86 +334,95 @@ err_notstart:
 }
 
 static
-xwer_t usi_xwscp_sysfs_cmd_parse(const char * cmdstring)
+xwer_t usi_xwscp_xwsys_cmd_parse(const char * cmdstring, size_t cnt)
 {
-	int token;
-	substring_t tmp[MAX_OPT_ARGS];
-	char * p, * pos;
+        int token;
+        substring_t tmp[MAX_OPT_ARGS];
+        char cmd[cnt + 1];
+        char * p, * pos;
         xwer_t rc = -ENOSYS;
 
-	xwscplogf(INFO, "cmd:\"%s\"\n", cmdstring);
-	pos = (char *)cmdstring;
-	while ((p = strsep(&pos, ";")) != NULL) {
-		if (!*p) {
-			continue;
+        memcpy(cmd, cmdstring, cnt);
+        if ('\n' == cmd[cnt - 1]) {
+                if ('\r' == cmd[cnt - 2]) {
+                        cmd[cnt - 2] = '\0';
+                } else {
+                        cmd[cnt - 1] = '\0';
                 }
-		token = match_token(p, xwscp_cmd_tokens, tmp);
-		switch (token) {
-                case USI_XWSCP_SYSFS_CMD_STOP:
+        } else if ('\0' == cmd[cnt - 1]) {
+        } else {
+                cmd[cnt] = '\0';
+        }
+
+        xwscplogf(INFO, "cmd:\"%s\"\n", cmd);
+        pos = (char *)cmd;
+        while ((p = strsep(&pos, ";")) != NULL) {
+                if (!*p) {
+                        continue;
+                }
+                token = match_token(p, xwscp_cmd_tokens, tmp);
+                switch (token) {
+                case USI_XWSCP_XWSYS_CMD_STOP:
                         rc = usi_xwscp_stop();
                         break;
-                case USI_XWSCP_SYSFS_CMD_START:
+                case USI_XWSCP_XWSYS_CMD_START:
                         rc = usi_xwscp_start();
                         break;
-		case USI_XWSCP_SYSFS_CMD_EXPORT:
-                        rc = usi_xwscp_sysfs_cmd_export_port();
-			break;
-		case USI_XWSCP_SYSFS_CMD_UNEXPORT:
-                        rc = usi_xwscp_sysfs_cmd_unexport_port();
-			break;
-		}
-	}
+                case USI_XWSCP_XWSYS_CMD_EXPORT:
+                        rc = usi_xwscp_xwsys_cmd_export_port();
+                        break;
+                case USI_XWSCP_XWSYS_CMD_UNEXPORT:
+                        rc = usi_xwscp_xwsys_cmd_unexport_port();
+                        break;
+                }
+        }
         return rc;
 }
 
 static
-ssize_t usi_xwscp_sysfs_cmd_show(struct xwsys_object *xwobj,
-                                 struct xwsys_attribute *soattr,
-                                 char *buf)
+ssize_t usi_xwscp_xwsys_cmd_show(struct xwsys_object * xwobj,
+                                 struct xwsys_attribute * xwattr,
+                                 char * buf)
 {
-        return 0;
+        return -ENOSYS;
 }
 
 static
-ssize_t usi_xwscp_sysfs_cmd_store(struct xwsys_object *xwobj,
-                                  struct xwsys_attribute *soattr,
-                                  const char *buf,
-                                  size_t count)
+ssize_t usi_xwscp_xwsys_cmd_store(struct xwsys_object * xwobj,
+                                  struct xwsys_attribute * xwattr,
+                                  const char * buf,
+                                  size_t cnt)
 {
         xwer_t rc;
 
-        if ('\0' != buf[count - 1]) {
-                count = -EINVAL;
-        } else {
-                rc = usi_xwscp_sysfs_cmd_parse(buf);
-                if (__xwcc_unlikely(rc < 0)) {
-                        count = rc;
-                }
+        rc = usi_xwscp_xwsys_cmd_parse(buf, cnt);
+        if (__xwcc_unlikely(rc < 0)) {
+                cnt = rc;
         }
-        return count;
+        return cnt;
 }
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********        /sys/xwos/xwscp/state        ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 static
-ssize_t usi_xwscp_sysfs_state_show(struct xwsys_object * xwobj,
-                                   struct xwsys_attribute * soattr,
+ssize_t usi_xwscp_xwsys_state_show(struct xwsys_object * xwobj,
+                                   struct xwsys_attribute * xwattr,
                                    char * buf);
 
 static
-ssize_t usi_xwscp_sysfs_state_store(struct xwsys_object * xwobj,
-                                   struct xwsys_attribute * soattr,
+ssize_t usi_xwscp_xwsys_state_store(struct xwsys_object * xwobj,
+                                   struct xwsys_attribute * xwattr,
                                    const char * buf,
                                    size_t count);
 
 static XWSYS_ATTR(file_xwscp_state, state, 0644,
-                  usi_xwscp_sysfs_state_show,
-                  usi_xwscp_sysfs_state_store);
+                  usi_xwscp_xwsys_state_show,
+                  usi_xwscp_xwsys_state_store);
 
 static
-ssize_t usi_xwscp_sysfs_state_show(struct xwsys_object * xwobj,
-                                   struct xwsys_attribute * soattr,
+ssize_t usi_xwscp_xwsys_state_show(struct xwsys_object * xwobj,
+                                   struct xwsys_attribute * xwattr,
                                    char * buf)
 {
         ssize_t showcnt;
@@ -453,8 +462,8 @@ ssize_t usi_xwscp_sysfs_state_show(struct xwsys_object * xwobj,
 }
 
 static
-ssize_t usi_xwscp_sysfs_state_store(struct xwsys_object * xwobj,
-                                    struct xwsys_attribute * soattr,
+ssize_t usi_xwscp_xwsys_state_store(struct xwsys_object * xwobj,
+                                    struct xwsys_attribute * xwattr,
                                     const char * buf,
                                     size_t count)
 {
@@ -468,52 +477,52 @@ xwer_t usi_xwscp_init(void)
 {
         xwer_t rc;
 
-        usi_xwscp_sysfs = xwsys_register("xwscp", NULL, NULL);
-        if (__xwcc_unlikely(is_err_or_null(usi_xwscp_sysfs))) {
-                rc = PTR_ERR(usi_xwscp_sysfs);
+        usi_xwscp_xwsys = xwsys_register("xwscp", NULL, NULL);
+        if (__xwcc_unlikely(is_err_or_null(usi_xwscp_xwsys))) {
+                rc = PTR_ERR(usi_xwscp_xwsys);
                 xwscplogf(ERR,
                           "Create \"/sys/xwos/xwscp\" ... [rc:%d]\n",
                           rc);
-                goto err_usi_xwscp_sysfs_create;
+                goto err_usi_xwscp_xwsys_create;
         }
         xwscplogf(INFO, "Create \"/sys/xwos/xwscp\" ... [OK]\n");
 
-        rc = xwsys_create_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_cmd);
+        rc = xwsys_create_file(usi_xwscp_xwsys, &xwsys_attr_file_xwscp_cmd);
         if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR,
                           "Create \"/sys/xwos/xwscp/cmd\" ... [rc:%d]\n",
                           rc);
-                goto err_usi_xwscp_sysfs_cmd_create;
+                goto err_usi_xwscp_xwsys_cmd_create;
         }
         xwscplogf(INFO, "Create \"/sys/xwos/xwscp/cmd\" ... [OK]\n");
 
-        rc = xwsys_create_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_state);
+        rc = xwsys_create_file(usi_xwscp_xwsys, &xwsys_attr_file_xwscp_state);
         if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR,
                           "Create \"/sys/xwos/xwscp/state\" ... [rc:%d]\n",
                           rc);
-                goto err_usi_xwscp_sysfs_state_create;
+                goto err_usi_xwscp_xwsys_state_create;
         }
         xwscplogf(INFO, "Create \"/sys/xwos/xwscp/state\" ... [OK]\n");
         return XWOK;
 
-err_usi_xwscp_sysfs_state_create:
-        xwsys_remove_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_cmd);
-err_usi_xwscp_sysfs_cmd_create:
-        xwsys_unregister(usi_xwscp_sysfs);
-        usi_xwscp_sysfs = NULL;
-err_usi_xwscp_sysfs_create:
+err_usi_xwscp_xwsys_state_create:
+        xwsys_remove_file(usi_xwscp_xwsys, &xwsys_attr_file_xwscp_cmd);
+err_usi_xwscp_xwsys_cmd_create:
+        xwsys_unregister(usi_xwscp_xwsys);
+        usi_xwscp_xwsys = NULL;
+err_usi_xwscp_xwsys_create:
         return rc;
 }
 
 void usi_xwscp_exit(void)
 {
         xwscplogf(INFO, "Destory \"/sys/xwos/xwscp/port\" ... [OK]\n");
-        xwsys_remove_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_state);
+        xwsys_remove_file(usi_xwscp_xwsys, &xwsys_attr_file_xwscp_state);
         xwscplogf(INFO, "Destory \"/sys/xwos/xwscp/state\" ... [OK]\n");
-        xwsys_remove_file(usi_xwscp_sysfs, &xwsys_attr_file_xwscp_cmd);
+        xwsys_remove_file(usi_xwscp_xwsys, &xwsys_attr_file_xwscp_cmd);
         xwscplogf(INFO, "Destory \"/sys/xwos/xwscp/cmd\" ... [OK]\n");
-        xwsys_unregister(usi_xwscp_sysfs);
-        usi_xwscp_sysfs = NULL;
+        xwsys_unregister(usi_xwscp_xwsys);
+        usi_xwscp_xwsys = NULL;
         xwscplogf(INFO, "Destory \"/sys/xwos/xwscp\" ... [OK]\n");
 }

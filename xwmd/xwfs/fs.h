@@ -39,10 +39,10 @@
 /**
  * @brief log function of OSAL FS
  */
-#if (defined(XWMDCFG_XWFS_LOG) && (1 == XWMDCFG_XWFS_LOG))
-#define xwfslogf(lv, fmt, ...)          xwlogf(lv, "xwfs", fmt, ##__VA_ARGS__)
+#if defined(XWMDCFG_xwfs_LOG) && (1 == XWMDCFG_xwfs_LOG)
+  #define xwfslogf(lv, fmt, ...)        xwlogf(lv, "xwfs", fmt, ##__VA_ARGS__)
 #else
-#define xwfslogf(lv, fmt, ...)
+  #define xwfslogf(lv, fmt, ...)
 #endif
 /* #if defined(XWMDCFG_XWFS_LOG) && (1 == XWMDCFG_XWFS_LOG) */
 

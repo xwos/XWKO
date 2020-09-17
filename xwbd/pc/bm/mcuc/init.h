@@ -52,18 +52,12 @@ extern struct xwfs_dir * dir_mcuc;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t mcuc_start(const char * cmdstring);
-
+xwer_t mcuc_start(void);
 xwer_t mcuc_stop(void);
-
 xwsq_t mcuc_get_state(void);
-
 xwer_t mcuc_grab(void);
-
 xwer_t mcuc_put(void);
-
 xwer_t mcuc_init(void);
-
 void mcuc_exit(void);
 
 #endif /* bm/mcuc/init.h */

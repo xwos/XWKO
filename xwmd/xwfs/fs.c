@@ -342,7 +342,7 @@ int xwfs_test_super(struct super_block * sb, void * data)
 static
 int xwfs_set_super(struct super_block * sb, void * data)
 {
-	return set_anon_super(sb, NULL);
+        return set_anon_super(sb, NULL);
 }
 
 /**
@@ -363,13 +363,13 @@ struct dentry * xwfs_mount(struct file_system_type * fst,
                            int flags, const char * dev_name,
                            void * data)
 {
-	struct super_block * sb;
+        struct super_block * sb;
         struct dentry * rootd;
-	struct xwfs_mntopts mntopts = {
+        struct xwfs_mntopts mntopts = {
                 .mode = XWFS_DEFAULT_MODE,
                 .kuid = make_kuid(current_user_ns(), 0),
                 .kgid = make_kgid(current_user_ns(), 0),
-	};
+        };
         xwer_t rc;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
@@ -1280,6 +1280,7 @@ xwer_t xwfs_stop(void)
                 kern_unmount(xwfs_rootpath.mnt);
                 xwfs_rootpath.mnt = NULL;
                 xwfs_rootpath.dentry = NULL;
+                xwfslogf(INFO, "kernel umount xwfs ... [OK]\n");
         }
         return rc;
 }
@@ -1303,140 +1304,141 @@ xwer_t xwfs_giveup(void)
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********           /sys/xwos/xwfs           ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwsys_object * xwfs_sysfs_obj;
+struct xwsys_object * xwfs_xwsys_obj;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         /sys/xwos/xwfs/cmd         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWFS_SYSFS_ARGBUFSIZE  32
+/******** /sys/xwos/xwfs/cmd ********/
+#define XWFS_XWSYS_ARGBUFSIZE  32
 
-enum xwfs_sysfs_cmd_em {
-        XWFS_SYSFS_CMD_STOP = 0,
-        XWFS_SYSFS_CMD_START,
-        XWFS_SYSFS_CMD_NUM,
+enum xwfs_xwsys_cmd_em {
+        XWFS_XWSYS_CMD_STOP = 0,
+        XWFS_XWSYS_CMD_START,
+        XWFS_XWSYS_CMD_NUM,
 };
 
 static
-ssize_t xwfs_sysfs_cmd_show(struct xwsys_object * xwobj,
-                            struct xwsys_attribute * soattr,
+ssize_t xwfs_xwsys_cmd_show(struct xwsys_object * xwobj,
+                            struct xwsys_attribute * xwattr,
                             char * buf);
 
 static
-ssize_t xwfs_sysfs_cmd_store(struct xwsys_object * xwobj,
-                             struct xwsys_attribute * soattr,
+ssize_t xwfs_xwsys_cmd_store(struct xwsys_object * xwobj,
+                             struct xwsys_attribute * xwattr,
                              const char * buf,
-                             size_t count);
+                             size_t cnt);
 
 static XWSYS_ATTR(file_xwfs_cmd, cmd, 0644,
-                  xwfs_sysfs_cmd_show,
-                  xwfs_sysfs_cmd_store);
+                  xwfs_xwsys_cmd_show,
+                  xwfs_xwsys_cmd_store);
 
 static const match_table_t xwfs_cmd_tokens = {
-        {XWFS_SYSFS_CMD_STOP, "stop"},
-        {XWFS_SYSFS_CMD_START, "start"},
-        {XWFS_SYSFS_CMD_NUM, NULL},
+        {XWFS_XWSYS_CMD_STOP, "stop"},
+        {XWFS_XWSYS_CMD_START, "start"},
+        {XWFS_XWSYS_CMD_NUM, NULL},
 };
 
 static
-ssize_t xwfs_sysfs_cmd_show(struct xwsys_object * xwobj,
-                            struct xwsys_attribute * soattr,
+ssize_t xwfs_xwsys_cmd_show(struct xwsys_object * xwobj,
+                            struct xwsys_attribute * xwattr,
                             char * buf)
 {
         return -ENOSYS;
 }
 
 static
-xwer_t xwfs_sysfs_cmd_parse(const char * cmdstring)
+xwer_t xwfs_xwsys_cmd_parse(const char * cmdstring, size_t cnt)
 {
-	int token;
-	substring_t tmp[MAX_OPT_ARGS];
-	char * p, * pos;
+        int token;
+        substring_t tmp[MAX_OPT_ARGS];
+        char cmd[cnt + 1];
+        char * p, * pos;
         xwer_t rc = -ENOSYS;
 
-	xwfslogf(INFO, "cmd:\"%s\"\n", cmdstring);
-	pos = (char *)cmdstring;
-	while ((p = strsep(&pos, ";")) != NULL) {
-		if (!*p) {
-			continue;
+        memcpy(cmd, cmdstring, cnt);
+        if ('\n' == cmd[cnt - 1]) {
+                if ('\r' == cmd[cnt - 2]) {
+                        cmd[cnt - 2] = '\0';
+                } else {
+                        cmd[cnt - 1] = '\0';
                 }
-		token = match_token(p, xwfs_cmd_tokens, tmp);
-		switch (token) {
-                case XWFS_SYSFS_CMD_STOP:
+        } else if ('\0' == cmd[cnt - 1]) {
+        } else {
+                cmd[cnt] = '\0';
+        }
+
+        xwfslogf(INFO, "cmd:\"%s\"\n", cmd);
+        pos = (char *)cmd;
+        while ((p = strsep(&pos, ";")) != NULL) {
+                if (!*p) {
+                        continue;
+                }
+                token = match_token(p, xwfs_cmd_tokens, tmp);
+                switch (token) {
+                case XWFS_XWSYS_CMD_STOP:
                         rc = xwfs_stop();
                         break;
-                case XWFS_SYSFS_CMD_START:
+                case XWFS_XWSYS_CMD_START:
                         rc = xwfs_start();
                         break;
-		}
-	}
+                }
+        }
+
         return rc;
 }
 
 static
-ssize_t xwfs_sysfs_cmd_store(struct xwsys_object * xwobj,
-                             struct xwsys_attribute * soattr,
+ssize_t xwfs_xwsys_cmd_store(struct xwsys_object * xwobj,
+                             struct xwsys_attribute * xwattr,
                              const char * buf,
-                             size_t count)
+                             size_t cnt)
 {
         xwer_t rc;
 
-        if ('\0' != buf[count - 1]) {
-                count = -EINVAL;
-        } else {
-                rc = xwfs_sysfs_cmd_parse(buf);
-                if (__xwcc_unlikely(rc < 0)) {
-                        count = rc;
-                }
+        rc = xwfs_xwsys_cmd_parse(buf, cnt);
+        if (__xwcc_unlikely(rc < 0)) {
+                cnt = rc;
         }
-        return count;
+        return cnt;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********        /sys/xwos/xwfs/state        ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/******** /sys/xwos/xwfs/state ********/
 static
-ssize_t xwfs_sysfs_state_show(struct xwsys_object * xwobj,
-                              struct xwsys_attribute * soattr,
+ssize_t xwfs_xwsys_state_show(struct xwsys_object * xwobj,
+                              struct xwsys_attribute * xwattr,
                               char * buf);
 
 static
-ssize_t xwfs_sysfs_state_store(struct xwsys_object * xwobj,
-                               struct xwsys_attribute * soattr,
+ssize_t xwfs_xwsys_state_store(struct xwsys_object * xwobj,
+                               struct xwsys_attribute * xwattr,
                                const char * buf,
-                               size_t count);
+                               size_t cnt);
 
 static XWSYS_ATTR(file_xwfs_state, state, 0644,
-                  xwfs_sysfs_state_show,
-                  xwfs_sysfs_state_store);
+                  xwfs_xwsys_state_show,
+                  xwfs_xwsys_state_store);
 
 static
-ssize_t xwfs_sysfs_state_show(struct xwsys_object * xwobj,
-                                   struct xwsys_attribute * soattr,
+ssize_t xwfs_xwsys_state_show(struct xwsys_object * xwobj,
+                                   struct xwsys_attribute * xwattr,
                                    char * buf)
 {
         ssize_t showcnt;
 
         showcnt = 0;
-
-        /* Title */
         showcnt += sprintf(&buf[showcnt], "[XWFS]\n");
-
         if (xwfs_mntcnt < 1) {
                 showcnt += sprintf(&buf[showcnt], "State: OFF\n");
         } else {
                 showcnt += sprintf(&buf[showcnt], "State: ON\n");
         }
-
-        /* End flag */
         buf[showcnt] = '\0';
         return showcnt;
 }
 
 static
-ssize_t xwfs_sysfs_state_store(struct xwsys_object * xwobj,
-                               struct xwsys_attribute * soattr,
+ssize_t xwfs_xwsys_state_store(struct xwsys_object * xwobj,
+                               struct xwsys_attribute * xwattr,
                                const char * buf,
-                               size_t count)
+                               size_t cnt)
 {
         return -ENOSYS;
 }
@@ -1469,42 +1471,42 @@ xwer_t xwfs_init(void)
         }
         xwfslogf(INFO, "Register xwfs ... [OK]\n");
 
-        xwfs_sysfs_obj = xwsys_register("xwfs", NULL, NULL);
-        if (__xwcc_unlikely(is_err_or_null(xwfs_sysfs_obj))) {
-                rc = PTR_ERR(xwfs_sysfs_obj);
+        xwfs_xwsys_obj = xwsys_register("xwfs", NULL, NULL);
+        if (__xwcc_unlikely(is_err_or_null(xwfs_xwsys_obj))) {
+                rc = PTR_ERR(xwfs_xwsys_obj);
                 xwfslogf(ERR,
                          "Create \"/sys/xwos/xwfs\" ... [rc:%d]\n",
                          rc);
-                goto err_xwfs_sysfs_obj_create;
+                goto err_xwfs_xwsys_obj_create;
         }
         xwfslogf(INFO, "Create \"/sys/xwos/xwfs\" ... [OK]\n");
 
-        rc = xwsys_create_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_cmd);
+        rc = xwsys_create_file(xwfs_xwsys_obj, &xwsys_attr_file_xwfs_cmd);
         if (__xwcc_unlikely(rc < 0)) {
                 xwfslogf(ERR,
                          "Create \"/sys/xwos/xwfs/cmd\" ... [rc:%d]\n",
                          rc);
-                goto err_xwfs_sysfs_attr_cmd_create;
+                goto err_xwfs_xwsys_attr_cmd_create;
         }
         xwfslogf(INFO, "Create \"/sys/xwos/xwfs/cmd\" ... [OK]\n");
 
-        rc = xwsys_create_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_state);
+        rc = xwsys_create_file(xwfs_xwsys_obj, &xwsys_attr_file_xwfs_state);
         if (__xwcc_unlikely(rc < 0)) {
                 xwfslogf(ERR,
                          "Create \"/sys/xwos/xwfs/state\" ... [rc:%d]\n",
                          rc);
-                goto err_xwfs_sysfs_attr_state_create;
+                goto err_xwfs_xwsys_attr_state_create;
         }
         xwfslogf(INFO, "Create \"/sys/xwos/xwfs/state\" ... [OK]\n");
 
         return XWOK;
 
-err_xwfs_sysfs_attr_state_create:
-        xwsys_remove_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_cmd);
-err_xwfs_sysfs_attr_cmd_create:
-        xwsys_unregister(xwfs_sysfs_obj);
-        xwfs_sysfs_obj = NULL;
-err_xwfs_sysfs_obj_create:
+err_xwfs_xwsys_attr_state_create:
+        xwsys_remove_file(xwfs_xwsys_obj, &xwsys_attr_file_xwfs_cmd);
+err_xwfs_xwsys_attr_cmd_create:
+        xwsys_unregister(xwfs_xwsys_obj);
+        xwfs_xwsys_obj = NULL;
+err_xwfs_xwsys_obj_create:
         unregister_filesystem(&xwfs_fstype);
 err_reg_fs:
         kmem_cache_destroy(xwfs_entry_cache);
@@ -1514,12 +1516,12 @@ err_xwfs_entry_cache:
 
 void xwfs_exit(void)
 {
-        xwsys_remove_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_state);
+        xwsys_remove_file(xwfs_xwsys_obj, &xwsys_attr_file_xwfs_state);
         xwfslogf(INFO, "Destory \"/sys/xwos/xwfs/state\" ... [OK]\n");
-        xwsys_remove_file(xwfs_sysfs_obj, &xwsys_attr_file_xwfs_cmd);
+        xwsys_remove_file(xwfs_xwsys_obj, &xwsys_attr_file_xwfs_cmd);
         xwfslogf(INFO, "Destory \"/sys/xwos/xwfs/cmd\" ... [OK]\n");
-        xwsys_unregister(xwfs_sysfs_obj);
-        xwfs_sysfs_obj = NULL;
+        xwsys_unregister(xwfs_xwsys_obj);
+        xwfs_xwsys_obj = NULL;
         xwfslogf(INFO, "Destory \"/sys/xwos/xwfs\" ... [OK]\n");
 
         unregister_filesystem(&xwfs_fstype);
