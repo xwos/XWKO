@@ -53,6 +53,9 @@ struct xwosal_smr {
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EINVAL: 无效参数
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -68,6 +71,8 @@ xwer_t xwosal_smr_init(struct xwosal_smr * smr, xwssq_t val, xwssq_t max)
  * @brief XWOSAL API：销毁静态方式初始化的信号量
  * @param smr: (I) 信号量的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -85,6 +90,10 @@ xwer_t xwosal_smr_destroy(struct xwosal_smr * smr)
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EINVAL: 无效参数
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -100,6 +109,8 @@ xwer_t xwosal_smr_create(xwid_t * smridbuf, xwssq_t val, xwssq_t max)
  * @brief XWOSAL API：删除动态方式创建的信号量
  * @param smrid: (I) 信号量ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -148,7 +159,7 @@ struct xwosal_smr * xwosal_smr_get_obj(xwid_t smrid)
  * @param pos: (I) 信号量对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 信号选择器或信号量类型错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -166,7 +177,7 @@ xwer_t xwosal_smr_bind(xwid_t smrid, xwid_t sltid, xwsq_t pos)
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 信号选择器类型错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -184,6 +195,7 @@ xwer_t xwosal_smr_unbind(xwid_t smrid, xwid_t sltid)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EALREADY: 信号量已被冻结
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -206,6 +218,7 @@ xwer_t xwosal_smr_freeze(xwid_t smrid)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EALREADY: 信号量未被冻结
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -223,6 +236,10 @@ xwer_t xwosal_smr_thaw(xwid_t smrid, xwssq_t val, xwssq_t max)
  * @brief XWOSAL API：发布信号量
  * @param smrid: (I) 信号量ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENEGATIVE: 信号量已被冻结
+ * @retval -ERANGE: 信号量的值已经最大
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -241,7 +258,9 @@ xwer_t xwosal_smr_post(xwid_t smrid)
  * @param smrid: (I) 信号量ID
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -254,17 +273,16 @@ xwer_t xwosal_smr_wait(xwid_t smrid)
 }
 
 /**
- * @brief XWOSAL API：尝试获取信号量
+ * @brief XWOSAL API：检测一下信号量，不会阻塞调用者
  * @param smrid: (I) 信号量ID
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @retval -ENODATA: 信号量资源不可用（信号量无法被获取）
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
- * @note
- * - 此函数不会阻塞调用者，因此可以在中断上下文中使用。
  */
 static __xwos_inline_api
 xwer_t xwosal_smr_trywait(xwid_t smrid)
@@ -280,8 +298,10 @@ xwer_t xwosal_smr_trywait(xwid_t smrid)
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -299,6 +319,9 @@ xwer_t xwosal_smr_timedwait(xwid_t smrid, xwtm_t * xwtm)
  * @brief XWOSAL API：等待并获取信号量，且等待不可被中断
  * @param smrid: (I) 信号量ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -315,6 +338,8 @@ xwer_t xwosal_smr_wait_unintr(xwid_t smrid)
  * @param smrid: (I) 信号量ID
  * @param sval: (O) 指向缓冲区的指针，通过此缓冲区返回信号量计数器的值
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程

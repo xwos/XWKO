@@ -77,9 +77,9 @@
 #endif /* !XWMDCFG_isc_xwscp_LOG */
 
 #if defined(XWMDCFG_CHECK_PARAMETERS) && (1 == XWMDCFG_CHECK_PARAMETERS)
-#define XWSCP_VALIDATE(exp, errstr, ...)        \
-        if (__xwcc_unlikely(!(exp))) {          \
-            return __VA_ARGS__;                 \
+#define XWSCP_VALIDATE(exp, errstr, ...)         \
+        if (__xwcc_unlikely(!(exp))) {           \
+            return __VA_ARGS__;                  \
         }
 #else /* XWMDCFG_CHECK_PARAMETERS */
 #define XWSCP_VALIDATE(exp, errstr, ...)

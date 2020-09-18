@@ -8,6 +8,7 @@ Module.symvers
 XuanWuOS.symvers
 xwos.symvers
 *.o
+*.o.d
 .tmp_versions
 wkspc
 XuanWuOS.cfg

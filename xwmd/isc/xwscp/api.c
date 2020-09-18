@@ -25,7 +25,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/lib/string.h>
+#include <linux/string.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>

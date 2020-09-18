@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Linux内核中XWSCP的适配层
+ * @brief 精简的点对点通讯协议：用户态接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

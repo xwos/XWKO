@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWPCP在sysfs和xwfs中接口
+ * @brief 点对点通讯协议：用户态接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

@@ -90,7 +90,7 @@ int XuanWuKo_init(void)
                 xwkologf(ERR, "Init board ... [FAILED], rc:%d\n", rc);
                 goto err_board_init;
         }
-        xwkologf(INFO, "Init board... [OK]\n");
+        xwkologf(INFO, "Init board ... [OK]\n");
 
         return XWOK;
 

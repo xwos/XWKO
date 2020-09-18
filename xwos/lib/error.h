@@ -40,13 +40,13 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 将错误码转换为指针
- * @param errno: (I) 错误码
+ * @param err: (I) 错误码
  * @return 值为错误码的指针
  */
 static __xwcc_inline
-void * __xwcc_must_check err_ptr(xwer_t errno)
+void * __xwcc_must_check err_ptr(xwer_t err)
 {
-        return ERR_PTR(errno);
+        return ERR_PTR(err);
 }
 
 /**

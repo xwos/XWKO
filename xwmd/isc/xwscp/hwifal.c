@@ -25,8 +25,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <linux/string.h>
 #include <xwos/lib/xwaop.h>
-#include <xwos/lib/string.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 
