@@ -19,8 +19,7 @@
 # > other provisions required by the GPL. If you do not delete the
 # > provisions above, a recipient may use your version of this file
 # > under either the MPL or the GPL.
-#
 
-XWMO_CSRCS := protocol.c hwifal.c api.c usi.c
+XWMO_CSRCS := protocol.c hwifal.c api.c usi.c hwif/uart.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=

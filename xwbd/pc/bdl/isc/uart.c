@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWPCP硬件接口层
+ * @brief 板级描述层：ISC物理接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,27 +21,15 @@
  * > under either the MPL or the GPL.
  */
 
-#ifndef __bdl_isc_xwpcpif_h__
-#define __bdl_isc_xwpcpif_h__
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
-#include <xwmd/isc/xwpcp/hwifal.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#include <linux/module.h>
+#include <bdl/isc/uart.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern const struct xwpcp_hwifal_operations bdl_xwpcpif_ops;
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-
-#endif /* bdl/isc/xwpcp.h */
+char modparam_isc_uart[256] = "/dev/ttyUSB0";
+module_param_string(iscuart, modparam_isc_uart, 256, 0644);
+MODULE_PARM_DESC(ifdev, "ISC UART");

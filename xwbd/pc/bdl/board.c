@@ -32,7 +32,7 @@
 #include <bdl/board.h>
 
 #if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
-#include <xwam/example/hixwos/xwmo.h>
+  #include <xwam/example/hixwos/xwmo.h>
 #endif /* XWAMCFG_example_hixwos */
 
 /******** ******** ******** ******** ******** ******** ******** ********

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOSCP硬件接口层
+ * @brief 精简的点对点通讯协议：UART硬件接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -41,7 +41,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern const struct xwscp_hwifal_operations bdl_xwscpif_ops;
+extern
+const struct xwscp_hwifal_operations xwscpif_uart_ops;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  inline functions ******** ******** ********

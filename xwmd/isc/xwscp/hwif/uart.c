@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWSCP硬件接口层
+ * @brief 精简的点对点通讯协议：UART硬件接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -24,48 +24,49 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#include <linux/uaccess.h>
+#include <linux/fs.h>
+#include <linux/tty.h>
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/scheduler.h>
-#include <linux/fs.h>
-#include <linux/uaccess.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/protocol.h>
-#include <bdl/isc/ifdev.h>
-#include <bdl/isc/xwscpif.h>
+#include <xwmd/isc/xwscp/hwif/uart.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********           XWSCP HW hwifal            ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** static function prototypes ******** ********/
 static
-xwer_t bdl_xwscpif_open(struct xwscp * xwscp);
+xwer_t xwscpif_uart_open(struct xwscp * xwscp);
 
 static
-xwer_t bdl_xwscpif_close(struct xwscp * xwscp);
+xwer_t xwscpif_uart_close(struct xwscp * xwscp);
 
 static
-xwer_t bdl_xwscpif_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size,
-                      xwtm_t * xwtm);
+xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size,
+                       xwtm_t * xwtm);
 
 static
-xwer_t bdl_xwscpif_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size);
+xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size);
 
 static
-void bdl_xwscpif_notify(struct xwscp * xwscp, xwsq_t evt);
+void xwscpif_uart_notify(struct xwscp * xwscp, xwsq_t evt);
 
-/******** ******** .data ******** ********/
-const struct xwscp_hwifal_operations bdl_xwscpif_ops = {
-        .open = bdl_xwscpif_open,
-        .close = bdl_xwscpif_close,
-        .tx = bdl_xwscpif_tx,
-        .rx = bdl_xwscpif_rx,
-        .notify = bdl_xwscpif_notify,
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       .data       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+const struct xwscp_hwifal_operations xwscpif_uart_ops = {
+        .open = xwscpif_uart_open,
+        .close = xwscpif_uart_close,
+        .tx = xwscpif_uart_tx,
+        .rx = xwscpif_uart_rx,
+        .notify = xwscpif_uart_notify,
 };
 
 /* hwifal device */
-struct ktermios bdl_xwscpif_dev_termios = {
-        .c_cflag = CREAD | HUPCL | CLOCAL | CS8 | BRDCFG_XWSCPIF_UART_BAUDRATE,
+struct ktermios xwscpif_uart_dev_termios = {
+        .c_cflag = CREAD | HUPCL | CLOCAL | CS8 | BRDCFG_UART_BAUDRATE,
         .c_iflag = IGNBRK | IGNPAR,
         .c_oflag = 0,
         .c_lflag = 0,
@@ -73,41 +74,43 @@ struct ktermios bdl_xwscpif_dev_termios = {
         .c_cc[VMIN]  = 1,
 };
 
-/******** ******** function implementations ******** ********/
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
 static
-xwer_t bdl_xwscpif_open(struct xwscp * xwscp)
+xwer_t xwscpif_uart_open(struct xwscp * xwscp)
 {
         struct file * filp;
         struct tty_struct * tty;
         xwer_t rc;
 
-        filp = filp_open(modparam_ifdev, O_RDWR | O_NOCTTY, 0);
+        filp = filp_open(xwscp->hwifcb, O_RDWR | O_NOCTTY, 0);
         if (is_err(filp)) {
-                xwscplogf(ERR, "open <%s> failed!\n", modparam_ifdev);
                 rc = ptr_err(filp);
+                xwscplogf(ERR, "open %s ... [%d].\n", xwscp->hwifcb, rc);
 	} else {
-                xwscplogf(INFO, "open <%s> OK!\n", modparam_ifdev);
+                xwscplogf(INFO, "open %s ... [OK].\n", xwscp->hwifcb);
                 xwscp->hwifcb = filp;
                 tty = ((struct tty_file_private *)filp->private_data)->tty;
                 /* set uart port attribute */
-                tty_set_termios(tty, &bdl_xwscpif_dev_termios);
+                tty_set_termios(tty, &xwscpif_uart_dev_termios);
                 rc = XWOK;
         }
         return rc;
 }
 
 static
-xwer_t bdl_xwscpif_close(struct xwscp * xwscp)
+xwer_t xwscpif_uart_close(struct xwscp * xwscp)
 {
         filp_close(xwscp->hwifcb, current->files);
         xwscp->hwifcb = NULL;
-        xwscplogf(INFO, "close <%s> OK!\n", modparam_ifdev);
+        xwscplogf(INFO, "close hwif ... [OK].\n");
         return XWOK;
 }
 
 static
-xwer_t bdl_xwscpif_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size,
-                      xwtm_t * xwtm)
+xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size,
+                       xwtm_t * xwtm)
 {
         xwer_t rc;
 	mm_segment_t fs;
@@ -135,7 +138,7 @@ xwer_t bdl_xwscpif_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size,
 }
 
 static
-xwer_t bdl_xwscpif_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size)
+xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size)
 {
 	mm_segment_t fs;
         struct file * filp;
@@ -166,7 +169,7 @@ xwer_t bdl_xwscpif_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size)
 }
 
 static
-void bdl_xwscpif_notify(struct xwscp *xwscp, xwsq_t evt)
+void xwscpif_uart_notify(struct xwscp *xwscp, xwsq_t evt)
 {
         if (XWSCP_HWIFNTF_NETUNREACH == evt) {
         }

@@ -23,6 +23,14 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      .data        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#if defined(XWMDCFG_isc_xwpcp) && (1 == XWMDCFG_isc_xwpcp)
+extern xwid_t xwpcp_rxthrd_tid;
+extern xwid_t xwpcp_txthrd_tid;
+#endif
+
+#if defined(XWMDCFG_isc_xwscp) && (1 == XWMDCFG_isc_xwscp)
+extern xwid_t xwscp_thrd_tid;
+#endif
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -34,13 +42,13 @@ void xwmd_pm_notify(unsigned long pmevt)
         case PM_SUSPEND_PREPARE:
 #if defined(XWMDCFG_isc_xwpcp) && (1 == XWMDCFG_isc_xwpcp)
                 if (USI_XWPCP_STATE_START == usi_xwpcp_get_state()) {
-                        xwosal_thrd_intr(usi_xwpcp_txthrd);
-                        xwosal_thrd_intr(usi_xwpcp_rxthrd);
+                        xwosal_thrd_intr(xwpcp_rxthrd_tid);
+                        xwosal_thrd_intr(xwpcp_txthrd_tid);
                 }
 #endif
 #if defined(XWMDCFG_isc_xwscp) && (1 == XWMDCFG_isc_xwscp)
                 if (USI_XWSCP_STATE_START == usi_xwscp_get_state()) {
-                        xwosal_thrd_intr(usi_xwscp_thrd);
+                        xwosal_thrd_intr(xwscp_thrd_tid);
                 }
 #endif
                 break;

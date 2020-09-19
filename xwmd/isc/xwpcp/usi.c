@@ -27,31 +27,21 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/mm/common.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
-#include <linux/slab.h>
 #include <linux/parser.h>
 #include <linux/uaccess.h>
-#include <bdl/isc/xwpcpif.h>
 #include <xwmd/xwfs/fs.h>
 #include <xwmd/xwfs/bs.h>
 #include <xwmd/sysfs/core.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <xwmd/isc/xwpcp/usi.h>
+#include <xwmd/isc/xwpcp/hwif/uart.h>
+#include <bdl/isc/uart.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            XWPCP resources            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define USI_XWPCP_TXTHRD_PRIORITY \
-        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 20)
-#define USI_XWPCP_RXTHRD_PRIORITY \
-        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 20)
-
 struct xwpcp usi_xwpcp;
-xwid_t usi_xwpcp_txthrd;
-xwid_t usi_xwpcp_rxthrd;
-xwu8_t __xwcc_aligned(XWMMCFG_ALIGNMENT) usi_xwpcp_mempool[XWPCP_MEMPOOL_SIZE];
 xwsq_t usi_xwpcp_state = USI_XWPCP_STATE_STOP;
 
 xwsq_t usi_xwpcp_get_state(void)
@@ -207,10 +197,7 @@ static
 xwer_t usi_xwpcp_start(void)
 {
         xwer_t rc;
-        xwer_t trc;
-        xwid_t tid;
 
-        tid = 0;
         if (USI_XWPCP_STATE_START == usi_xwpcp_state) {
                 rc = -EALREADY;
                 goto err_already;
@@ -232,48 +219,17 @@ xwer_t usi_xwpcp_start(void)
                 goto err_mkdir_usi_xwpcp_xwfs_portdir;
         }
 
-        xwpcp_init(&usi_xwpcp);
-        rc = xwpcp_start(&usi_xwpcp, "usi_xwpcp", &bdl_xwpcpif_ops,
-                         (xwptr_t)usi_xwpcp_mempool, XWPCP_MEMPOOL_SIZE);
+        rc = xwpcp_start(&usi_xwpcp, "usi_xwpcp",
+                         &xwpcpif_uart_ops, modparam_isc_uart);
         if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Start XWPCP ... [rc:%d]\n", rc);
                 goto err_xwpcp_start;
         }
         xwpcplogf(INFO, "Start XWPCP ... [OK]\n");
 
-        rc = xwosal_thrd_create(&tid, "xwpcp_tx_thrd",
-                                (xwosal_thrd_f)xwpcp_txthrd,
-                                &usi_xwpcp, XWOS_UNUSED_ARGUMENT,
-                                USI_XWPCP_TXTHRD_PRIORITY,
-                                XWOS_UNUSED_ARGUMENT);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwpcplogf(ERR, "Create XWPCP TX thread ... [rc:%d]\n", rc);
-                goto err_xwpcp_txthrd_create;
-        }
-        usi_xwpcp_txthrd = tid;
-        xwpcplogf(INFO, "Create XWPCP TX thread ... [OK]\n");
-
-        rc = xwosal_thrd_create(&tid, "xwpcp_rx_thrd",
-                                (xwosal_thrd_f)xwpcp_rxthrd,
-                                &usi_xwpcp, XWOS_UNUSED_ARGUMENT,
-                                USI_XWPCP_RXTHRD_PRIORITY,
-                                XWOS_UNUSED_ARGUMENT);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwpcplogf(ERR, "Create XWPCP RX thread ... [rc:%d]\n", rc);
-                goto err_xwpcp_rxthrd_create;
-        }
-        usi_xwpcp_rxthrd = tid;
-        xwpcplogf(INFO, "Create XWPCP RX thread ... [OK]\n");
-
         usi_xwpcp_state = USI_XWPCP_STATE_START;
         return XWOK;
 
-err_xwpcp_rxthrd_create:
-        xwosal_thrd_terminate(usi_xwpcp_txthrd, &trc);
-        xwosal_thrd_delete(usi_xwpcp_txthrd);
-        usi_xwpcp_txthrd = 0;
-err_xwpcp_txthrd_create:
-        xwpcp_stop(&usi_xwpcp);
 err_xwpcp_start:
         xwfs_rmdir(usi_xwpcp_xwfs_portdir);
         usi_xwpcp_xwfs_portdir = NULL;
@@ -290,29 +246,11 @@ err_already:
 static
 xwer_t usi_xwpcp_stop(void)
 {
-        xwer_t rc, trc;
+        xwer_t rc;
 
         if (USI_XWPCP_STATE_START != usi_xwpcp_state) {
                 rc = -EPERM;
                 goto err_notstart;
-        }
-
-        rc = xwosal_thrd_terminate(usi_xwpcp_rxthrd, &trc);
-        if (XWOK == rc) {
-                rc = xwosal_thrd_delete(usi_xwpcp_rxthrd);
-                if (XWOK == rc) {
-                        usi_xwpcp_rxthrd = 0;
-                        xwpcplogf(INFO, "Terminate XWPCP RX thread... [OK]\n");
-                }
-        }
-
-        rc = xwosal_thrd_terminate(usi_xwpcp_txthrd, &trc);
-        if (XWOK == rc) {
-                rc = xwosal_thrd_delete(usi_xwpcp_txthrd);
-                if (XWOK == rc) {
-                        usi_xwpcp_txthrd = 0;
-                        xwpcplogf(INFO, "Terminate XWPCP TX thread... [OK]\n");
-                }
         }
 
         rc = xwpcp_stop(&usi_xwpcp);

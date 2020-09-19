@@ -66,8 +66,6 @@ enum xwpcp_usmsg_state_em {
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 extern struct xwpcp usi_xwpcp;
-extern xwid_t usi_xwpcp_txthrd;
-extern xwid_t usi_xwpcp_rxthrd;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********

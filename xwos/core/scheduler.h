@@ -38,6 +38,7 @@
 #define XWOS_SD_PRIORITY_INVALID                MAX_PRIO
 #define XWOS_SD_PRIORITY_RAISE(base, inc)       ((base) - (inc))
 #define XWOS_SD_PRIORITY_DROP(base, dec)        ((base) + (dec))
+#define XWSDOBJ_ATTR_PRIVILEGED                 XWOS_UNUSED_ARGUMENT
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********

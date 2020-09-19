@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：通讯物理接口
+ * @brief 板级描述层：ISC物理接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,15 +21,21 @@
  * > under either the MPL or the GPL.
  */
 
+#ifndef __bdl_isc_uart_h__
+#define __bdl_isc_uart_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <linux/module.h>
-#include <bdl/isc/ifdev.h>
+#include <linux/tty.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-char modparam_ifdev[64] = "/dev/ttyACM0";
-module_param_string(ifdev, modparam_ifdev, 64, 0644);
-MODULE_PARM_DESC(ifdev, "interface device");
+extern char modparam_isc_uart[256];
+
+#endif /* bdl/isc/uart.h */

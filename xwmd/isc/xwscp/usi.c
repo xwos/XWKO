@@ -36,19 +36,14 @@
 #include <xwmd/sysfs/core.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/protocol.h>
-#include <bdl/isc/xwscpif.h>
 #include <xwmd/isc/xwscp/usi.h>
+#include <xwmd/isc/xwscp/hwif/uart.h>
+#include <bdl/isc/uart.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            XWSCP resrouces            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define USI_XWSCP_THRD_PRIORITY \
-        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 20)
-
 struct xwscp usi_xwscp;
-
-xwid_t usi_xwscp_thrd = 0;
-
 xwsq_t usi_xwscp_state = USI_XWSCP_STATE_STOP;
 
 xwsq_t usi_xwscp_get_state(void)
@@ -185,9 +180,7 @@ static const match_table_t xwscp_cmd_tokens = {
 xwer_t usi_xwscp_start(void)
 {
         xwer_t rc;
-        xwid_t tcbd;
 
-        tcbd = 0;
         if (USI_XWSCP_STATE_START == usi_xwscp_state) {
                 rc = -EALREADY;
                 goto err_already;
@@ -205,40 +198,17 @@ xwer_t usi_xwscp_start(void)
                 goto err_mkdir_usi_xwscp_xwfs;
         }
 
-        xwscp_init(&usi_xwscp);
-        rc = xwscp_start(&usi_xwscp, "usi_xwscp", &bdl_xwscpif_ops);
+        rc = xwscp_start(&usi_xwscp, "usi_xwscp",
+                         &xwscpif_uart_ops, modparam_isc_uart);
         if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Activate xwscp ... [Failed], errno: %d\n", rc);
                 goto err_xwscp_start;
         }
         xwscplogf(INFO, "Activate xwscp ... [OK]\n");
 
-        rc = xwscp_hwifal_open(&usi_xwscp);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwscplogf(ERR, "Open xwscp hwifal ... [Failed], errno: %d\n", rc);
-                goto err_xwscp_ifopen;
-        }
-        xwscplogf(INFO, "Open xwscp hwifal ... [OK]\n");
-
-        rc = xwosal_thrd_create(&tcbd, "xwscp_thread",
-                                (xwosal_thrd_f)xwscp_thrd,
-                                &usi_xwscp, XWOS_UNUSED_ARGUMENT,
-                                USI_XWSCP_THRD_PRIORITY,
-                                XWOS_UNUSED_ARGUMENT);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwscplogf(ERR, "Create xwscp tx thread ... [Failed], errno %d\n", rc);
-                goto err_xwscp_thread_create;
-        }
-        usi_xwscp_thrd = tcbd;
-        xwscplogf(INFO, "Create xwscp daemon thread ... [OK]\n");
-
         usi_xwscp_state = USI_XWSCP_STATE_START;
         return XWOK;
 
-err_xwscp_thread_create:
-        xwscp_hwifal_close(&usi_xwscp);
-err_xwscp_ifopen:
-        xwscp_stop(&usi_xwscp);
 err_xwscp_start:
         xwfs_rmdir(usi_xwscp_xwfs);
         usi_xwscp_xwfs = NULL;
@@ -258,26 +228,12 @@ xwer_t usi_xwscp_stop(void)
                 goto err_notstart;
         }
 
-        rc = xwosal_thrd_terminate(usi_xwscp_thrd, &rc);
-        if (XWOK == rc) {
-                rc = xwosal_thrd_delete(usi_xwscp_thrd);
-                if (XWOK == rc) {
-                        usi_xwscp_thrd = 0;
-                        xwscplogf(INFO, "Terminate xwscp thread... [OK]\n");
-                }
-        }
-
-        rc = xwscp_hwifal_close(&usi_xwscp);
-        if (XWOK == rc) {
-                xwscplogf(INFO, "close xwscp hwifal ... [OK]\n");
-        }
-
         rc = xwscp_stop(&usi_xwscp);
         if (XWOK == rc) {
-                xwscplogf(INFO, "stop xwscp ... [OK]\n");
+                xwscplogf(INFO, "stop xwscp ... [OK].\n");
         }
 
-        xwscplogf(INFO, "kfree mempool ... [OK]\n");
+        xwscplogf(INFO, "kfree mempool ... [OK].\n");
 
         xwfs_rmdir(usi_xwscp_xwfs);
         usi_xwscp_xwfs = NULL;

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：通讯物理接口
+ * @brief 点对点通讯协议：UART硬件接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,13 +21,14 @@
  * > under either the MPL or the GPL.
  */
 
-#ifndef __bdl_isc_ifdev_h__
-#define __bdl_isc_ifdev_h__
+#ifndef __bdl_isc_xwpcpif_h__
+#define __bdl_isc_xwpcpif_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <linux/tty.h>
+#include <xwos/standard.h>
+#include <xwmd/isc/xwpcp/hwifal.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -36,6 +37,12 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern char modparam_ifdev[64];
+extern
+const struct xwpcp_hwifal_operations xwpcpif_uart_ops;
 
-#endif /* bdl/sys/ifdev.h */
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+
+#endif /* bdl/isc/xwpcp.h */
