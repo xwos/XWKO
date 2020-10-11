@@ -281,7 +281,7 @@ xwer_t xwsync_smr_freeze(struct xwsync_smr * smr)
 }
 EXPORT_SYMBOL(xwsync_smr_freeze);
 
-xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
+xwer_t xwsync_smr_thaw(struct xwsync_smr * smr)
 {
         struct xwsync_object * xwsyncobj;
         struct xwsync_evt * evt;
@@ -301,8 +301,7 @@ xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                 goto err_not_neg;
         }
         xwlib_bclst_init_head(&smr->wq);
-        smr->max = max;
-        smr->count = val;
+        smr->count = 0;
         if (smr->count > 0) {
                 xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                 if (NULL != evt) {

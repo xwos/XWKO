@@ -86,7 +86,7 @@ __xwos_api
 xwer_t xwsync_smr_freeze(struct xwsync_smr * smr);
 
 __xwos_api
-xwer_t xwsync_smr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max);
+xwer_t xwsync_smr_thaw(struct xwsync_smr * smr);
 
 __xwos_api
 xwer_t xwsync_smr_post(struct xwsync_smr * smr);

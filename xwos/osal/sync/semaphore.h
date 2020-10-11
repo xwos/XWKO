@@ -211,10 +211,8 @@ xwer_t xwosal_smr_freeze(xwid_t smrid)
 }
 
 /**
- * @brief XWOSAL API：解冻信号量，并重新初始化
+ * @brief XWOSAL API：解冻信号量
  * @param smrid: (I) 信号量ID
- * @param val: (I) 信号量的初始值
- * @param max: (I) 信号量的最大值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EALREADY: 信号量未被冻结
@@ -227,9 +225,9 @@ xwer_t xwosal_smr_freeze(xwid_t smrid)
  * - 此函数只对已冻结的信号量起作用，对未冻结的信号量调用此函数将返回错误码。
  */
 static __xwos_inline_api
-xwer_t xwosal_smr_thaw(xwid_t smrid, xwssq_t val, xwssq_t max)
+xwer_t xwosal_smr_thaw(xwid_t smrid)
 {
-        return xwosdl_smr_thaw(smrid, val, max);
+        return xwosdl_smr_thaw(smrid);
 }
 
 /**
@@ -291,7 +289,7 @@ xwer_t xwosal_smr_trywait(xwid_t smrid)
 }
 
 /**
- * @brief XWOSAL API：限时等待获取信号量
+ * @brief XWOSAL API：限时等待并获取信号量
  * @param smrid: (I) 信号量ID
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
