@@ -26,7 +26,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <linux/string.h>
-#include <xwos/lib/xwaop.h>
+#include <xwos/lib/xwbop.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 
@@ -74,7 +74,9 @@ xwer_t xwscp_hwifal_open(struct xwscp * xwscp, void * hwifcb)
         } else {
                 rc = XWOK;
         }
-        xwscp->hwifst = XWSCP_HWIFST_OPENED;
+        if (XWOK == rc) {
+                xwscp->hwifst = XWSCP_HWIFST_OPENED;
+        }
         return rc;
 }
 
