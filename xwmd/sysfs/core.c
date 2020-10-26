@@ -21,34 +21,22 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
-#include <xwos/lib/xwlog.h>
 #include <linux/slab.h>
 #include <linux/kobject.h>
 #include <linux/sysfs.h>
 #include <linux/parser.h>
+#include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
 #include <xwmd/sysfs/core.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWSYS_ARGBUFSIZE        32
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 enum xwsys_state_cmd_em {
         XWSYS_STATE_CMD_START = 0,
         XWSYS_STATE_CMD_STOP,
         XWSYS_STATE_CMD_NUM,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** xwsys entry ******** ********/
 static
 int xwsys_uevent_filter(struct kset * kset, struct kobject * kobj);
@@ -70,9 +58,6 @@ struct xwsys_object * xwsys_get(struct xwsys_object * xwobj);
 static __xwcc_inline
 void xwsys_put(struct xwsys_object * xwobj);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********   .sdata & .data  ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** /sys/xwos entry ******** ********/
 static const struct kset_uevent_ops xwsys_uevent_ops = {
         .filter = xwsys_uevent_filter,
@@ -93,9 +78,6 @@ static struct kobj_type xwsys_ktype = {
  */
 static struct kset * xwsys_kset;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief sysfs bindings for xwos: read syscall
  * @param kobj: (I) kobject

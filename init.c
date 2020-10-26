@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuKO的初始化
+ * @brief 玄武KO的初始化
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,9 +21,6 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/init.h>
@@ -31,32 +28,20 @@
 #include <xwmd/xwfs/fs.h>
 #include <bdl/board.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define xwkologf(lv, fmt, ...)    xwlogf(lv, "xwko", fmt, ##__VA_ARGS__)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 int XuanWuKo_init(void);
 
 static
 void XuanWuKo_exit(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 MODULE_LICENSE("Dual MPL/GPL");
-MODULE_AUTHOR("隐星魂(Roy.Sun) <https://https://xwos.tech>");
+MODULE_AUTHOR("隐星魂(Roy.Sun) <https://http://xwos.tech>");
 MODULE_DESCRIPTION("XuanWuKO");
 module_init(XuanWuKo_init);
 module_exit(XuanWuKo_exit);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 int XuanWuKo_init(void)
 {

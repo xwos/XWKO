@@ -21,44 +21,28 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <linux/version.h>
 #include <linux/kconfig.h>
 #include <linux/parser.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwaop.h>
-#include <xwos/osal/thread.h>
 #include <xwmd/sysfs/core.h>
 #include <xwmd/xwfs/fs.h>
 #include <bdl/board.h>
-#include <bm/mcuc/imitator.h>
 #include <bm/mcuc/msgnode.h>
 #include <bm/mcuc/session.h>
 #include <bm/mcuc/wkup.h>
 #include <bm/mcuc/init.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********     xwfs/mcuc/     ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** .data ******** ********/
-struct xwfs_dir * dir_mcuc = NULL;
+struct xwfs_dir * xwfs_dir_mcuc = NULL;
+xwsq_a mcuc_state = MCUC_STATE_STOP;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********    start & stop   ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** .data ******** ********/
-__xwcc_atomic xwsq_t mcuc_state = MCUC_STATE_STOP;
-
-/******** ******** function implementations ******** ********/
 xwer_t mcuc_start(void)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_add(xwsq_t, &mcuc_state, MCUC_STATE_STOP, 1,
-                                NULL, NULL);
+        rc = xwaop_teq_then_add(xwsq, &mcuc_state, MCUC_STATE_STOP, 1, NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_perm;
@@ -70,42 +54,38 @@ xwer_t mcuc_start(void)
                 goto err_xwfs_not_ready;
         }
 
-        rc = xwfs_mkdir("mcuc", NULL, &dir_mcuc);
-        if (__xwcc_unlikely(rc < 0))
+        rc = xwfs_mkdir("mcuc", NULL, &xwfs_dir_mcuc);
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mkdir_mcuc;
+        }
 
         rc = mcuc_msgnode_init();
-        if (__xwcc_unlikely(rc < 0))
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_msgnode_init;
+        }
 
         rc = mcuc_session_init();
-        if (__xwcc_unlikely(rc < 0))
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_session_init;
+        }
 
         rc = mcuc_wkup_init();
-        if (__xwcc_unlikely(rc < 0))
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_wkup_init;
-
-        if (mcuc_imitator) {
-                rc = mcuc_imitator_init();
-                if (__xwcc_unlikely(rc < 0))
-                        goto err_mcuc_imitator_start;
         }
         return XWOK;
 
-err_mcuc_imitator_start:
-        mcuc_wkup_exit();
 err_wkup_init:
         mcuc_session_exit();
 err_session_init:
         mcuc_msgnode_exit();
 err_msgnode_init:
-        xwfs_rmdir(dir_mcuc);
-        dir_mcuc = NULL;
+        xwfs_rmdir(xwfs_dir_mcuc);
+        xwfs_dir_mcuc = NULL;
 err_mkdir_mcuc:
         xwfs_giveup();
 err_xwfs_not_ready:
-        mcuc_imitator = false;
+        xwaop_teq_then_sub(xwsq, &mcuc_state, MCUC_STATE_START, 1, NULL, NULL);
 err_perm:
         return rc;
 }
@@ -114,26 +94,18 @@ xwer_t mcuc_stop(void)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_sub(xwsq_t, &mcuc_state, MCUC_STATE_START, 1,
-                                NULL, NULL);
+        rc = xwaop_teq_then_sub(xwsq, &mcuc_state, MCUC_STATE_START, 1, NULL, NULL);
         if (rc < 0) {
                 rc = -EPERM;
                 goto err_state;
         }
 
-        if (mcuc_imitator) {
-                mcuc_imitator_exit();
-                mcuc_imitator = false;
-        }
-
         mcuc_wkup_exit();
-
         mcuc_session_exit();
-
         mcuc_msgnode_exit();
 
-        xwfs_rmdir(dir_mcuc);
-        dir_mcuc = NULL;
+        xwfs_rmdir(xwfs_dir_mcuc);
+        xwfs_dir_mcuc = NULL;
 
         xwfs_giveup();
 
@@ -147,7 +119,7 @@ xwer_t mcuc_grab(void)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_add(xwsq_t, &mcuc_state, MCUC_STATE_START, 1,
+        rc = xwaop_tge_then_add(xwsq, &mcuc_state, MCUC_STATE_START, 1,
                                 NULL, NULL);
         return rc;
 }
@@ -156,7 +128,7 @@ xwer_t mcuc_put(void)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_sub(xwsq_t, &mcuc_state, MCUC_STATE_START, 1,
+        rc = xwaop_tge_then_sub(xwsq, &mcuc_state, MCUC_STATE_START, 1,
                                 NULL, NULL);
         return rc;
 }
@@ -165,13 +137,10 @@ xwsq_t mcuc_get_state(void)
 {
         xwsq_t st;
 
-        xwaop_read(xwsq_t, &mcuc_state, &st);
+        xwaop_read(xwsq, &mcuc_state, &st);
         return st;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********           /sys/xwos/mcuc            ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwsys_object * mcuc_xwsys_obj;
 
 /******** /sys/xwos/mcuc/cmd ********/
@@ -193,14 +162,12 @@ XWSYS_ATTR(file_mcuc_cmd, cmd, 0644,
 enum xwfs_xwsys_cmd_em {
         MCUC_XWSYS_CMD_STOP = 0,
         MCUC_XWSYS_CMD_START,
-        MCUC_XWSYS_CMD_IMITATOR,
         MCUC_XWSYS_CMD_NUM,
 };
 
 static const match_table_t mcuc_cmd_tokens = {
         {MCUC_XWSYS_CMD_STOP, "stop"},
         {MCUC_XWSYS_CMD_START, "start"},
-        {MCUC_XWSYS_CMD_IMITATOR, "imitator(%d)"},
         {MCUC_XWSYS_CMD_NUM, NULL},
 };
 
@@ -220,7 +187,6 @@ xwer_t mcuc_xwsys_cmd_parse(const char * cmdstring, size_t cnt)
         char * p, * pos;
         xwer_t rc = -ENOSYS;
         char cmd[cnt + 1];
-        int imt = 0;
 
         memcpy(cmd, cmdstring, cnt);
         if ('\n' == cmd[cnt - 1]) {
@@ -247,14 +213,6 @@ xwer_t mcuc_xwsys_cmd_parse(const char * cmdstring, size_t cnt)
                         break;
                 case MCUC_XWSYS_CMD_START:
                         rc = mcuc_start();
-                        break;
-                case MCUC_XWSYS_CMD_IMITATOR:
-                        rc = match_int(&tmp[0], &imt);
-                        if (0 != imt) {
-                                mcuc_imitator = true;
-                        } else {
-                                mcuc_imitator = false;
-                        }
                         break;
                 }
         }
@@ -319,9 +277,6 @@ ssize_t mcuc_xwsys_state_store(struct xwsys_object * xwobj,
         return -ENOSYS;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********     init & exit   ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t mcuc_init(void)
 {
         struct xwsys_object * xwsysobj;

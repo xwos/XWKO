@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的内存管理机制：简单内存分配器
+ * @brief 玄武OS内存管理：简单内存分配器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,32 +21,19 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/sma.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief XWMM API：初始化简单内存分配器对象。
- * @param sa: (I) 简单内存分配器对象
- * @param origin: (I) 内存区域的首地址
- * @param size: (I) 内存区域的大小
- * @param pos: (I) 内存区域的位置
- * @param name: (I) 分配器的名字
+ * @brief XWMM API：初始化简单内存分配器对象
+ * @param[in] sa: 简单内存分配器对象
+ * @param[in] origin: 内存区域的首地址
+ * @param[in] size: 内存区域的大小
+ * @param[in] pos: 内存区域的位置
+ * @param[in] name: 分配器的名字
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 内存的大小无效
@@ -62,9 +49,7 @@ xwer_t xwmm_sma_init(struct xwmm_sma * sa,
 {
         xwer_t rc;
 
-        origin = ALIGN(origin, XWMM_ALIGNMENT);
-        size = ROUND(size, XWMM_ALIGNMENT);
-        pos = ALIGN(pos, XWMM_ALIGNMENT);
+        pos = XWBOP_ALIGN(pos, XWMM_ALIGNMENT);
         if (size < pos) {
                 rc = -EINVAL;
         } else {
@@ -78,11 +63,11 @@ xwer_t xwmm_sma_init(struct xwmm_sma * sa,
 }
 
 /**
- * @brief XWMM API：从简单内存分配器中申请内存。
- * @param sa: (I) 简单内存分配器对象
- * @param size: (I) 大小
- * @param aligned: (I) 申请到的内存的首地址需要对齐到的边界
- * @param membuf: (O) 指向指针缓存的指针，此指针缓存用于返回申请到的内存的首地址
+ * @brief XWMM API：从简单内存分配器中申请内存
+ * @param[in] sa: 简单内存分配器对象
+ * @param[in] size: 大小
+ * @param[in] aligned: 申请到的内存的首地址需要对齐到的边界
+ * @param[out] membuf: 指向地址缓存的指针，通过此指针缓存返回申请到的内存的首地址
  * @return 错误码
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 参数无效
@@ -119,10 +104,10 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
                 aligned = XWMM_ALIGNMENT;
         }/* else {} */
 
-        size = ALIGN(size, XWMM_ALIGNMENT);
+        size = XWBOP_ALIGN(size, XWMM_ALIGNMENT);
         do {
-                cpos = xwaop_load(xwsq_t, &sa->pos, xwmb_modr_acquire);
-                tmp = ALIGN((sa->zone.origin + cpos), aligned);
+                cpos = xwaop_load(xwsq, &sa->pos, xwmb_modr_acquire);
+                tmp = XWBOP_ALIGN((sa->zone.origin + cpos), aligned);
                 npos = size + tmp - sa->zone.origin;
                 if (npos > sa->zone.size) {
                         rc = -ENOMEM;
@@ -130,7 +115,7 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
                         goto err_nomem;
                 }
                 *membuf = (void *)tmp;
-        } while (xwaop_teq_then_write(xwsq_t, &sa->pos, cpos, npos, NULL));
+        } while (xwaop_teq_then_write(xwsq, &sa->pos, cpos, npos, NULL));
         return XWOK;
 
 err_nomem:
@@ -139,9 +124,9 @@ err_inval:
 }
 
 /**
- * @brief XWMM API：释放内存。
- * @param sa: (I) 简单内存分配器对象
- * @param mem: (I) 内存的首地址
+ * @brief XWMM API：释放内存
+ * @param[in] sa: 简单内存分配器对象
+ * @param[in] mem: 内存的首地址
  * @return 错误码
  * @note
  * - 同步/异步：同步

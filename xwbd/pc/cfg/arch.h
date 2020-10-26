@@ -16,45 +16,38 @@
 #define ARCHCFG_64BIT                           1
 
 /******** ******** architecture libs ******** ********/
-/******** clib ********/
+/******** libc ********/
 #define ARCHCFG_COMPILER_CLIB                   1
+#define ARCHCFG_COMPILER_ERRNO                  1
 
 /******** C++ ********/
 #define ARCHCFG_CXX                             0
 
 /******** xwbop ********/
-#define ARCHCFG_LIB_XWBOP_S1M8                  0
-#define ARCHCFG_LIB_XWBOP_C0M8                  0
-#define ARCHCFG_LIB_XWBOP_X1M8                  0
 #define ARCHCFG_LIB_XWBOP_FFS8                  0
 #define ARCHCFG_LIB_XWBOP_FLS8                  0
 #define ARCHCFG_LIB_XWBOP_RBIT8                 0
+#define ARCHCFG_LIB_XWBOP_WEIGHT8               0
 
-#define ARCHCFG_LIB_XWBOP_S1M16                 0
-#define ARCHCFG_LIB_XWBOP_C0M16                 0
-#define ARCHCFG_LIB_XWBOP_X1M16                 0
 #define ARCHCFG_LIB_XWBOP_FFS16                 0
 #define ARCHCFG_LIB_XWBOP_FLS16                 0
 #define ARCHCFG_LIB_XWBOP_RBIT16                0
 #define ARCHCFG_LIB_XWBOP_RE16                  0
 #define ARCHCFG_LIB_XWBOP_RE16S32               0
+#define ARCHCFG_LIB_XWBOP_WEIGHT16              0
 
-#define ARCHCFG_LIB_XWBOP_S1M32                 0
-#define ARCHCFG_LIB_XWBOP_C0M32                 0
-#define ARCHCFG_LIB_XWBOP_X1M32                 0
 #define ARCHCFG_LIB_XWBOP_FFS32                 0
 #define ARCHCFG_LIB_XWBOP_FLS32                 0
 #define ARCHCFG_LIB_XWBOP_RBIT32                0
 #define ARCHCFG_LIB_XWBOP_RE32                  0
 #define ARCHCFG_LIB_XWBOP_RE32S64               0
+#define ARCHCFG_LIB_XWBOP_WEIGHT32              0
 
-#define ARCHCFG_LIB_XWBOP_S1M64                 0
-#define ARCHCFG_LIB_XWBOP_C0M64                 0
-#define ARCHCFG_LIB_XWBOP_X1M64                 0
 #define ARCHCFG_LIB_XWBOP_FFS64                 0
 #define ARCHCFG_LIB_XWBOP_FLS64                 0
 #define ARCHCFG_LIB_XWBOP_RBIT64                0
 #define ARCHCFG_LIB_XWBOP_RE64                  0
+#define ARCHCFG_LIB_XWBOP_WEIGHT64              0
 
 #define ARCHCFG_LIB_XWBMPOP_FFS                 0
 #define ARCHCFG_LIB_XWBMPOP_FFZ                 0

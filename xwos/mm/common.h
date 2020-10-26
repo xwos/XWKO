@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的内存管理机制：内存管理核心定义
+ * @brief 玄武OS内存管理：通用定义
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -24,15 +24,13 @@
 #ifndef __xwos_mm_common_h__
 #define __xwos_mm_common_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/lib/xwbop.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @defgroup xwmm_common 通用定义
+ * @{
+ */
+
 #define XWMM_ALIGNMENT          XWMMCFG_ALIGNMENT
 #define XWMM_ALIGNMENT_MASK     (XWMM_ALIGNMENT - 1)
 
@@ -40,18 +38,6 @@
   #error "XWMMCFG_ALIGNMENT must be the order of 2!"
 #endif
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief memory allocating flag enumerations
- */
-enum xwmm_flag_em {
-        XWMM_FLAG_UNKNOEN = 0,
-        XWMM_FLAG_ATOMIC = BIT(0),
-        XWMM_FLAG_NORMAL = BIT(1),
-        XWMM_FLAG_CRITICAL = BIT(2),
-};
 /**
  * @brief memory management zone
  */
@@ -59,5 +45,31 @@ struct xwmm_zone {
         xwptr_t origin; /**< origin address */
         xwsz_t size; /**< unit: byte */
 };
+
+/**
+ * @brief XWMM API：测试地址是否在内存区域内
+ * @return 布尔值
+ * @retval true: 是
+ * @retval false: 否
+ */
+static __xwcc_inline
+bool xwmm_in_zone(void * mem, xwptr_t origin, xwsz_t size)
+{
+        xwptr_t memptr = (xwptr_t)mem;
+        bool ret;
+
+        if (memptr < origin) {
+                ret = false;
+        } else if (memptr > (origin + size)) {
+                ret = false;
+        } else {
+                ret = true;
+        }
+        return ret;
+}
+
+/**
+ * @} xwmm_common
+ */
 
 #endif /* xwos/mm/common.h */

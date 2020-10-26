@@ -24,26 +24,16 @@
 #ifndef __xwmd_isc_xwscp_usi_h__
 #define __xwmd_isc_xwscp_usi_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/osal/thread.h>
-#include <xwmd/isc/xwscp/protocol.h>
 #include <linux/time.h>
+#include <xwmd/isc/xwscp/protocol.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwscp_usmsg {
         size_t size;
-        struct timeval timeout;
-        uint8_t *text;
+        struct __kernel_timespec timeout;
+        uint8_t * text;
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define USI_XWSCP_STATE_STOP             0
 #define USI_XWSCP_STATE_START            1
 
@@ -53,22 +43,11 @@ struct xwscp_usmsg {
 #define UAPI_XWSCP_IOC_RX                _IOC(_IOC_READ, UAPI_XWSCP_IOC_MAGIC, 0, \
                                               sizeof(struct xwscp_usmsg))
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern struct xwscp usi_xwscp;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t usi_xwscp_init(void);
-
 void usi_xwscp_exit(void);
-
 xwsq_t usi_xwscp_get_state(void);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********  inline functions ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+void usi_xwscp_pm_notify(unsigned long pmevt);
 
 #endif /* xwmd/isc/xwscp/usi.h */

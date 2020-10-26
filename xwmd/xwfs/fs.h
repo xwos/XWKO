@@ -24,21 +24,12 @@
 #ifndef __xwmd_xwfs_fs_h__
 #define __xwmd_xwfs_fs_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
-#include <xwos/lib/xwlog.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 #include <linux/ioctl.h>
+#include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief log function of OSAL FS
- */
 #if defined(XWMDCFG_xwfs_LOG) && (1 == XWMDCFG_xwfs_LOG)
   #define xwfslogf(lv, fmt, ...)        xwlogf(lv, "xwfs", fmt, ##__VA_ARGS__)
 #else
@@ -46,9 +37,6 @@
 #endif
 /* #if defined(XWMDCFG_XWFS_LOG) && (1 == XWMDCFG_XWFS_LOG) */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwfs_mntopts {
         umode_t mode;
         kuid_t kuid;
@@ -57,12 +45,12 @@ struct xwfs_mntopts {
 
 struct xwfs_mnt_info {
         struct xwfs_mntopts mntopts; /**< mounting options */
-        struct super_block *sb; /**< super block */
+        struct super_block * sb; /**< super block */
 };
 
 struct xwfs_dir {
         struct inode inode;
-        struct xwfs_dir *parent;
+        struct xwfs_dir * parent;
 };
 
 struct xwfs_node;
@@ -82,8 +70,8 @@ struct xwfs_operations {
 
 struct xwfs_node {
         struct inode inode;
-        struct xwfs_dir *parent;
-        const struct xwfs_operations *xwfsops;
+        struct xwfs_dir * parent;
+        const struct xwfs_operations * xwfsops;
 };
 
 union xwfs_entry {
@@ -92,40 +80,25 @@ union xwfs_entry {
         struct inode inode;
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwfs_start(void);
-
 xwer_t xwfs_stop(void);
-
 xwer_t xwfs_holdon(void);
-
 xwer_t xwfs_giveup(void);
-
-xwer_t xwfs_mkdir(const char *name, struct xwfs_dir *parent,
-                  struct xwfs_dir **newdir);
-
-xwer_t xwfs_mknod(const char *name,
+xwer_t xwfs_mkdir(const char * name, struct xwfs_dir * parent,
+                  struct xwfs_dir ** newdir);
+xwer_t xwfs_mknod(const char * name,
                   umode_t mode,
-                  const struct xwfs_operations *xwfsops,
-                  void *data,
-                  struct xwfs_dir *parent,
-                  struct xwfs_node **newnode);
-
-xwer_t xwfs_rmdir(struct xwfs_dir *dir);
-
-xwer_t xwfs_rmnod(struct xwfs_node *node);
-
+                  const struct xwfs_operations * xwfsops,
+                  void * data,
+                  struct xwfs_dir * parent,
+                  struct xwfs_node ** newnode);
+xwer_t xwfs_rmdir(struct xwfs_dir * dir);
+xwer_t xwfs_rmnod(struct xwfs_node * node);
 xwer_t xwfs_init(void);
-
 void xwfs_exit(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __always_inline
-void *xwfs_node_get_data(struct xwfs_node *node)
+void * xwfs_node_get_data(struct xwfs_node * node)
 {
         return node->inode.i_private;
 }

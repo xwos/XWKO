@@ -21,9 +21,6 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwaop.h>
@@ -31,19 +28,7 @@
 #include <bm/mcuc/init.h>
 #include <bm/mcuc/wkup.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      types        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********        function declarations        ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 int mcuc_wkup_open(struct xwfs_node * xwfsnode, struct file * file);
-
 int mcuc_wkup_close(struct xwfs_node * xwfsnode, struct file * file);
 
 static
@@ -66,9 +51,6 @@ long mcuc_wkup_ioctl(struct xwfs_node * xwfsnode,
                      unsigned int cmd,
                      unsigned long arg);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      .data        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 const struct xwfs_operations mcuc_wkup_xwfsops = {
         .open = mcuc_wkup_open,
         .release = mcuc_wkup_close,
@@ -79,9 +61,6 @@ const struct xwfs_operations mcuc_wkup_xwfsops = {
 
 struct xwfs_node * mcuc_wkup;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 int mcuc_wkup_open(struct xwfs_node * xwfsnode, struct file * file)
 {
         return (int)mcuc_grab();
@@ -127,7 +106,7 @@ xwer_t mcuc_wkup_init(void)
         struct xwfs_node * node;
 
         rc = xwfs_mknod("wkup", 0660, &mcuc_wkup_xwfsops, NULL,
-                        dir_mcuc, &node);
+                        xwfs_dir_mcuc, &node);
         if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"wkup\"), rc: %d\n", rc);
                 goto err_mknod_wkup;

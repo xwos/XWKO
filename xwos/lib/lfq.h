@@ -24,53 +24,41 @@
 #ifndef __xwos_lib_lfq_h__
 #define __xwos_lib_lfq_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <asmlib/lfq.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @defgroup lfq 无锁队列
+ * @{
+ */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/ospl/soc/lfq.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 初始化无锁队列节点
- * @param n: (I) 队列节点指针
+ * @param[in] n: 队列节点指针
  */
 static __xwlib_inline
-void xwlib_lfq_init(__xwcc_atomic xwlfq_t * n)
+void xwlib_lfq_init(xwlfq_a * n)
 {
         *n = (xwlfq_t)0;
 }
 
 /**
  * @brief 将一个节点推入无锁队列（栈式队列）
- * @param h: (I) 无锁队列头的指针
- * @param n: (I) 入队节点的指针
+ * @param[in] h: 无锁队列头的指针
+ * @param[in] n: 入队节点的指针
  */
-static __xwlib_inline
-void xwlib_lfq_push(__xwcc_atomic xwlfq_t * h, __xwcc_atomic xwlfq_t * n)
-{
-        arch_lfq_push(h, n);
-}
+void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n);
 
 /**
  * @brief 弹出无锁队列中的第一个节点（栈式队列）
- * @param h: (I) 无锁队列头的指针
+ * @param[in] h: 无锁队列头的指针
  * @return 被弹出的节点
  */
-static __xwlib_inline
-xwlfq_t * xwlib_lfq_pop(__xwcc_atomic xwlfq_t * h)
-{
-        return arch_lfq_pop(h);
-}
+xwlfq_t * xwlib_lfq_pop(xwlfq_a * h);
+
+/**
+ * @} lfq
+ */
 
 #endif /* xwos/lib/lfq.h */

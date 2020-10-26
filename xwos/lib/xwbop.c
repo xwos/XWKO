@@ -21,16 +21,9 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#if (defined(XWLIBCFG_XWBOP_RBIT8)) && (1 == XWLIBCFG_XWBOP_RBIT8)
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT8)) || (1 != ARCHCFG_LIB_XWBOP_RBIT8)
 #define XWBOP_RBIT8_R2(n)  n,           n + 2*64,       n + 1*64,       n + 3*64
 #define XWBOP_RBIT8_R4(n)  XWBOP_RBIT8_R2(n), XWBOP_RBIT8_R2(n + 2 * 16), \
@@ -38,12 +31,7 @@
 #define XWBOP_RBIT8_R6(n)  XWBOP_RBIT8_R4(n), XWBOP_RBIT8_R4(n + 2 * 4), \
                            XWBOP_RBIT8_R4(n + 1 * 4), XWBOP_RBIT8_R4(n + 3 * 4)
 #endif /* !ARCHCFG_LIB_XWBOP_RBIT8 */
-#endif /* XWLIBCFG_XWBOP_RBIT8 */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#if (defined(XWLIBCFG_XWBOP_RBIT8)) && (1 == XWLIBCFG_XWBOP_RBIT8)
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT8)) || (1 != ARCHCFG_LIB_XWBOP_RBIT8)
 /**
  * @brief 位镜面翻转表
@@ -52,12 +40,7 @@ __xwlib_rodata const xwu8_t xwbop_rbit8_table[256] = {
         XWBOP_RBIT8_R6(0), XWBOP_RBIT8_R6(2), XWBOP_RBIT8_R6(1), XWBOP_RBIT8_R6(3)
 };
 #endif /* !ARCHCFG_LIB_XWBOP_RBIT8 */
-#endif /* XWLIBCFG_XWBOP_RBIT8 */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#if (defined(XWLIBCFG_XWBOP_FFS8)) && (1 == XWLIBCFG_XWBOP_FFS8)
 #if (!defined(ARCHCFG_LIB_XWBOP_FFS8)) || (1 != ARCHCFG_LIB_XWBOP_FFS8)
 __xwlib_code
 xwssq_t xwbop_ffs8(xwu8_t x)
@@ -88,9 +71,7 @@ xwssq_t xwbop_ffs8(xwu8_t x)
 #endif /* !__GNUC__ */
 }
 #endif /* !ARCHCFG_LIB_XWBOP_FFS8 */
-#endif /* XWLIBCFG_XWBOP_FFS8 */
 
-#if (defined(XWLIBCFG_XWBOP_FLS8) && (1 == XWLIBCFG_XWBOP_FLS8))
 #if ((!defined(ARCHCFG_LIB_XWBOP_FLS8)) || (1 != ARCHCFG_LIB_XWBOP_FLS8))
 __xwlib_code
 xwssq_t xwbop_fls8(xwu8_t x)
@@ -121,9 +102,7 @@ xwssq_t xwbop_fls8(xwu8_t x)
 #endif /* !__GNUC__ */
 }
 #endif /* !ARCHCFG_LIB_XWBOP_FLS8 */
-#endif /* XWLIBCFG_XWBOP_FLS8 */
 
-#if (defined(XWLIBCFG_XWBOP_FFS16)) && (1 == XWLIBCFG_XWBOP_FFS16)
 #if (!defined(ARCHCFG_LIB_XWBOP_FFS16)) || (1 != ARCHCFG_LIB_XWBOP_FFS16)
 __xwlib_code
 xwssq_t xwbop_ffs16(xwu16_t x)
@@ -158,9 +137,7 @@ xwssq_t xwbop_ffs16(xwu16_t x)
 #endif /* !__GNUC__ */
 }
 #endif /* !ARCHCFG_LIB_XWBOP_FFS16 */
-#endif /* XWLIBCFG_XWBOP_FFS16 */
 
-#if (defined(XWLIBCFG_XWBOP_FLS16) && (1 == XWLIBCFG_XWBOP_FLS16))
 #if ((!defined(ARCHCFG_LIB_XWBOP_FLS16)) || (1 != ARCHCFG_LIB_XWBOP_FLS16))
 __xwlib_code
 xwssq_t xwbop_fls16(xwu16_t x)
@@ -195,9 +172,7 @@ xwssq_t xwbop_fls16(xwu16_t x)
 #endif /* !__GNUC__ */
 }
 #endif /* !ARCHCFG_LIB_XWBOP_FLS16 */
-#endif /* XWLIBCFG_XWBOP_FLS16 */
 
-#if (defined(XWLIBCFG_XWBOP_FFS32)) && (1 == XWLIBCFG_XWBOP_FFS32)
 #if (!defined(ARCHCFG_LIB_XWBOP_FFS32)) || (1 != ARCHCFG_LIB_XWBOP_FFS32)
 __xwlib_code
 xwssq_t xwbop_ffs32(xwu32_t x)
@@ -236,9 +211,7 @@ xwssq_t xwbop_ffs32(xwu32_t x)
 #endif /* !__GNUC__ */
 }
 #endif /* !ARCHCFG_LIB_XWBOP_FFS32 */
-#endif /* XWLIBCFG_XWBOP_FFS32 */
 
-#if (defined(XWLIBCFG_XWBOP_FLS32) && (1 == XWLIBCFG_XWBOP_FLS32))
 #if ((!defined(ARCHCFG_LIB_XWBOP_FLS32)) || (1 != ARCHCFG_LIB_XWBOP_FLS32))
 __xwlib_code
 xwssq_t xwbop_fls32(xwu32_t x)
@@ -277,9 +250,7 @@ xwssq_t xwbop_fls32(xwu32_t x)
 #endif /* !__GNUC__ */
 }
 #endif /* !ARCHCFG_LIB_XWBOP_FLS32 */
-#endif /* XWLIBCFG_XWBOP_FLS32 */
 
-#if (defined(XWLIBCFG_XWBOP_FFS64) && (1 == XWLIBCFG_XWBOP_FFS64))
 #if ((!defined(ARCHCFG_LIB_XWBOP_FFS64)) || (1 != ARCHCFG_LIB_XWBOP_FFS64))
 __xwlib_code
 xwssq_t xwbop_ffs64(xwu64_t x)
@@ -322,9 +293,7 @@ xwssq_t xwbop_ffs64(xwu64_t x)
 #endif /* !__GNUC__ */
 }
 #endif /* !ARCHCFG_LIB_XWBOP_FFS64 */
-#endif /* XWLIBCFG_XWBOP_FFS64 */
 
-#if (defined(XWLIBCFG_XWBOP_FLS64)) && (1 == XWLIBCFG_XWBOP_FLS64)
 #if (!defined(ARCHCFG_LIB_XWBOP_FLS64)) || (1 != ARCHCFG_LIB_XWBOP_FLS64)
 __xwlib_code
 xwssq_t xwbop_fls64(xwu64_t x)
@@ -370,12 +339,11 @@ xwssq_t xwbop_fls64(xwu64_t x)
 #endif /* !__GNUC__ */
 }
 #endif /* !ARCHCFG_LIB_XWBOP_FLS64 */
-#endif /* XWLIBCFG_XWBOP_FLS64 */
 
 __xwlib_code
 void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 {
-        xwsz_t n = BITS_TO_BMPS(num);
+        xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
@@ -386,7 +354,7 @@ void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 __xwlib_code
 xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 {
-        xwsz_t n = BITS_TO_BMPS(num);
+        xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i, j;
         xwssq_t ret;
 
@@ -407,7 +375,7 @@ xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 __xwlib_code
 void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num)
 {
-        xwsz_t n = BITS_TO_BMPS(num);
+        xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
@@ -418,7 +386,7 @@ void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num)
 __xwlib_code
 void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num)
 {
-        xwsz_t n = BITS_TO_BMPS(num);
+        xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
@@ -430,8 +398,8 @@ void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num)
 __xwlib_code
 void xwbmpop_s1i(xwbmp_t * bmp, xwsq_t n)
 {
-        bmp = bmp + BIT_BMP(n);
-        xwbop_s1m(xwbmp_t, bmp, BIT_BMP_MASK(n));
+        bmp = bmp + XWBOP_BMP(n);
+        xwbop_s1m(xwbmp_t, bmp, XWBOP_BMP_MASK(n));
 }
 #endif /* !ARCHCFG_LIB_XWBMPOP_S1I */
 
@@ -441,7 +409,7 @@ void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsq_t i;
         xwsz_t size;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         for (i = 0; i < size; i++) {
                 xwbop_s1m(xwbmp_t, &bmp[i], msk[i]);
         }
@@ -451,8 +419,8 @@ void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 __xwlib_code
 void xwbmpop_c0i(xwbmp_t * bmp, xwsq_t n)
 {
-        bmp = bmp + BIT_BMP(n);
-        xwbop_c0m(xwbmp_t, bmp, BIT_BMP_MASK(n));
+        bmp = bmp + XWBOP_BMP(n);
+        xwbop_c0m(xwbmp_t, bmp, XWBOP_BMP_MASK(n));
 }
 #endif /* !ARCHCFG_LIB_XWBMPOP_C0I */
 
@@ -462,7 +430,7 @@ void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsq_t i;
         xwsz_t size;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         for (i = 0; i < size; i++) {
                 xwbop_c0m(xwbmp_t, &bmp[i], msk[i]);
         }
@@ -472,8 +440,8 @@ void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 __xwlib_code
 void xwbmpop_x1i(xwbmp_t * bmp, xwsq_t n)
 {
-        bmp = bmp + BIT_BMP(n);
-        xwbop_x1m(xwbmp_t, bmp, BIT_BMP_MASK(n));
+        bmp = bmp + XWBOP_BMP(n);
+        xwbop_x1m(xwbmp_t, bmp, XWBOP_BMP_MASK(n));
 }
 #endif /* !ARCHCFG_LIB_XWBMPOP_X1I */
 
@@ -483,7 +451,7 @@ void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsq_t i;
         xwsz_t size;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         for (i = 0; i < size; i++) {
                 xwbop_x1m(xwbmp_t, &bmp[i], msk[i]);
         }
@@ -493,8 +461,8 @@ void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 __xwlib_code
 bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n)
 {
-        bmp = bmp + BIT_BMP(n);
-        return (bool)(*bmp & BIT_BMP_MASK(n));
+        bmp = bmp + XWBOP_BMP(n);
+        return (bool)(*bmp & XWBOP_BMP_MASK(n));
 }
 #endif /* !ARCHCFG_LIB_XWBMPOP_T1I */
 
@@ -505,7 +473,7 @@ bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsz_t size;
         bool ret;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         ret = false;
         for (i = 0; i < size; i++) {
                 ret = !!((bmp[i] & msk[i]) == msk[i]);
@@ -523,7 +491,7 @@ bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsz_t size;
         bool ret;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         ret = false;
         for (i = 0; i < size; i++) {
                 ret = !!((bmp[i] & msk[i]) == msk[i]);
@@ -546,7 +514,7 @@ bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsz_t size;
         bool ret;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         ret = false;
         for (i = 0; i < size; i++) {
                 ret = !!(bmp[i] & msk[i]);
@@ -564,7 +532,7 @@ bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsz_t size;
         bool ret;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         ret = false;
         for (i = 0; i < size; i++) {
                 ret = !!(bmp[i] & msk[i]);
@@ -587,7 +555,7 @@ bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsz_t size;
         bool ret;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         ret = false;
         for (i = 0; i < size; i++) {
                 ret = !(bmp[i] & msk[i]);
@@ -605,7 +573,7 @@ bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsz_t size;
         bool ret;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         ret = false;
         for (i = 0; i < size; i++) {
                 ret = !(bmp[i] & msk[i]);
@@ -628,7 +596,7 @@ bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsz_t size;
         bool ret;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         ret = false;
         for (i = 0; i < size; i++) {
                 ret = !!((bmp[i] & msk[i]) != msk[i]);
@@ -646,7 +614,7 @@ bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         xwsz_t size;
         bool ret;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         ret = false;
         for (i = 0; i < size; i++) {
                 ret = !!((bmp[i] & msk[i]) != msk[i]);
@@ -663,12 +631,24 @@ bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 __xwlib_code
+void xwbmpop_not(xwbmp_t * bmp, xwsz_t num)
+{
+        xwsq_t i;
+        xwsz_t size;
+
+        size = BITS_TO_XWBMP_T(num);
+        for (i = 0; i < size; i++) {
+                bmp[i] = ~bmp[i];
+        }
+}
+
+__xwlib_code
 void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         for (i = 0; i < size; i++) {
                 bmp[i] &= opd[i];
         }
@@ -680,7 +660,7 @@ void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
         xwsq_t i;
         xwsz_t size;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         for (i = 0; i < size; i++) {
                 bmp[i] |= opd[i];
         }
@@ -692,7 +672,7 @@ void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
         xwsq_t i;
         xwsz_t size;
 
-        size = BITS_TO_BMPS(num);
+        size = BITS_TO_XWBMP_T(num);
         for (i = 0; i < size; i++) {
                 bmp[i] ^= opd[i];
         }
@@ -702,14 +682,14 @@ void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 __xwlib_code
 xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
 {
-        xwsz_t m = BITS_TO_BMPS(num);
+        xwsz_t m = BITS_TO_XWBMP_T(num);
         xwsz_t i;
         xwbmp_t msk;
         xwssq_t p = -1;
 
         for (i = 0; i < m; i++) {
                 if (i == (m - 1)) {
-                        msk = (BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+                        msk = (XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                         if ((xwbmp_t)0 == msk) {
                                 msk = (xwbmp_t)(~(xwbmp_t)0);
                         }/* else {} */
@@ -732,14 +712,14 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
 __xwlib_code
 xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num)
 {
-        xwsz_t m = BITS_TO_BMPS(num);
+        xwsz_t m = BITS_TO_XWBMP_T(num);
         xwsz_t i;
         xwbmp_t msk;
         xwssq_t p = -1;
 
         for (i = 0; i < m; i++) {
                 if (i == (m - 1)) {
-                        msk = ~(BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+                        msk = ~(XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                         if ((xwbmp_t)(~(xwbmp_t)0) == msk) {
                                 msk = (xwbmp_t)0;
                         }/* else {} */
@@ -762,22 +742,22 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num)
 __xwlib_code
 xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
 {
-        xwsz_t i = BITS_TO_BMPS(num);
+        xwsz_t i = BITS_TO_XWBMP_T(num);
         xwbmp_t msk;
         xwssq_t p = -1;
 
-        msk = (BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+        msk = (XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((xwbmp_t)0 == msk) {
                 msk = (xwbmp_t)(~(xwbmp_t)0);
         }/* else {} */
-        for (; i > 0;) {
+        do {
                 i--;
                 p = xwbop_fls(xwbmp_t, bmp[i] & msk);
                 if (p >= 0) {
                         break;
                 }
                 msk = (xwbmp_t)(~(xwbmp_t)0);
-        }
+        } while (i > 0);
         p += ((xwssq_t)i << XWBMP_T_SHIFT); /* p = p + i * BITS_PER_XWBMP_T; */
         return p;
 }
@@ -787,28 +767,42 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
 __xwlib_code
 xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num)
 {
-        xwsz_t i = BITS_TO_BMPS(num);
+        xwsz_t i = BITS_TO_XWBMP_T(num);
         xwbmp_t msk;
         xwssq_t p = -1;
 
-        msk = ~(BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+        msk = ~(XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((xwbmp_t)(~(xwbmp_t)0) == msk) {
                 msk = (xwbmp_t)0;
         }/* else {} */
-        while (i > 0) {
+        do {
                 i--;
                 p = xwbop_flz(xwbmp_t, bmp[i] | msk);
                 if (p >= 0) {
                         break;
                 }
                 msk = (xwbmp_t)0;
-        }
+        } while (i > 0);
         p += ((xwssq_t)i << XWBMP_T_SHIFT); /* p = p + i * BITS_PER_XWBMP_T; */
         return p;
 }
 #endif /* !ARCHCFG_LIB_XWBMPOP_FLZ */
 
-#if (defined(XWLIBCFG_XWBOP_RE16)) && (1 == XWLIBCFG_XWBOP_RE16)
+__xwlib_code
+xwsz_t xwbmpop_weight(xwbmp_t * bmp, xwsz_t num)
+{
+        xwsz_t i;
+        xwsz_t n;
+        xwsz_t res;
+
+        res = 0;
+        n = BITS_TO_XWBMP_T(num);
+        for (i = 0; i < n; i++) {
+                res += xwbop_weight(xwbmp_t, bmp[i]);
+        }
+        return res;
+}
+
 #if (!defined(ARCHCFG_LIB_XWBOP_RE16)) || (1 != ARCHCFG_LIB_XWBOP_RE16)
 __xwlib_code
 xwu16_t xwbop_re16(xwu16_t x)
@@ -826,9 +820,7 @@ xwu16_t xwbop_re16(xwu16_t x)
         return r.d16;
 }
 #endif /* !ARCHCFG_LIB_XWBOP_RE16 */
-#endif /* XWLIBCFG_XWBOP_RE16 */
 
-#if (defined(XWLIBCFG_XWBOP_RE32)) && (1 == XWLIBCFG_XWBOP_RE32)
 #if (!defined(ARCHCFG_LIB_XWBOP_RE32)) || (1 != ARCHCFG_LIB_XWBOP_RE32)
 __xwlib_code
 xwu32_t xwbop_re32(xwu32_t x)
@@ -850,9 +842,7 @@ xwu32_t xwbop_re32(xwu32_t x)
         return r.d32;
 }
 #endif /* !ARCHCFG_LIB_XWBOP_RE32 */
-#endif /* XWLIBCFG_XWBOP_RE32 */
 
-#if (defined(XWLIBCFG_XWBOP_RE64)) && (1 == XWLIBCFG_XWBOP_RE64)
 #if (!defined(ARCHCFG_LIB_XWBOP_RE64)) || (1 != ARCHCFG_LIB_XWBOP_RE64)
 __xwlib_code
 xwu64_t xwbop_re64(xwu64_t x)
@@ -882,9 +872,7 @@ xwu64_t xwbop_re64(xwu64_t x)
         return r.d64;
 }
 #endif /* !ARCHCFG_LIB_XWBOP_RE64 */
-#endif /* XWLIBCFG_XWBOP_RE64 */
 
-#if (defined(XWLIBCFG_XWBOP_RBIT8)) && (1 == XWLIBCFG_XWBOP_RBIT8)
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT8)) || (1 != ARCHCFG_LIB_XWBOP_RBIT8)
 __xwlib_code
 xwu8_t xwbop_rbit8(xwu8_t x)
@@ -892,9 +880,7 @@ xwu8_t xwbop_rbit8(xwu8_t x)
         return xwbop_rbit8_table[x];
 }
 #endif /* !ARCHCFG_LIB_XWBOP_RBIT8 */
-#endif /* XWLIBCFG_XWBOP_RBIT8 */
 
-#if (defined(XWLIBCFG_XWBOP_RBIT16)) && (1 == XWLIBCFG_XWBOP_RBIT16)
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT16)) || (1 != ARCHCFG_LIB_XWBOP_RBIT16)
 __xwlib_code
 xwu16_t xwbop_rbit16(xwu16_t x)
@@ -913,9 +899,7 @@ xwu16_t xwbop_rbit16(xwu16_t x)
         return r.d16;
 }
 #endif /* !ARCHCFG_LIB_XWBOP_RBIT16 */
-#endif /* XWLIBCFG_XWBOP_RBIT16 */
 
-#if (defined(XWLIBCFG_XWBOP_RBIT32)) && (1 == XWLIBCFG_XWBOP_RBIT32)
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT32)) || (1 != ARCHCFG_LIB_XWBOP_RBIT32)
 __xwlib_code
 xwu32_t xwbop_rbit32(xwu32_t x)
@@ -938,9 +922,7 @@ xwu32_t xwbop_rbit32(xwu32_t x)
         return r.d32;
 }
 #endif /* !ARCHCFG_LIB_XWBOP_RBIT32 */
-#endif /* XWLIBCFG_XWBOP_RBIT32 */
 
-#if defined(XWLIBCFG_XWBOP_RBIT64) && (1 == XWLIBCFG_XWBOP_RBIT64)
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT64)) || (1 != ARCHCFG_LIB_XWBOP_RBIT64)
 __xwlib_code
 xwu64_t xwbop_rbit64(xwu64_t x)
@@ -971,4 +953,50 @@ xwu64_t xwbop_rbit64(xwu64_t x)
         return r.d64;
 }
 #endif /* !ARCHCFG_LIB_XWBOP_RBIT64 */
-#endif /* XWLIBCFG_XWBOP_RBIT64 */
+
+#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT8)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT8)
+__xwlib_code
+xwsz_t xwbop_weight8(xwu8_t x)
+{
+        xwu8_t res = x - ((x >> 1) & (xwu8_t)0x55);
+        res = (res & (xwu8_t)0x33) + ((res >> 2) & (xwu8_t)0x33);
+        return (res + (res >> 4)) & (xwu8_t)0x0F;
+}
+#endif /* !ARCHCFG_LIB_XWBOP_WEIGHT8 */
+
+#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT16)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT16)
+__xwlib_code
+xwsz_t xwbop_weight16(xwu16_t x)
+{
+        xwu16_t res = x - ((x >> 1) & (xwu16_t)0x5555);
+        res = (res & (xwu16_t)0x3333) + ((res >> 2) & (xwu16_t)0x3333);
+        res = (res + (res >> 4)) & (xwu16_t)0x0F0F;
+        return (res + (res >> 8)) & (xwu16_t)0x00FF;
+}
+#endif /* !ARCHCFG_LIB_XWBOP_WEIGHT16 */
+
+#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT32)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT32)
+__xwlib_code
+xwsz_t xwbop_weight32(xwu32_t x)
+{
+        xwu32_t res = x - ((x >> 1) & (xwu32_t)0x55555555);
+        res = (res & (xwu32_t)0x33333333) + ((res >> 2) & (xwu32_t)0x33333333);
+        res = (res + (res >> 4)) & (xwu32_t)0x0F0F0F0F;
+        res = res + (res >> 8);
+        return (res + (res >> 16)) & (xwu32_t)0x000000FF;
+}
+#endif /* !ARCHCFG_LIB_XWBOP_WEIGHT32 */
+
+#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT64)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT64)
+__xwlib_code
+xwsz_t xwbop_weight64(xwu64_t x)
+{
+        xwu64_t res = x - ((x >> 1) & (xwu64_t)0x5555555555555555);
+        res = (res & (xwu64_t)0x3333333333333333) +
+              ((res >> 2) & (xwu64_t)0x3333333333333333);
+        res = (res + (res >> 4)) & (xwu64_t)0x0F0F0F0F0F0F0F0F;
+        res = res + (res >> 8);
+        res = res + (res >> 16);
+        return (res + (res >> 32)) & (xwu64_t)0x00000000000000FF;
+}
+#endif /* !ARCHCFG_LIB_XWBOP_WEIGHT64 */

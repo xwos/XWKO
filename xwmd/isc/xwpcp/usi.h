@@ -24,31 +24,22 @@
 #ifndef __xwmd_isc_xwpcp_usi_h__
 #define __xwmd_isc_xwpcp_usi_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/osal/thread.h>
+#include <xwos/osal/skd.h>
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <linux/time.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwpcp_usmsg {
         int16_t prio;
         size_t size;
-        struct timeval timeout;
-        uint8_t *text;
+        struct __kernel_timespec timeout;
+        uint8_t * text;
 };
 
 enum xwpcp_usmsg_state_em {
         XWPCP_USMSG_OK,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define USI_XWPCP_STATE_STOP    0
 #define USI_XWPCP_STATE_START   1
 
@@ -62,22 +53,11 @@ enum xwpcp_usmsg_state_em {
 #define UAPI_XWPCP_IOC_RX       _IOC(_IOC_READ, UAPI_XWPCP_IOC_MAGIC, 0, \
                                      sizeof(struct xwpcp_usmsg))
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern struct xwpcp usi_xwpcp;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t usi_xwpcp_init(void);
-
 void usi_xwpcp_exit(void);
-
 xwsq_t usi_xwpcp_get_state(void);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+void usi_xwpcp_pm_notify(unsigned long pmevt);
 
 #endif /* xwmd/isc/xwpcp/usi.h */

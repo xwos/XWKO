@@ -30,4 +30,4 @@ ARCH_EOBJS :=
 ARCH_CSRCS :=
 ARCH_ASRCS :=
 
-ARCH_CSRCS += asmlib/lfq.c
+ARCH_CSRCS += xwosimpl_soc_lfq.c

@@ -30,27 +30,16 @@
 #ifndef __xwos_standard_h__
 #define __xwos_standard_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <cfg/XuanWuOS.h>
-#include <xwos/rule.h>
-#include <xwos/compiler.h>
-#include <xwos/version.h>
-#include <xwos/type.h>
+#include <xwos/lib/rule.h>
+#include <xwos/lib/compiler.h>
+#include <xwos/lib/version.h>
+#include <xwos/lib/type.h>
 #include <xwos/lib/error.h>
 #include <linux/kernel.h>
 #include <linux/version.h>
 #include <linux/stringify.h>
 #include <linux/module.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macro       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 接口
  */
@@ -98,7 +87,5 @@
     #error "Unkown CPU bits!"
   #endif
 #endif /* !ARCHCFG_PTRSIZE */
-
-#define xwoslogf(lv, fmt, ...)    xwlogf(lv, "xwos", fmt, ##__VA_ARGS__)
 
 #endif /* xwos/standard.h */

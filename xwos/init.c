@@ -21,121 +21,113 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/core/scheduler.h>
-#include <xwos/core/swt.h>
-#include <xwos/core/pm.h>
-#include <xwos/lock/mutex.h>
-#include <xwos/sync/semaphore.h>
-#include <xwos/sync/condition.h>
+#include <xwos/mp/ksym.h>
+#include <xwos/mp/skd.h>
+#include <xwos/mp/swt.h>
+#include <xwos/mp/pm.h>
+#include <xwos/mp/lock/mtx.h>
+#include <xwos/mp/sync/sem.h>
+#include <xwos/mp/sync/cond.h>
 #include <xwos/mm/kma.h>
 #include <xwos/mm/bma.h>
 #include <xwos/init.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#define LOGTAG  "init"
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       function implementations      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwos_init(void)
 {
         xwer_t rc;
 
-        /******** KAL ********/
-        rc = xwos_scheduler_init();
+        /******** ksym ********/
+        rc = xwmp_ksym_init();
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_xwos_scheduler_init;
+                goto err_xwmp_ksym_init;
         }
 
-        rc = xwos_pm_init();
+        /******** KAL ********/
+        rc = xwmp_skd_init();
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_xwos_pm_init;
+                goto err_xwmp_skd_init;
+        }
+
+        rc = xwmp_pm_init();
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_xwmp_pm_init;
         }
 
         /******** object cache ********/
-        rc = xwos_swt_cache_create();
+        rc = xwmp_swt_cache_create();
         if (__xwcc_unlikely(rc < 0)) {
-                xwoslogf(ERR, "Create xwos/core/swt cache ... [FAILED], rc:%d\n", rc);
+                xwlogf(ERR, LOGTAG,
+                       "Create xwos/mp/swt cache ... [FAILED], rc:%d\n", rc);
                 goto err_swt_cache_create;
         }
-        xwoslogf(INFO, "Create xwos/core/swt cache ... [OK]\n");
+        xwlogf(INFO, LOGTAG,
+               "Create xwos/mp/swt cache ... [OK]\n");
 
-        rc = xwsync_smr_cache_create();
+        rc = xwmp_sem_cache_create();
         if (__xwcc_unlikely(rc < 0)) {
-                xwoslogf(ERR,
-                         "Create xwos/sync/smr cache ... [FAILED], rc:%d\n",
-                         rc);
-                goto err_smr_cache_create;
+                xwlogf(ERR, LOGTAG,
+                       "Create xwos/mp/sync/sem cache ... [FAILED], rc:%d\n", rc);
+                goto err_sem_cache_create;
         }
-        xwoslogf(INFO, "Create xwos/sync/smr cache ... [OK]\n");
+        xwlogf(INFO, LOGTAG,
+               "Create xwos/mp/sync/sem cache ... [OK]\n");
 
-        rc = xwsync_cdt_cache_create();
+        rc = xwmp_cond_cache_create();
         if (__xwcc_unlikely(rc < 0)) {
-                xwoslogf(ERR,
-                         "Create xwos/sync/cdt cache ... [FAILED], rc:%d\n",
-                         rc);
-                goto err_cdt_cache_create;
+                xwlogf(ERR, LOGTAG,
+                       "Create xwos/mp/sync/cond cache ... [FAILED], rc:%d\n", rc);
+                goto err_cond_cache_create;
         }
-        xwoslogf(INFO, "create xwos/sync/cdt cache ... [OK]\n");
+        xwlogf(INFO, LOGTAG,
+               "create xwos/mp/sync/cond cache ... [OK]\n");
 
-        rc = xwlk_mtx_cache_create();
+        rc = xwmp_mtx_cache_create();
         if (__xwcc_unlikely(rc < 0)) {
-                xwoslogf(ERR,
-                         "Create xwos/lock/mutex cache ... [FAILED], rc:%d\n",
-                         rc);
+                xwlogf(ERR, LOGTAG,
+                       "Create xwos/mp/lock/mtx cache ... [FAILED], rc:%d\n", rc);
                 goto err_mtx_cache_create;
         }
-        xwoslogf(INFO, "Create xwos/lock/mutex cache ... [OK]\n");
+        xwlogf(INFO, LOGTAG, "Create xwos/mp/lock/mtx cache ... [OK]\n");
 
         /******** MM ********/
-        rc = xwmm_dkma_init(XWMMCFG_DKMA_SIZE);
+        rc = xwmm_kma_init(XWMMCFG_KMA_SIZE);
         if (__xwcc_unlikely(rc < 0)) {
-                xwoslogf(ERR,
-                         "Init xwos/mm/dkma ... [FAILED], rc:%d\n",
-                         rc);
-                goto err_xwmm_dkma_init;
+                xwlogf(ERR, LOGTAG,
+                       "Init xwos/mm/kma ... [FAILED], rc:%d\n", rc);
+                goto err_xwmm_kma_init;
         }
-        xwoslogf(INFO, "Init xwos/mm/dkma ... [OK]\n");
+        xwlogf(INFO, LOGTAG, "Init xwos/mm/kma ... [OK]\n");
 
         return XWOK;
 
-err_xwmm_dkma_init:
-        xwlk_mtx_cache_destroy();
+err_xwmm_kma_init:
+        xwmp_mtx_cache_destroy();
 err_mtx_cache_create:
-        xwsync_cdt_cache_destroy();
-err_cdt_cache_create:
-        xwsync_smr_cache_destroy();
-err_smr_cache_create:
-        xwos_swt_cache_destroy();
+        xwmp_cond_cache_destroy();
+err_cond_cache_create:
+        xwmp_sem_cache_destroy();
+err_sem_cache_create:
+        xwmp_swt_cache_destroy();
 err_swt_cache_create:
-        xwos_pm_exit();
-err_xwos_pm_init:
-        xwos_scheduler_exit();
-err_xwos_scheduler_init:
+        xwmp_pm_exit();
+err_xwmp_pm_init:
+        xwmp_skd_exit();
+err_xwmp_skd_init:
+err_xwmp_ksym_init:
         return rc;
 }
 
 void xwos_exit(void)
 {
-        xwmm_dkma_exit();
-        xwlk_mtx_cache_destroy();
-        xwsync_cdt_cache_destroy();
-        xwsync_smr_cache_destroy();
-        xwos_swt_cache_destroy();
-        xwos_pm_exit();
-        xwos_scheduler_exit();
+        xwmm_kma_exit();
+        xwmp_mtx_cache_destroy();
+        xwmp_cond_cache_destroy();
+        xwmp_sem_cache_destroy();
+        xwmp_swt_cache_destroy();
+        xwmp_pm_exit();
+        xwmp_skd_exit();
 }

@@ -21,7 +21,8 @@
 ;; > provisions above, a recipient may use your version of this file
 ;; > under either the MPL or the GPL.
 
-(defvar elscript (expand-file-name (nth 2 command-line-args)) "script name")
+(defvar elscript (expand-file-name (nth 2 command-line-args)) "script full path")
+(defvar elname (file-name-nondirectory elscript))
 (defvar elpath (file-name-directory elscript))
 (push elpath load-path)
 (require 'errno)
@@ -54,8 +55,15 @@
 (defmacro logtag (tag)
   (list 'car (list 'read-from-string (list 'concat "log" (list 'format "%s" tag)))))
 
-(defun log (tag fmtstr &rest arglist)
-  (apply (logtag tag) fmtstr arglist))
+;;;;;;;; ;;;;;;;; ;;;;;;;; misc function ;;;;;;;; ;;;;;;;; ;;;;;;;;
+(defun expand-directory (dir &rest arglist)
+  (file-name-directory
+   (expand-file-name
+    (concat dir
+            (let (result)
+              (dolist (elt arglist result)
+                (setq result (concat result elt))))
+            "fakefile"))))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; arguments ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (setq debug-on-error t)
@@ -65,6 +73,7 @@
 (defvar cfgdir nil "Path of configurations directory")
 (defvar wkspc nil "Path of workspace directory")
 (defvar XuanWuOS-cfg ".cfg" "Name of XuanWuOS.cfg")
+(logi "script path:%s" elpath)
 (logd "argv:%s" argv)
 
 (let ((options-done nil))
@@ -115,16 +124,16 @@
        (t (setq XuanWuOS-cfg option)))))
 
   (unless (> (length cfgdir) 0)
-  (loge "Missing argument for --cfgdir!")
-  (kill-emacs EINVAL))
+    (loge "Missing argument for --cfgdir!")
+    (kill-emacs EINVAL))
 
   (unless (> (length topdir) 0)
-  (loge "Missing argument for --topdir!")
-  (kill-emacs EINVAL))
+    (loge "Missing argument for --topdir!")
+    (kill-emacs EINVAL))
 
   (unless (> (length wkspc) 0)
-  (loge "Missing argument for --wkspc!")
-  (kill-emacs EINVAL)))
+    (loge "Missing argument for --wkspc!")
+    (kill-emacs EINVAL)))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; Get infomation ;;;;;;;; ;;;;;;;; ;;;;;;;;
 ;; Get top directory
@@ -142,9 +151,9 @@
 (defvar arch-cfg-h (concat cfgdir "/" "arch.h") "Path of cfg/arch.h")
 (defvar cpu-cfg-h (concat cfgdir "/" "cpu.h") "Path of cfg/cpu.h")
 (defvar soc-cfg-h (concat cfgdir "/" "soc.h") "Path of cfg/soc.h")
-(defvar pp-cfg-h (concat cfgdir "/" "perpheral.h") "Path of cfg/perpheral.h")
 (defvar brd-cfg-h (concat cfgdir "/" "board.h") "Path of cfg/board.h")
 (defvar xwkn-cfg-h (concat cfgdir "/" "xwos.h") "Path of cfg/xwos.h")
+(defvar xwcd-cfg-h (concat cfgdir "/" "xwcd.h") "Path of cfg/xwcd.h")
 (defvar xwmd-cfg-h (concat cfgdir "/" "xwmd.h") "Path of cfg/xwmd.h")
 (defvar xwem-cfg-h (concat cfgdir "/" "xwem.h") "Path of cfg/xwem.h")
 (defvar xwam-cfg-h (concat cfgdir "/" "xwam.h") "Path of cfg/xwam.h")
@@ -152,9 +161,9 @@
 (setq arch-cfg-h-buffer (find-file-noselect arch-cfg-h))
 (setq cpu-cfg-h-buffer (find-file-noselect cpu-cfg-h))
 (setq soc-cfg-h-buffer (find-file-noselect soc-cfg-h))
-(setq pp-cfg-h-buffer (find-file-noselect pp-cfg-h))
 (setq brd-cfg-h-buffer (find-file-noselect brd-cfg-h))
 (setq xwkn-cfg-h-buffer (find-file-noselect xwkn-cfg-h))
+(setq xwcd-cfg-h-buffer (find-file-noselect xwcd-cfg-h))
 (setq xwmd-cfg-h-buffer (find-file-noselect xwmd-cfg-h))
 (setq xwem-cfg-h-buffer (find-file-noselect xwem-cfg-h))
 (setq xwam-cfg-h-buffer (find-file-noselect xwam-cfg-h))
@@ -278,6 +287,8 @@
 ;; Get directories Info
 (setq xwos-kr-dir (concat "xwos"))
 (logi "xwos-kr-dir:%s" xwos-kr-dir)
+(setq xwos-cd-dir (concat "xwcd"))
+(logi "xwos-cd-dir:%s" xwos-cd-dir)
 (setq xwos-md-dir (concat "xwmd"))
 (logi "xwos-md-dir:%s" xwos-md-dir)
 (setq xwos-em-dir (concat "xwem"))
@@ -291,8 +302,6 @@
 (logi "xwos-cpu-dir:%s" xwos-cpu-dir)
 (setq xwos-soc-dir (concat xwos-cpu-dir "/" XuanWuOS-cfg-soc))
 (logi "xwos-soc-dir:%s" xwos-soc-dir)
-(setq xwos-pp-dir (concat "xwcd/perpheral"))
-(logi "xwos-pp-dir:%s" xwos-pp-dir)
 (setq xwos-brd-dir (concat "xwbd/" XuanWuOS-cfg-brd))
 (logi "xwos-brd-dir:%s" xwos-brd-dir)
 (setq xwos-bdl-dir (concat xwos-brd-dir "/bdl"))
@@ -336,7 +345,7 @@
 (insert (concat "XWOS_ARCH_DIR := " xwos-arch-dir "\n"))
 (insert (concat "XWOS_CPU_DIR := " xwos-cpu-dir "\n"))
 (insert (concat "XWOS_SOC_DIR := " xwos-soc-dir "\n"))
-(insert (concat "XWOS_PP_DIR := " xwos-pp-dir "\n"))
+(insert (concat "XWOS_CD_DIR := " xwos-cd-dir "\n"))
 (insert (concat "XWOS_BRD_DIR := " xwos-brd-dir "\n"))
 (insert (concat "XWOS_BDL_DIR := " xwos-bdl-dir "\n"))
 (insert (concat "XWOS_BM_DIR := " xwos-bm-dir "\n"))
@@ -395,9 +404,9 @@
         (set-buffer soc-cfg-h-buffer))
       (setq loopflg nil))))
 (set-buffer XuanWuOS-cfg-buffer)
-(insert "## ******** ******** ******** ******** Perpheral ******** ******** ******** ******** ##\n")
+(insert "## ******** ******** ******** ******** Chip & Device ******** ******** ******** ******** ##\n")
 (let (item cfg (loopflg t) (iterpoint 1))
-  (set-buffer pp-cfg-h-buffer)
+  (set-buffer xwcd-cfg-h-buffer)
   (while loopflg
     (goto-char iterpoint)
     (setq iterpoint (re-search-forward
@@ -410,7 +419,7 @@
         (setq cfg (if (string= (match-string 2) "1") "y" "n"))
         (set-buffer XuanWuOS-cfg-buffer)
         (insert (concat item " := " cfg "\n"))
-        (set-buffer pp-cfg-h-buffer))
+        (set-buffer xwcd-cfg-h-buffer))
       (setq loopflg nil))))
 (set-buffer XuanWuOS-cfg-buffer)
 (insert "## ******** ******** ******** ******** Board ******** ******** ******** ******** ##\n")
@@ -597,13 +606,13 @@ distclean:
 (insert "## ******** ******** ******** ******** directory info ******** ******** ******** ******** ##\n")
 (insert (concat "export XWOS_PATH=" XuanWuOS-path "\n"))
 (insert (concat "export XWOS_KN_DIR=" xwos-kr-dir "\n"))
+(insert (concat "export XWOS_CD_DIR=" xwos-cd-dir "\n"))
 (insert (concat "export XWOS_MD_DIR=" xwos-md-dir "\n"))
 (insert (concat "export XWOS_EM_DIR=" xwos-em-dir "\n"))
 (insert (concat "export XWOS_AM_DIR=" xwos-am-dir "\n"))
 (insert (concat "export XWOS_ARCH_DIR=" xwos-arch-dir "\n"))
 (insert (concat "export XWOS_CPU_DIR=" xwos-cpu-dir "\n"))
 (insert (concat "export XWOS_SOC_DIR=" xwos-soc-dir "\n"))
-(insert (concat "export XWOS_PP_DIR=" xwos-pp-dir "\n"))
 (insert (concat "export XWOS_BRD_DIR=" xwos-brd-dir "\n"))
 (insert (concat "export XWOS_BDL_DIR=" xwos-bdl-dir "\n"))
 (insert (concat "export XWOS_BM_DIR=" xwos-bm-dir "\n"))

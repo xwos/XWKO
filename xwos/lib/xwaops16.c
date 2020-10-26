@@ -21,27 +21,13 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwaop.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #ifdef __GNUC__
 __xwlib_code
-xws16_t xwaop__xws16_t__load(__xwcc_atomic xws16_t * a,
-                             const enum xwmb_memory_order_em mo)
+xws16_t xwaop__xws16__load(xws16_a * a,
+                           const enum xwmb_memory_order_em mo)
 {
         xws16_t v;
 
@@ -50,30 +36,30 @@ xws16_t xwaop__xws16_t__load(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xws16_t xwaop__xws16_t__store(__xwcc_atomic xws16_t * a,
-                              const enum xwmb_memory_order_em mo,
-                              xws16_t v)
+xws16_t xwaop__xws16__store(xws16_a * a,
+                            const enum xwmb_memory_order_em mo,
+                            xws16_t v)
 {
         __atomic_store_n(a, v, (int)mo);
         return v;
 }
 
 __xwlib_code
-void xwaop__xws16_t__read(__xwcc_atomic xws16_t * a,
-                          xws16_t * ov)
+void xwaop__xws16__read(xws16_a * a,
+                        xws16_t * ov)
 {
         xws16_t o;
 
-        o = xwaop__xws16_t__load(a, xwmb_modr_acquire);
+        o = xwaop__xws16__load(a, xwmb_modr_acquire);
         if (ov) {
                 *ov = o;
         }
 }
 
 __xwlib_code
-void xwaop__xws16_t__write(__xwcc_atomic xws16_t * a,
-                           xws16_t v,
-                           xws16_t * ov)
+void xwaop__xws16__write(xws16_a * a,
+                         xws16_t v,
+                         xws16_t * ov)
 {
         xws16_t o;
 
@@ -84,10 +70,10 @@ void xwaop__xws16_t__write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__teq_then_write(__xwcc_atomic xws16_t * a,
-                                      xws16_t t,
-                                      xws16_t v,
-                                      xws16_t * ov)
+xwer_t xwaop__xws16__teq_then_write(xws16_a * a,
+                                    xws16_t t,
+                                    xws16_t v,
+                                    xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -109,10 +95,10 @@ xwer_t xwaop__xws16_t__teq_then_write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tne_then_write(__xwcc_atomic xws16_t * a,
-                                      xws16_t t,
-                                      xws16_t v,
-                                      xws16_t * ov)
+xwer_t xwaop__xws16__tne_then_write(xws16_a * a,
+                                    xws16_t t,
+                                    xws16_t v,
+                                    xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -139,10 +125,10 @@ xwer_t xwaop__xws16_t__tne_then_write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgt_then_write(__xwcc_atomic xws16_t * a,
-                                      xws16_t t,
-                                      xws16_t v,
-                                      xws16_t * ov)
+xwer_t xwaop__xws16__tgt_then_write(xws16_a * a,
+                                    xws16_t t,
+                                    xws16_t v,
+                                    xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -169,10 +155,10 @@ xwer_t xwaop__xws16_t__tgt_then_write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tge_then_write(__xwcc_atomic xws16_t * a,
-                                      xws16_t t,
-                                      xws16_t v,
-                                      xws16_t * ov)
+xwer_t xwaop__xws16__tge_then_write(xws16_a * a,
+                                    xws16_t t,
+                                    xws16_t v,
+                                    xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -199,10 +185,10 @@ xwer_t xwaop__xws16_t__tge_then_write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tlt_then_write(__xwcc_atomic xws16_t * a,
-                                      xws16_t t,
-                                      xws16_t v,
-                                      xws16_t * ov)
+xwer_t xwaop__xws16__tlt_then_write(xws16_a * a,
+                                    xws16_t t,
+                                    xws16_t v,
+                                    xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -229,10 +215,10 @@ xwer_t xwaop__xws16_t__tlt_then_write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tle_then_write(__xwcc_atomic xws16_t * a,
-                                      xws16_t t,
-                                      xws16_t v,
-                                      xws16_t * ov)
+xwer_t xwaop__xws16__tle_then_write(xws16_a * a,
+                                    xws16_t t,
+                                    xws16_t v,
+                                    xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -259,10 +245,10 @@ xwer_t xwaop__xws16_t__tle_then_write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgtlt_then_write(__xwcc_atomic xws16_t * a,
-                                        xws16_t l, xws16_t r,
-                                        xws16_t v,
-                                        xws16_t * ov)
+xwer_t xwaop__xws16__tgtlt_then_write(xws16_a * a,
+                                      xws16_t l, xws16_t r,
+                                      xws16_t v,
+                                      xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -289,10 +275,10 @@ xwer_t xwaop__xws16_t__tgtlt_then_write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgelt_then_write(__xwcc_atomic xws16_t * a,
-                                        xws16_t l, xws16_t r,
-                                        xws16_t v,
-                                        xws16_t * ov)
+xwer_t xwaop__xws16__tgelt_then_write(xws16_a * a,
+                                      xws16_t l, xws16_t r,
+                                      xws16_t v,
+                                      xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -319,10 +305,10 @@ xwer_t xwaop__xws16_t__tgelt_then_write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgtle_then_write(__xwcc_atomic xws16_t * a,
-                                        xws16_t l, xws16_t r,
-                                        xws16_t v,
-                                        xws16_t * ov)
+xwer_t xwaop__xws16__tgtle_then_write(xws16_a * a,
+                                      xws16_t l, xws16_t r,
+                                      xws16_t v,
+                                      xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -349,10 +335,10 @@ xwer_t xwaop__xws16_t__tgtle_then_write(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgele_then_write(__xwcc_atomic xws16_t * a,
-                                        xws16_t l, xws16_t r,
-                                        xws16_t v,
-                                        xws16_t * ov)
+xwer_t xwaop__xws16__tgele_then_write(xws16_a * a,
+                                      xws16_t l, xws16_t r,
+                                      xws16_t v,
+                                      xws16_t * ov)
 {
         xws16_t o;
         xwer_t rc;
@@ -380,9 +366,9 @@ xwer_t xwaop__xws16_t__tgele_then_write(__xwcc_atomic xws16_t * a,
 
 /******** ******** add ******** ********/
 __xwlib_code
-void xwaop__xws16_t__add(__xwcc_atomic xws16_t * a,
-                         xws16_t v,
-                         xws16_t * nv, xws16_t * ov)
+void xwaop__xws16__add(xws16_a * a,
+                       xws16_t v,
+                       xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
 
@@ -396,10 +382,10 @@ void xwaop__xws16_t__add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__teq_then_add(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__teq_then_add(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -427,10 +413,10 @@ xwer_t xwaop__xws16_t__teq_then_add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tne_then_add(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tne_then_add(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -463,10 +449,10 @@ xwer_t xwaop__xws16_t__tne_then_add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgt_then_add(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgt_then_add(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -499,10 +485,10 @@ xwer_t xwaop__xws16_t__tgt_then_add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tge_then_add(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tge_then_add(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -535,10 +521,10 @@ xwer_t xwaop__xws16_t__tge_then_add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tlt_then_add(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tlt_then_add(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -571,10 +557,10 @@ xwer_t xwaop__xws16_t__tlt_then_add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tle_then_add(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tle_then_add(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -607,10 +593,10 @@ xwer_t xwaop__xws16_t__tle_then_add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgtlt_then_add(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgtlt_then_add(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -643,10 +629,10 @@ xwer_t xwaop__xws16_t__tgtlt_then_add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgelt_then_add(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgelt_then_add(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -679,10 +665,10 @@ xwer_t xwaop__xws16_t__tgelt_then_add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgtle_then_add(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgtle_then_add(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -715,10 +701,10 @@ xwer_t xwaop__xws16_t__tgtle_then_add(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgele_then_add(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgele_then_add(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -752,9 +738,9 @@ xwer_t xwaop__xws16_t__tgele_then_add(__xwcc_atomic xws16_t * a,
 
 /******** ******** subtract ******** ********/
 __xwlib_code
-void xwaop__xws16_t__sub(__xwcc_atomic xws16_t * a,
-                         xws16_t v,
-                         xws16_t * nv, xws16_t * ov)
+void xwaop__xws16__sub(xws16_a * a,
+                       xws16_t v,
+                       xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
 
@@ -768,10 +754,10 @@ void xwaop__xws16_t__sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__teq_then_sub(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__teq_then_sub(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -799,10 +785,10 @@ xwer_t xwaop__xws16_t__teq_then_sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tne_then_sub(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tne_then_sub(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -835,10 +821,10 @@ xwer_t xwaop__xws16_t__tne_then_sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgt_then_sub(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgt_then_sub(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -871,10 +857,10 @@ xwer_t xwaop__xws16_t__tgt_then_sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tge_then_sub(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tge_then_sub(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -907,10 +893,10 @@ xwer_t xwaop__xws16_t__tge_then_sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tlt_then_sub(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tlt_then_sub(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -943,10 +929,10 @@ xwer_t xwaop__xws16_t__tlt_then_sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tle_then_sub(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tle_then_sub(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -979,10 +965,10 @@ xwer_t xwaop__xws16_t__tle_then_sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgtlt_then_sub(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgtlt_then_sub(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1015,10 +1001,10 @@ xwer_t xwaop__xws16_t__tgtlt_then_sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgelt_then_sub(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgelt_then_sub(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1051,10 +1037,10 @@ xwer_t xwaop__xws16_t__tgelt_then_sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgtle_then_sub(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgtle_then_sub(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1087,10 +1073,10 @@ xwer_t xwaop__xws16_t__tgtle_then_sub(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgele_then_sub(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgele_then_sub(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1124,9 +1110,9 @@ xwer_t xwaop__xws16_t__tgele_then_sub(__xwcc_atomic xws16_t * a,
 
 /******** ******** reverse subtract ******** ********/
 __xwlib_code
-void xwaop__xws16_t__rsb(__xwcc_atomic xws16_t * a,
-                         xws16_t v,
-                         xws16_t * nv, xws16_t * ov)
+void xwaop__xws16__rsb(xws16_a * a,
+                       xws16_t v,
+                       xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1149,10 +1135,10 @@ void xwaop__xws16_t__rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__teq_then_rsb(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__teq_then_rsb(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1185,10 +1171,10 @@ xwer_t xwaop__xws16_t__teq_then_rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tne_then_rsb(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tne_then_rsb(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1221,10 +1207,10 @@ xwer_t xwaop__xws16_t__tne_then_rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgt_then_rsb(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgt_then_rsb(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1257,10 +1243,10 @@ xwer_t xwaop__xws16_t__tgt_then_rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tge_then_rsb(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tge_then_rsb(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1293,10 +1279,10 @@ xwer_t xwaop__xws16_t__tge_then_rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tlt_then_rsb(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tlt_then_rsb(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1329,10 +1315,10 @@ xwer_t xwaop__xws16_t__tlt_then_rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tle_then_rsb(__xwcc_atomic xws16_t * a,
-                                    xws16_t t,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tle_then_rsb(xws16_a * a,
+                                  xws16_t t,
+                                  xws16_t v,
+                                  xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1365,10 +1351,10 @@ xwer_t xwaop__xws16_t__tle_then_rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgtlt_then_rsb(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgtlt_then_rsb(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1401,10 +1387,10 @@ xwer_t xwaop__xws16_t__tgtlt_then_rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgelt_then_rsb(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgelt_then_rsb(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1437,10 +1423,10 @@ xwer_t xwaop__xws16_t__tgelt_then_rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgtle_then_rsb(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgtle_then_rsb(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1473,10 +1459,10 @@ xwer_t xwaop__xws16_t__tgtle_then_rsb(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws16_t__tgele_then_rsb(__xwcc_atomic xws16_t * a,
-                                      xws16_t l, xws16_t r,
-                                      xws16_t v,
-                                      xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tgele_then_rsb(xws16_a * a,
+                                    xws16_t l, xws16_t r,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1510,9 +1496,9 @@ xwer_t xwaop__xws16_t__tgele_then_rsb(__xwcc_atomic xws16_t * a,
 
 /******** ******** bit operations ******** ********/
 __xwlib_code
-void xwaop__xws16_t__or(__xwcc_atomic xws16_t * a,
-                        xws16_t v,
-                        xws16_t * nv, xws16_t * ov)
+void xwaop__xws16__or(xws16_a * a,
+                      xws16_t v,
+                      xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
 
@@ -1526,9 +1512,9 @@ void xwaop__xws16_t__or(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-void xwaop__xws16_t__and(__xwcc_atomic xws16_t * a,
-                         xws16_t v,
-                         xws16_t * nv, xws16_t * ov)
+void xwaop__xws16__and(xws16_a * a,
+                       xws16_t v,
+                       xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
 
@@ -1542,9 +1528,9 @@ void xwaop__xws16_t__and(__xwcc_atomic xws16_t * a,
 }
 
 __xwlib_code
-void xwaop__xws16_t__xor(__xwcc_atomic xws16_t * a,
-                         xws16_t v,
-                         xws16_t * nv, xws16_t * ov)
+void xwaop__xws16__xor(xws16_a * a,
+                       xws16_t v,
+                       xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
 
@@ -1559,10 +1545,10 @@ void xwaop__xws16_t__xor(__xwcc_atomic xws16_t * a,
 
 /******** ******** test and operation ******** ********/
 __xwlib_code
-xwer_t xwaop__xws16_t__tst_then_op(__xwcc_atomic xws16_t * a,
-                                   xwaop_tst_f tst, void * tst_args,
-                                   xwaop_op_f op, void * op_args,
-                                   xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16__tst_then_op(xws16_a * a,
+                                 xwaop_tst_f tst, void * tst_args,
+                                 xwaop_op_f op, void * op_args,
+                                 xws16_t * nv, xws16_t * ov)
 {
         xws16_t o;
         xws16_t n;
@@ -1571,7 +1557,8 @@ xwer_t xwaop__xws16_t__tst_then_op(__xwcc_atomic xws16_t * a,
         do {
                 o = __atomic_load_n(a, __ATOMIC_CONSUME);
                 if (tst) {
-                        if (tst((const void *)&o, tst_args)) {
+                        rc = tst((const void *)&o, tst_args);
+                        if (XWOK == rc) {
                                 if (op) {
                                         op(&n, (const void *)&o, op_args);
                                         rc = (xwer_t)__atomic_compare_exchange_n(
@@ -1580,12 +1567,10 @@ xwer_t xwaop__xws16_t__tst_then_op(__xwcc_atomic xws16_t * a,
                                                 __ATOMIC_ACQ_REL,
                                                 __ATOMIC_CONSUME);
                                 } else {
-                                        rc = XWOK;
                                         n = o;
                                         break;
                                 }
                         } else {
-                                rc = -EACCES;
                                 n = o;
                                 break;
                         }

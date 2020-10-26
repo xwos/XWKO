@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的内存管理机制：内核内存分配器
+ * @brief 玄武OS内存管理：内核内存分配器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,74 +21,38 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <linux/slab.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/sma.h>
 #include <xwos/mm/kma.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macro       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-static __xwos_code
-xwer_t xwmm_dkma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf);
-
-static __xwos_code
-xwer_t xwmm_dkma_free(void * mem);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 使用简单内存分配器作为默认的内核内存分配器
  */
-__xwos_data struct xwmm_sma xwmm_dkma;
+__xwos_data struct xwmm_sma xwmm_kma;
 
 /**
  * @brief 默认的内核内存分配器的名字
  */
-__xwos_rodata const char xwmm_dkma_name[] = "xwmm_dkma";
+__xwos_rodata const char xwmm_kma_name[] = "xwmm_kma";
 
-/**
- * @brief 申请内核内存虚函数
- */
-__xwos_data xwmm_kma_alloc_f xwmm_kma_alloc_vf = xwmm_dkma_alloc;
-
-/**
- * @brief 释放内核内存虚函数
- */
-__xwos_data xwmm_kma_free_f xwmm_kma_free_vf = xwmm_dkma_free;
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 初始化默认的内核内存分配器
- * @param total: (I) 总的大小
+ * @param[in] total: 总的大小
  */
 __xwos_init_code
-xwer_t xwmm_dkma_init(xwsz_t total)
+xwer_t xwmm_kma_init(xwsz_t total)
 {
-        void *origin;
+        void * origin;
         xwer_t rc;
 
         origin = kmalloc(total, GFP_KERNEL);
-        rc = xwmm_sma_init(&xwmm_dkma,
+        rc = xwmm_sma_init(&xwmm_kma,
                            (xwptr_t)origin,
                            (xwsz_t)total,
                            (xwsq_t)0,
-                           xwmm_dkma_name);
+                           xwmm_kma_name);
         return rc;
 }
 
@@ -96,35 +60,29 @@ xwer_t xwmm_dkma_init(xwsz_t total)
  * @brief 退出默认的内核内存分配器
  */
 __xwos_init_code
-xwer_t xwmm_dkma_exit(void)
+xwer_t xwmm_kma_exit(void)
 {
-        kfree((void *)xwmm_dkma.zone.origin);
+        kfree((void *)xwmm_kma.zone.origin);
         return XWOK;
 }
 
 /**
- * @brief 从默认的内核内存分配器中申请内存
- * @param size: (I) 大小
- * @param aligned: (I) 申请到的内存的首地址需要对齐到的边界
- * @param membuf: (O) 指向指针缓存的指针，此指针缓存用于返回申请到的内存的首地址
+ * @brief XWMM API：申请内核内存
+ * @param[in] size: 大小
+ * @param[in] aligned: 申请到的内存的首地址需要对齐到的边界
+ * @param[out] membuf: 指向指针缓存的指针，此指针缓存用于返回申请到的内存的首地址
  * @return 错误码
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 参数无效
  * @retval -ENOMEM: 内存不足
  */
-static __xwos_code
-xwer_t xwmm_dkma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
+__xwos_code
+xwer_t xwmm_kma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
 {
-        bool ret;
-        void *m;
+        void * m;
         xwer_t rc;
 
-        ret = try_module_get(THIS_MODULE);
-        if (__xwcc_unlikely(!ret)) {
-                rc = -EOWNERDEAD;
-                goto err_modget;
-        }
-        rc = xwmm_sma_alloc(&xwmm_dkma, size, aligned, &m);
+        rc = xwmm_sma_alloc(&xwmm_kma, size, aligned, &m);
         if (rc < 0) {
                 goto err_nomem;
         }
@@ -132,55 +90,18 @@ xwer_t xwmm_dkma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
         return XWOK;
 
 err_nomem:
-        module_put(THIS_MODULE);
-err_modget:
         return rc;
-}
-
-/**
- * @brief 释放内存到默认的内核内存分配器
- * @param mem: (I) 内存首地址指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- */
-static __xwos_code
-xwer_t xwmm_dkma_free(void * mem)
-{
-        xwer_t rc;
-
-        rc = xwmm_sma_free(&xwmm_dkma, mem);
-        if (XWOK == rc) {
-                module_put(THIS_MODULE);
-        }
-        return rc;
-}
-
-/**
- * @brief XWMM API：申请内核内存
- * @param size: (I) 大小
- * @param aligned: (I) 申请到的内存的首地址需要对齐到的边界
- * @param membuf: (O) 指向指针缓存的指针，此指针缓存用于返回申请到的内存的首地址
- * @return 错误码
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 参数无效
- * @retval -ENOMEM: 内存不足
- */
-__xwos_api
-xwer_t xwmm_kma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
-{
-        return xwmm_kma_alloc_vf(size, aligned, membuf);
 }
 
 /**
  * @brief XWMM API：释放内核内存
- * @param mem: (I) 内存首地址指针
+ * @param[in] mem: 内存首地址指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  */
-__xwos_api
+__xwos_code
 xwer_t xwmm_kma_free(void * mem)
 {
-        return xwmm_kma_free_vf(mem);
+        return xwmm_sma_free(&xwmm_kma, mem);
 }

@@ -21,12 +21,10 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ***<***** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/mm/common.h>
+#include <xwos/mp/pm.h>
 #include <linux/parser.h>
 #include <linux/uaccess.h>
 #include <xwmd/xwfs/fs.h>
@@ -38,9 +36,7 @@
 #include <xwmd/isc/xwpcp/hwif/uart.h>
 #include <bdl/isc/uart.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********            XWPCP resources            ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+XWPCP_DEF_MEMPOOL(usi_xwpcp_mem);
 struct xwpcp usi_xwpcp;
 xwsq_t usi_xwpcp_state = USI_XWPCP_STATE_STOP;
 
@@ -49,9 +45,26 @@ xwsq_t usi_xwpcp_get_state(void)
         return usi_xwpcp_state;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********          xwfs/xwmd/isc/xwpcp          ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+void usi_xwpcp_pm_notify(unsigned long pmevt)
+{
+        switch (pmevt) {
+        case PM_HIBERNATION_PREPARE:
+        case PM_SUSPEND_PREPARE:
+                if (USI_XWPCP_STATE_START == usi_xwpcp_get_state()) {
+                        xwos_thd_intr(usi_xwpcp.txthd);
+                        xwos_thd_intr(usi_xwpcp.rxthd);
+                }
+                break;
+        case PM_POST_RESTORE:
+        case PM_POST_HIBERNATION:
+        case PM_POST_SUSPEND:
+                break;
+        case PM_RESTORE_PREPARE:
+        default:
+                break;
+        }
+}
+
 union usi_xwpcp_xwfs_port_data {
         struct {
                 uint8_t port;
@@ -93,25 +106,24 @@ ssize_t usi_xwpcp_xwfs_port_read(struct xwfs_node * xwfsnode,
                                  loff_t * pos)
 {
         union usi_xwpcp_xwfs_port_data portdata;
-        struct xwpcp_msg rxmsg;
-        ssize_t rdcnt;
+        ssize_t ret;
+        size_t rxsize;
         xwtm_t desire;
         xwer_t rc;
         uint8_t buf[cnt];
 
         portdata.word = (unsigned long)xwfs_node_get_data(xwfsnode);
-        rxmsg.port = portdata.attr.port;
-        rxmsg.size = cnt;
-        rxmsg.text = buf;
+        rxsize = cnt;
         desire = XWTM_MAX;
-        rc = xwpcp_rx(&usi_xwpcp, &rxmsg, &desire);
+        rc = xwpcp_rx(&usi_xwpcp, portdata.attr.port,
+                      buf, &rxsize, NULL, &desire);
         if (XWOK == rc) {
-                rdcnt = rxmsg.size;
-                rc = copy_to_user(usbuf, buf, rdcnt);
+                ret = rxsize;
+                rc = copy_to_user(usbuf, buf, rxsize);
         } else {
-                rdcnt = (ssize_t)rc;
+                ret = (ssize_t)rc;
         }
-        return rdcnt;
+        return ret;
 }
 
 static
@@ -122,27 +134,27 @@ ssize_t usi_xwpcp_xwfs_port_write(struct xwfs_node * xwfsnode,
                                  loff_t * pos)
 {
         union usi_xwpcp_xwfs_port_data portdata;
-        struct xwpcp_msg msg;
+        xwssz_t ret;
+        xwsz_t txsize;
         xwtm_t desire;
         xwer_t rc;
         uint8_t data[cnt];
 
         rc = copy_from_user(data, usdata, cnt);
         portdata.word = (unsigned long)xwfs_node_get_data(xwfsnode);
-        msg.port = portdata.attr.port;
-        msg.size = cnt;
-        msg.text = data;
         desire = XWTM_MAX;
-        rc = xwpcp_tx(&usi_xwpcp, &msg, portdata.attr.prio, &desire);
-        if (__xwcc_unlikely(rc < 0)) {
-                cnt = (ssize_t)rc;
+        txsize = cnt;
+        rc = xwpcp_tx(&usi_xwpcp, data, &txsize,
+                      portdata.attr.prio, portdata.attr.port, XWPCP_MSG_QOS_3,
+                      &desire);
+        if (rc < 0) {
+                ret = (ssize_t)rc;
+        } else {
+                ret = txsize;
         }
-        return cnt;
+        return ret;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********           /sys/xwos/xwpcp           ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwsys_object * usi_xwpcp_xwsys;
 
 /******** /sys/xwos/xwpcp/cmd ********/
@@ -209,7 +221,7 @@ xwer_t usi_xwpcp_start(void)
                 goto err_xwfs_not_ready;
         }
 
-        rc = xwfs_mkdir("xwpcp", dir_isc, &usi_xwpcp_xwfs);
+        rc = xwfs_mkdir("xwpcp", xwfs_dir_isc, &usi_xwpcp_xwfs);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mkdir_usi_xwpcp_xwfs;
         }
@@ -220,7 +232,8 @@ xwer_t usi_xwpcp_start(void)
         }
 
         rc = xwpcp_start(&usi_xwpcp, "usi_xwpcp",
-                         &xwpcpif_uart_ops, modparam_isc_uart);
+                         &xwpcpif_uart_ops, modparam_isc_uart,
+                         usi_xwpcp_mem, sizeof(usi_xwpcp_mem));
         if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Start XWPCP ... [rc:%d]\n", rc);
                 goto err_xwpcp_start;
@@ -287,7 +300,7 @@ xwer_t usi_xwpcp_xwsys_cmd_export_port(int port, int prio, char * portname)
                 rc = -ECHRNG;
                 goto err_port;
         }
-        if ((prio > XWMDCFG_isc_xwpcp_PRIORITY_NUM) || (prio < 0)) {
+        if ((prio > XWMDCFG_isc_xwpcp_PRI_NUM) || (prio < 0)) {
                 xwpcplogf(ERR, "Port priority is out of range!\n");
                 rc = -ERANGE;
                 goto err_prio;
@@ -507,8 +520,7 @@ ssize_t usi_xwpcp_xwsys_state_show(struct xwsys_object * xwobj,
 {
         size_t i;
         ssize_t showcnt;
-        size_t blkcnt;
-        xwssq_t smrval;
+        xwssq_t semval;
         xwer_t rc;
 
         showcnt = 0;
@@ -520,35 +532,22 @@ ssize_t usi_xwpcp_xwsys_state_show(struct xwsys_object * xwobj,
                 showcnt += sprintf(&buf[showcnt], "State: OFF\n");
         } else {
                 showcnt += sprintf(&buf[showcnt], "State: ON\n");
-                /* slot */
-                showcnt += sprintf(&buf[showcnt], "Slot Pool:\n");
-                blkcnt = usi_xwpcp.slot.pool->zone.size / usi_xwpcp.slot.pool->blksize;
-                for (i = 0; i < blkcnt; i++) {
-                        showcnt += sprintf(&buf[showcnt], "0x%X,",
-                                           usi_xwpcp.slot.pool->bcbs[i].order);
-                        if (i % 8 == 0) {
-                                showcnt += sprintf(&buf[showcnt], "\n");
-                        }
-                }
-                showcnt += sprintf(&buf[showcnt], "\n");
 
                 /* TXQ */
-                rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwpcp.txq.smr),
-                                         &smrval);
+                rc = xwos_sem_getvalue(&usi_xwpcp.txq.qsem, &semval);
                 if (XWOK == rc) {
                         showcnt += sprintf(&buf[showcnt],
                                            "TX Queue: 0x%lX\n",
-                                           smrval);
+                                           semval);
                 }
 
                 /* RXQ */
                 for (i = 0; i < XWPCP_PORT_NUM; i++) {
-                        rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwpcp.rxq.smr[i]),
-                                                 &smrval);
+                        rc = xwos_sem_getvalue(&usi_xwpcp.rxq.sem[i], &semval);
                         if (XWOK == rc) {
                                 showcnt += sprintf(&buf[showcnt],
                                                    "RX Queue[%ld]: 0x%lX\n",
-                                                   i, smrval);
+                                                   i, semval);
                         }
                 }
         }
@@ -567,9 +566,6 @@ ssize_t usi_xwpcp_xwsys_state_store(struct xwsys_object * xwobj,
         return -ENOSYS;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********    init & exit    ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t usi_xwpcp_init(void)
 {
         xwer_t rc;

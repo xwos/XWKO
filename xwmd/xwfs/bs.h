@@ -24,41 +24,16 @@
 #ifndef __xwmd_xwfs_bs_h__
 #define __xwmd_xwfs_bs_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+extern struct xwfs_dir * xwfs_dir_xwos;
+extern struct xwfs_dir * xwfs_dir_mp;
+extern struct xwfs_dir * xwfs_dir_sync;
+extern struct xwfs_dir * xwfs_dir_lock;
+extern struct xwfs_dir * xwfs_dir_xwmd;
+extern struct xwfs_dir * xwfs_dir_isc;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      .data        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-extern struct xwfs_dir *dir_xwos;
-
-extern struct xwfs_dir *dir_core;
-
-extern struct xwfs_dir *dir_sync;
-
-extern struct xwfs_dir *dir_locks;
-
-extern struct xwfs_dir *dir_xwmd;
-
-extern struct xwfs_dir *dir_isc;
-
-extern struct xwfs_dir *dir_sysm;
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwfs_create_skeleton(void);
-
 void xwfs_delete_skeleton(void);
 
 #endif /* xwmd/xwfs/bs.h */

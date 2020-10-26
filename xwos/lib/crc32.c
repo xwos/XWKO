@@ -21,20 +21,10 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/crc32.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWLIBCFG_CRC32_0X04C11DB7) && (1 == XWLIBCFG_CRC32_0X04C11DB7)
 /**
  * @brief 多项式0x04C11DB7的查询表
@@ -563,51 +553,52 @@ __xwlib_rodata const xwu32_t xwlib_crc32tbl_0xedb88320[256] = {
 };
 #endif /* XWLIBCFG_CRC32_0XEDB88320 */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(SOCCFG_CRC32) && (1 == SOCCFG_CRC32)
-extern __xwlib_code
-xwsz_t soc_crc32_cal(xwu32_t * crc32, bool refin, int plynml,
-                     int direction, const xwu8_t stream[], xwsz_t len);
+extern
+xwer_t soc_crc32_cal(xwu32_t * crc32,
+                     bool refin, xwu32_t plynml, xwu32_t direction,
+                     const xwu8_t stream[], xwsz_t * size);
 #else /* SOCCFG_CRC32 */
-#define soc_crc32_cal(crc32, refin, plynml, direction, stream, len)  0
+#define soc_crc32_cal(crc32, refin, plynml, direction, stream, size)    (-EOPNOTSUPP)
 #endif /* !SOCCFG_CRC32 */
 
 static __xwlib_code
-void xwlib_crc32_swcal_ls(xwu32_t * crc32, bool refin, const xwu32_t table[],
-                          const xwu8_t stream[], xwsz_t len);
+void xwlib_crc32_swcal_ls(xwu32_t * crc32,
+                          bool refin, const xwu32_t table[],
+                          const xwu8_t stream[], xwsz_t * size);
 
 static __xwlib_code
-void xwlib_crc32_swcal_rs(xwu32_t * crc32, bool refin, const xwu32_t table[],
-                          const xwu8_t stream[], xwsz_t len);
+void xwlib_crc32_swcal_rs(xwu32_t * crc32,
+                          bool refin, const xwu32_t table[],
+                          const xwu8_t stream[], xwsz_t * size);
 
 static __xwlib_code
-void xwlib_crc32_swcal(xwu32_t * crc32, bool refin, int plynml, int direction,
-                       const xwu8_t stream[], xwsz_t len);
+xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
+                         bool refin, xwu32_t plynml, xwu32_t direction,
+                         const xwu8_t stream[], xwsz_t * size);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 左移计算一段数据的CRC32校验值
- * @param crc32: (I) 初始值
- *               (O) 计算结果
- * @param refin: (I) 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
- * @param table: (I) CRC32查询表
- * @param stream: (I) 指向数据的指针
- * @param len: (I) 数据长度
+ * @brief 左移计算一段数据的CRC32校验值（直驱表法）
+ * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示初始值
+ * + (O) 作为输出时，返回计算结果
+ * @param[in] refin: 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param[in] table: CRC32查询表
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度
  */
 static __xwlib_code
-void xwlib_crc32_swcal_ls(xwu32_t * crc32, bool refin, const xwu32_t table[],
-                          const xwu8_t stream[], xwsz_t len)
+void xwlib_crc32_swcal_ls(xwu32_t * crc32,
+                          bool refin, const xwu32_t table[],
+                          const xwu8_t stream[], xwsz_t * size)
 {
         xwsz_t i;
         xwu8_t index, byte;
         xwu32_t remainder = *crc32;
 
-        /* Divide the message by the polynomial, a byte at a time. */
-        for (i = 0; i < len; i++) {
+        for (i = 0; i < *size; i++) {
                 if (refin) {
                         byte = xwbop_rbit8(stream[i]);
                 } else {
@@ -617,27 +608,31 @@ void xwlib_crc32_swcal_ls(xwu32_t * crc32, bool refin, const xwu32_t table[],
                 remainder = table[index] ^ (remainder << 8);
         }
         *crc32 = remainder;
+        *size = 0;
 }
 
 /**
- * @brief 右移计算一段数据的CRC32校验值
- * @param crc32: (I) 初始值
- *               (O) 计算结果
- * @param refin: (I) 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
- * @param table: (I) CRC32查询表
- * @param stream: (I) 指向数据的指针
- * @param len: (I) 数据长度
+ * @brief 右移计算一段数据的CRC32校验值（直驱表法）
+ * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示初始值
+ * + (O) 作为输出时，返回计算结果
+ * @param[in] refin: 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param[in] table: CRC32查询表
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度
  */
 static __xwlib_code
-void xwlib_crc32_swcal_rs(xwu32_t * crc32, bool refin, const xwu32_t table[],
-                          const xwu8_t stream[], xwsz_t len)
+void xwlib_crc32_swcal_rs(xwu32_t * crc32,
+                          bool refin, const xwu32_t table[],
+                          const xwu8_t stream[], xwsz_t * size)
 {
         xwsz_t i;
         xwu8_t index, byte;
         xwu32_t remainder = *crc32;
 
-        /* Divide the message by the polynomial, a byte at a time. */
-        for (i = 0; i < len; i++) {
+        for (i = 0; i < *size; i++) {
                 if (refin) {
                         byte = xwbop_rbit8(stream[i]);
                 } else {
@@ -647,82 +642,163 @@ void xwlib_crc32_swcal_rs(xwu32_t * crc32, bool refin, const xwu32_t table[],
                 remainder = table[index] ^ (remainder >> 8);
         }
         *crc32 = remainder;
+        *size = 0;
 }
 
 /**
- * @brief 纯软件方式计算一段数据的CRC32校验值
- * @param crc32: (I) 初始值
- *               (O) 计算结果
- * @param refin: (I) 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
- * @param plynml: (I) 多项式
- * @param direction: (I) 数据移位的方向
- * @param stream: (I) 指向数据的指针
- * @param len: (I) 数据长度
+ * @brief 软件方式计算一段数据的CRC32校验值（直驱表法）
+ * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示初始值
+ * + (O) 作为输出时，返回计算结果
+ * @param[in] refin: 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param[in] plynml: 多项式
+ * @param[in] direction: 数据移位的方向
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度
+ * @return 错误码
+ * @retval XWOK: 没有错误，计算结果有效
+ * @retval -EOPNOTSUPP: 不支持的多项式
  */
 static __xwlib_code
-void xwlib_crc32_swcal(xwu32_t * crc32, bool refin, int plynml, int direction,
-                       const xwu8_t stream[], xwsz_t len)
+xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
+                         bool refin, xwu32_t plynml, xwu32_t direction,
+                         const xwu8_t stream[], xwsz_t * size)
 {
+        xwer_t rc;
+
         switch (plynml) {
 #if defined(XWLIBCFG_CRC32_0X04C11DB7) && (1 == XWLIBCFG_CRC32_0X04C11DB7)
-        case XWLIB_CRC32_PLYNML_0X04C11DB7:
+        case 0x04C11DB7:
                 if (XWLIB_CRC32_LEFT_SHIFT == direction) {
                         xwlib_crc32_swcal_ls(crc32, refin, xwlib_crc32tbl_0x04c11db7,
-                                             stream, len);
+                                             stream, size);
                 } else {
                         xwlib_crc32_swcal_rs(crc32, refin, xwlib_crc32tbl_0x04c11db7,
-                                             stream, len);
+                                             stream, size);
                 }
+                rc = XWOK;
                 break;
 #endif /* XWLIBCFG_CRC32_0X04C11DB7 */
 
 #if defined(XWLIBCFG_CRC32_0XEDB88320) && (1 == XWLIBCFG_CRC32_0XEDB88320)
-        case XWLIB_CRC32_PLYNML_0XEDB88320:
+        case 0xEDB88320:
                 if (XWLIB_CRC32_RIGHT_SHIFT == direction) {
                         xwlib_crc32_swcal_rs(crc32, refin, xwlib_crc32tbl_0xedb88320,
-                                             stream, len);
+                                             stream, size);
                 } else {
                         xwlib_crc32_swcal_ls(crc32, refin, xwlib_crc32tbl_0xedb88320,
-                                             stream, len);
+                                             stream, size);
                 }
+                rc = XWOK;
                 break;
 #endif /* XWLIBCFG_CRC32_0XEDB8832 */
         default:
+                XWOS_UNUSED(crc32);
+                XWOS_UNUSED(refin);
+                XWOS_UNUSED(plynml);
+                XWOS_UNUSED(stream);
+                XWOS_UNUSED(size);
+                rc = -EOPNOTSUPP;
                 break;
         }
+        return rc;
 }
 
+/**
+ * @brief 计算一段数据的CRC32校验值
+ * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示初始值
+ * + (O) 作为输出时，返回计算结果，当计算失败时，值不会发生改变
+ * @param[in] xorout: 与结果异或的值
+ * @param[in] refin: 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param[in] refout: 是否按位镜像翻转输出(xwbop_rbit32)
+ * @param[in] plynml: 多项式
+ * @param[in] direction: 数据移位的方向
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度，当返回不为0时，
+ *       表示计算未完成，计算结果不会镜像翻转，也不会与xorout异或。
+ * @return 错误码
+ * @retval XWOK: 没有错误，计算结果有效
+ * @retval -EFAULT: 空指针
+ * @retval -EOPNOTSUPP: 不支持的多项式
+ */
 __xwlib_code
-void xwlib_crc32_cal(xwu32_t * crc32, xwu32_t xorout,
-                     bool refin, bool refout,
-                     int plynml, int direction,
-                     const xwu8_t stream[], xwsz_t len)
+xwer_t xwlib_crc32_cal(xwu32_t * crc32, xwu32_t xorout,
+                       bool refin, bool refout,
+                       xwu32_t plynml, xwu32_t direction,
+                       const xwu8_t stream[], xwsz_t * size)
 {
-        xwsz_t real, rest = 0;
+        xwer_t rc;
+        xwsz_t total, pos;
         xwu32_t res;
 
+        XWOS_VALIDATE((crc32), "nullptr", -EFAULT);
+        XWOS_VALIDATE((size), "nullptr", -EFAULT);
+
+        total = *size;
         res = *crc32;
+        pos = 0;
         /* 使用硬件计算部分CRC32校验值 */
-        real = soc_crc32_cal(&res, refin, plynml, direction, &stream[0], len);
-        rest = len - real;
-        if (rest) {
+        rc = soc_crc32_cal(&res, refin, plynml, direction, &stream[0], size);
+        if (*size > 0) {
                 /* 使用软件计算剩余部分的CRC32校验值 */
-                xwlib_crc32_swcal(&res, refin, plynml, direction, &stream[real], rest);
+                pos = total - *size;
+                rc = xwlib_crc32_swcal(&res,
+                                       refin, plynml, direction,
+                                       &stream[pos], size);
+                pos = total - *size;
         }/* else {} */
-        if (refout) {
-                res = xwbop_rbit32(res);
+        if (XWOK == rc) {
+                if (0 == *size) {
+                        if (refout) {
+                                res = xwbop_rbit32(res);
+                        }/* else {} */
+                        res = res ^ xorout;
+                }/* else {} */
+                *crc32 = res;
         }/* else {} */
-        *crc32 = res ^ xorout;
+        return rc;
 }
 
+/**
+ * @brief 用主流CRC32参数模型计算一段数据的CRC32校验值
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度
+ * @return CRC32
+ * @note
+ * + 主流CRC32参数模型：
+ *   - 多项式：0xEDB88320
+ *   - 初始值：0xFFFFFFFF
+ *   - 数据移位方向：右移
+ *   - 是否按位镜像翻转输入：否
+ *   - 是否按位镜像翻转输出：否
+ *   - 与结果进行异或计算：0xFFFFFFFF
+ * + 主流CRC32参数的镜像模型：
+ *   - 多项式：0x04C11DB7
+ *   - 初始值：0xFFFFFFFF
+ *   - 数据移位方向：左移
+ *   - 是否按位镜像翻转输入：是
+ *   - 是否按位镜像翻转输出：是
+ *   - 与结果进行异或计算：0xFFFFFFFF
+ * + 上面两个模型计算结果是一致的；
+ * + 本算法优先使用硬件加速运算，但某些平台的硬件可能有字节数的要求
+ *   （例如STM32要求字节数为4的倍数），多余的字节再采用软件计算；
+ * + 本软件算法使用的是直驱表法。
+ */
 __xwlib_code
-xwu32_t xwlib_crc32_calms(const xwu8_t stream[], xwsz_t len)
+xwu32_t xwlib_crc32_calms(const xwu8_t stream[], xwsz_t * size)
 {
         xwu32_t result;
 
         result = 0xFFFFFFFF;
         xwlib_crc32_cal(&result, 0xFFFFFFFF, false, false,
-                        XWLIB_CRC32_PLYNML_0XEDB88320, XWLIB_CRC32_RIGHT_SHIFT,
-                        stream, len);
+                        0xEDB88320, XWLIB_CRC32_RIGHT_SHIFT,
+                        stream, size);
         return result;
 }

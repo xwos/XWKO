@@ -21,21 +21,15 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <linux/uaccess.h>
 #include <linux/fs.h>
 #include <linux/tty.h>
 #include <xwos/standard.h>
-#include <xwos/osal/scheduler.h>
+#include <xwos/osal/skd.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <xwmd/isc/xwpcp/hwif/uart.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 xwer_t xwpcpif_uart_open(struct xwpcp * xwpcp);
 
@@ -51,10 +45,7 @@ xwer_t xwpcpif_uart_rx(struct xwpcp * xwpcp, xwu8_t * buf, xwsz_t * size);
 static
 void xwpcpif_uart_notify(struct xwpcp * xwpcp, xwsq_t ntf);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-const struct xwpcp_hwifal_operations xwpcpif_uart_ops = {
+const struct xwpcp_hwifal_operation xwpcpif_uart_ops = {
         .open = xwpcpif_uart_open,
         .close = xwpcpif_uart_close,
         .tx = xwpcpif_uart_tx,
@@ -71,9 +62,6 @@ struct ktermios xwpcpif_uart_dev_termios = {
         .c_cc[VMIN]  = 1,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 xwer_t xwpcpif_uart_open(struct xwpcp * xwpcp)
 {
@@ -150,7 +138,7 @@ xwer_t xwpcpif_uart_rx(struct xwpcp * xwpcp, xwu8_t * buf, xwsz_t * size)
                 if (__xwcc_unlikely(ret < 0)) {
                         rc = (xwer_t)ret;
                         xwpcplogf(INFO, "vfs_read() ... [%d].", rc);
-                        linux_thrd_clear_fake_signal(current);
+                        linux_thd_clear_fake_signal(current);
                         break;
                 } else {
                         rxsize += ret;

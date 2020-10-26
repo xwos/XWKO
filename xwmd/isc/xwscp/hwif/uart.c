@@ -21,22 +21,16 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <linux/uaccess.h>
 #include <linux/fs.h>
 #include <linux/tty.h>
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/scheduler.h>
+#include <xwos/osal/skd.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwmd/isc/xwscp/hwif/uart.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 xwer_t xwscpif_uart_open(struct xwscp * xwscp);
 
@@ -44,8 +38,7 @@ static
 xwer_t xwscpif_uart_close(struct xwscp * xwscp);
 
 static
-xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size,
-                       xwtm_t * xwtm);
+xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size);
 
 static
 xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size);
@@ -53,9 +46,6 @@ xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size);
 static
 void xwscpif_uart_notify(struct xwscp * xwscp, xwsq_t evt);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 const struct xwscp_hwifal_operations xwscpif_uart_ops = {
         .open = xwscpif_uart_open,
         .close = xwscpif_uart_close,
@@ -74,9 +64,6 @@ struct ktermios xwscpif_uart_dev_termios = {
         .c_cc[VMIN]  = 1,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 xwer_t xwscpif_uart_open(struct xwscp * xwscp)
 {
@@ -109,15 +96,12 @@ xwer_t xwscpif_uart_close(struct xwscp * xwscp)
 }
 
 static
-xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size,
-                       xwtm_t * xwtm)
+xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size)
 {
         xwer_t rc;
 	mm_segment_t fs;
 	struct file *filp;
         xwssz_t ret, rest;
-
-        XWOS_UNUSED(xwtm);
 
         rc = XWOK;
         fs = get_fs();
@@ -156,7 +140,7 @@ xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size)
                 if (__xwcc_unlikely(ret < 0)) {
                         rc = (xwer_t)ret;
                         xwscplogf(INFO, "Failed to vfs_read()! rc:%d", rc);
-                        linux_thrd_clear_fake_signal(current);
+                        linux_thd_clear_fake_signal(current);
                         break;
                 } else {
                         rxsize += ret;

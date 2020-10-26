@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的内存管理机制：伙伴算法内存块分配器
+ * @brief 玄武OS内存管理：伙伴算法内存块分配器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,50 +19,53 @@
  * > other provisions required by the GPL. If you do not delete the
  * > provisions above, a recipient may use your version of this file
  * > under either the MPL or the GPL.
- * @note
- * - 此算法是在所有上下文（线程、中断、中断底半部）都是安全的。
  */
 
 #ifndef __xwos_mm_bma_h__
 #define __xwos_mm_bma_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/mm/common.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @defgroup xwmm_bma 伙伴算法内存块分配器
+ * 此算法是在所有上下文（线程、中断、中断底半部）都是安全的。
+ * @{
+ */
+
 /* #define XWMM_BMA_LOG */
 
-#define XWMM_BMA_MAX_ORDER              (126)
-#define XWMM_BMA_COMBINED               (127)
-#define XWMM_BMA_ORDER_MASK             (0x7FU)
-#define XWMM_BMA_INUSED                 (BIT(7))
+#define XWMM_BMA_MAX_ORDER              (126) /**< 最大的阶 */
+#define XWMM_BMA_COMBINED               (127) /**< 块已被合并 */
+#define XWMM_BMA_ORDER_MASK             (0x7FU) /**< 阶的掩码 */
+#define XWMM_BMA_INUSED                 (XWBOP_BIT(7)) /**< 块正在使用的标记 */
 
-/**
- * @brief log function of bma
- */
 #if defined(XWMM_BMA_LOG)
-  #define xwmm_bmalogf(lv, fmt, ...) xwisrlogf(lv, fmt, ##__VA_ARGS__)
+  #define xwmm_bmalogf(lv, fmt, ...) xwlogf(lv, fmt, ##__VA_ARGS__)
 #else /* XWMM_BMA_LOG */
   #define xwmm_bmalogf(lv, fmt, ...)
 #endif /* !XWMM_BMA_LOG */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 定义伙伴算法内存块分配器结构体的RAW内存空间，
+ *        用于初始化伙伴算法内存块分配器结构体
+ * @param[in] mem: 内存数组名
+ * @param[in] blkodr: 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
+ */
+#define XWMM_BMA_DEF(mem, blkodr) \
+        xwu8_t mem[sizeof(struct xwmm_bma) + \
+                   (sizeof(struct xwmm_bma_bcb) * (1 << (blkodr))) + \
+                   (sizeof(struct xwmm_bma_orderlist) * ((blkodr) + 1))]
+
 /**
  * @brief 阶链表
  */
 struct xwmm_bma_orderlist {
         struct xwlib_bclst_head head; /**< 链表头 */
-        struct xwosal_splk lock; /**< 保护list的锁 */
+        struct xwos_splk lock; /**< 保护list的锁 */
 };
 
 /**
@@ -82,46 +85,20 @@ struct xwmm_bma {
         struct xwmm_zone zone; /**< 内存区域 */
         const char * name; /**< 名字 */
         xwsz_t blksize; /**< 单位块的大小（单位：字节） */
-        xwsq_t max_order; /**< 最大阶数 */
+        xwsq_t blkodr; /**< 单位块的数量，以2的blkodr次方的形式表示 */
         struct xwmm_bma_orderlist * orderlists; /**< 阶链表数组指针 */
         struct xwmm_bma_bcb * bcbs; /**< 内存块控制块数组指针 */
+        xwu8_t rem[0]; /**< 结构体剩余的内存空间 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ********       internal inline function implementations        ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_api
 xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
-                     xwptr_t origin, xwsz_t total, xwsz_t blksize,
-                     struct xwmm_bma_orderlist * orderlists,
-                     struct xwmm_bma_bcb * bcbs);
-
-__xwos_api
-xwer_t xwmm_bma_destroy(struct xwmm_bma * bma);
-
-__xwos_api
-xwer_t xwmm_bma_create(struct xwmm_bma ** ptrbuf, const char * name,
-                       xwptr_t origin, xwsz_t total, xwsz_t blksize);
-
-__xwos_api
-xwer_t xwmm_bma_delete(struct xwmm_bma * bma);
-
-__xwos_api
+                     xwptr_t origin, xwsz_t size,
+                     xwsz_t blksize, xwsz_t blkodr);
 xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf);
-
-__xwos_api
 xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      inline API implementations     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @} xwmm_bma
+ */
 
 #endif /* xwos/mm/bma.h */

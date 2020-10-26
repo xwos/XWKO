@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的内存管理机制：内存切片分配器
+ * @brief 玄武OS内存管理：内存切片分配器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,40 +21,23 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/lfq.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #include <xwos/mm/memslice.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief XWMM API：静态方式初始化内存切片分配器。
- * @param msa: (I) 内存切片分配器对象的指针
- * @param origin: (I) 建立内存切片分配算法的内存区域首地址
- * @param total_size: (I) 建立内存切片分配算法的内存区域大小
- * @param card_size: (I) 切片大小
- * @param name: (I) 名字
- * @param ctor: (I) 切片的构造函数
- * @param dtor: (I) 切片的析构函数
+ * @brief XWMM API：静态方式初始化内存切片分配器
+ * @param[in] msa: 内存切片分配器对象的指针
+ * @param[in] origin: 建立内存切片分配算法的内存区域首地址
+ * @param[in] total_size: 建立内存切片分配算法的内存区域大小
+ * @param[in] card_size: 切片大小
+ * @param[in] name: 名字
+ * @param[in] ctor: 切片的构造函数
+ * @param[in] dtor: 切片的析构函数
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
@@ -74,7 +57,7 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
 
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
 
-        card_size = ALIGN(card_size, XWMM_ALIGNMENT);
+        card_size = XWBOP_ALIGN(card_size, XWMM_ALIGNMENT);
         num_max = total_size / card_size;
         if (0 == num_max) {
                 rc = -E2SMALL;
@@ -90,7 +73,7 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
         msa->ctor = ctor;
         msa->dtor = dtor;
 
-        /* 构造所有“卡牌” */
+        /* 构造所有对象 */
         if (ctor) {
                 curr = origin;
                 next = curr;
@@ -110,8 +93,8 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
         nm = num_max;
         for (n = 0; n < nm; n++) {
                 next += card_size;
-                xwlib_lfq_init((__xwcc_atomic xwlfq_t *)curr);
-                xwlib_lfq_push(&msa->free_list, (__xwcc_atomic xwlfq_t *)curr);
+                xwlib_lfq_init((xwlfq_a *)curr);
+                xwlib_lfq_push(&msa->free_list, (xwlfq_a *)curr);
                 curr = next;
         }
 
@@ -122,101 +105,9 @@ err_mem2small:
 }
 
 /**
- * @brief XWMM API：销毁静态方式初始化的内存切片分配器。
- * @param msa: (I) 内存切片分配器对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
-xwer_t xwmm_memslice_destroy(struct xwmm_memslice * msa)
-{
-        XWOS_VALIDATE((msa), "nullptr", -EFAULT);
-
-        XWOS_UNUSED(msa);
-        return XWOK;
-}
-
-/**
- * @brief XWMM API：动态方式创建内存切片分配器。
- * @param ptrbuf: (O) 用于返回内存切片分配器对象指针的缓存
- * @param origin: (I) 建立内存切片分配算法的内存区域首地址
- * @param total_size: (I) 建立内存切片分配算法的内存区域大小
- * @param card_size: (I) 切片大小
- * @param ctor: (I) 切片的构造函数
- * @param dtor: (I) 切片的析构函数
- * @param name: (I) 名字
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -E2SMALL: 内存区域太小
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
-xwer_t xwmm_memslice_create(struct xwmm_memslice ** ptrbuf,
-                            xwptr_t origin, xwsz_t total_size, xwsz_t card_size,
-                            const char * name, ctor_f ctor, dtor_f dtor)
-{
-        void * mem;
-        struct xwmm_memslice * msa;
-        xwsz_t num_max;
-        xwer_t rc;
-
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
-        card_size = ALIGN(card_size, XWMM_ALIGNMENT);
-        num_max = total_size / card_size;
-        if (__xwcc_unlikely(0 == num_max)) {
-                rc = -E2SMALL;
-                goto err_mem2small;
-        }
-
-        rc = xwmm_kma_alloc(sizeof(struct xwmm_memslice), XWMM_ALIGNMENT, &mem);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_msa_alloc;
-        }
-        msa = mem;
-
-        rc = xwmm_memslice_init(msa, origin, total_size, card_size, name, ctor, dtor);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_msa_init;
-        }
-
-        *ptrbuf = msa;
-        return XWOK;
-
-err_msa_init:
-        xwmm_kma_free(msa);
-err_msa_alloc:
-err_mem2small:
-        return rc;
-}
-
-/**
- * @brief XWMM API：删除动态方式创建的内存切片分配器。
- * @param msa: (I) 内存切片分配器对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
-xwer_t xwmm_memslice_delete(struct xwmm_memslice * msa)
-{
-        XWOS_VALIDATE((msa), "nullptr", -EFAULT);
-        xwmm_kma_free(msa);
-        return XWOK;
-}
-
-/**
- * @brief XWMM API：申请一片内存切片。
- * @param msa: (I) 内存切片分配器对象的指针
- * @param membuf: (O) 指向指针缓存的指针，该指针缓存用于返回申请到的内存的首地址
+ * @brief XWMM API：申请一片内存切片
+ * @param[in] msa: 内存切片分配器对象的指针
+ * @param[out] membuf: 指向地址缓存的指针，通过此指针缓存返回申请到的内存的首地址
  * @return 错误码
  * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
@@ -240,7 +131,7 @@ xwer_t xwmm_memslice_alloc(struct xwmm_memslice * msa, void ** membuf)
                 *membuf = NULL;
                 goto err_lfq_pop;
         }
-        xwaop_sub(xwsz_t, &msa->num_free, 1, NULL, NULL);
+        xwaop_sub(xwsz, &msa->num_free, 1, NULL, NULL);
         *(xwptr_t *)card = msa->backup; /* restore original data */
         *membuf = card;
         return XWOK;
@@ -250,9 +141,9 @@ err_lfq_pop:
 }
 
 /**
- * @brief XWMM API：释放一片内存切片。
- * @param msa: (I) 内存切片分配器对象的指针
- * @param mem: (I) 内存切片的首地址
+ * @brief XWMM API：释放一片内存切片
+ * @param[in] msa: 内存切片分配器对象的指针
+ * @param[in] mem: 内存切片的首地址
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -263,21 +154,21 @@ __xwos_api
 xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem)
 {
         xwer_t rc;
-        __xwcc_atomic xwlfq_t * card;
+        xwlfq_a * card;
 
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
         XWOS_VALIDATE((mem), "nullptr", -EFAULT);
 
         if (__xwcc_unlikely((xwptr_t)mem < msa->zone.origin ||
-                       ((xwptr_t)mem - msa->zone.origin) > msa->zone.size)) {
+                            ((xwptr_t)mem - msa->zone.origin) > msa->zone.size)) {
                 rc = -EOWNER;
         } else {
                 if (msa->dtor) {
                         msa->dtor(mem);
                 }/* else {} */
-                card = (__xwcc_atomic xwlfq_t *)mem;
+                card = (xwlfq_a *)mem;
                 xwlib_lfq_push(&msa->free_list, card);
-                xwaop_add(xwsz_t, &msa->num_free, 1, NULL, NULL);
+                xwaop_add(xwsz, &msa->num_free, 1, NULL, NULL);
                 rc = XWOK;
         }
 

@@ -24,149 +24,140 @@
 #ifndef __xwos_lib_xwbmpaop_h__
 #define __xwos_lib_xwbmpaop_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @defgroup xwbmpaop 位图原子操作
+ * @{
+ */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/ospl/soc/xwbmpaop.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWOS BOPLIB：声明位图
+ * @param[in] name: 符号名
+ * @param[in] bits: 位图中的位数
+ */
+#define xwbmpaop_declare(name, bits)    xwbmp_a name[BITS_TO_XWBMP_T(bits)]
+
 /**
  * @brief XWOS AOPLIB：测试位图中的某位是否被置位
- * @param bmp: (I) 位图的起始地址指针
- * @param n: (I) 被测试的位的序号
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] n: 被测试的位的序号
  */
-__xwlib_code
-bool xwbmpaop_t1i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx);
+bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：将位图中某位置1
- * @param bmp: (I) 位图的起始地址指针
- * @param n: (I) 被置1的位的序号
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] n: 被置1的位的序号
  */
-__xwlib_code
-void xwbmpaop_s1i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx);
+void xwbmpaop_s1i(xwbmp_a * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：将位图中某位清0
- * @param bmp: (I) 位图的起始地址指针
- * @param n: (I) 被清0的位的序号
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] n: 被清0的位的序号
  */
-__xwlib_code
-void xwbmpaop_c0i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx);
+void xwbmpaop_c0i(xwbmp_a * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：将位图中某位翻转
- * @param bmp: (I) 位图的起始地址指针
- * @param n: (I) 被翻转的位的序号
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] n: 被翻转的位的序号
  */
-__xwlib_code
-void xwbmpaop_x1i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx);
+void xwbmpaop_x1i(xwbmp_a * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：测试位图中某位是否为0。如果是，就将它置1。
- * @param bmp: (I) 位图的起始地址指针
- * @param i: (I) 被测试位的序号
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] i: 被测试位的序号
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  */
-__xwlib_code
-xwer_t xwbmpaop_t0i_then_s1i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx);
+xwer_t xwbmpaop_t0i_then_s1i(xwbmp_a * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：测试位图中某位是否为1。如果是，就将它清0。
- * @param bmp: (I) 位图的起始地址指针
- * @param n: (I) 被测试位的序号
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] n: 被测试位的序号
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  */
-__xwlib_code
-xwer_t xwbmpaop_t1i_then_c0i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx);
+xwer_t xwbmpaop_t1i_then_c0i(xwbmp_a * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：从最高位起找到位图中第一个为1的位并将它清0
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] num: 位图中总的位数
  * @retval >=0: 位的序号
  * @retval -ENODATA: 没有任何一个位为1
  */
-__xwlib_code
-xwssq_t xwbmpaop_fls_then_c0i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num);
+xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num);
 
 /**
  * @brief XWOS AOPLIB：从最高位起找到位图中第一个为0的位并将它置1
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] num: 位图中总的位数
  * @retval >=0: 位的序号
  * @retval -ENODATA: 没有任何一个位为0
  */
-__xwlib_code
-xwssq_t xwbmpaop_flz_then_s1i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num);
+xwssq_t xwbmpaop_flz_then_s1i(xwbmp_a * bmp, xwsz_t num);
 
 /**
  * @brief XWOS AOPLIB：从最低位起找到位图中第一个为1的位并将它清0
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] num: 位图中总的位数
  * @retval >=0: 位的序号
  * @retval -ENODATA: 没有任何一个位为1
  */
-__xwlib_code
-xwssq_t xwbmpaop_ffs_then_c0i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num);
+xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num);
 
 /**
  * @brief XWOS AOPLIB：从最低位起找到位图中第一个为0的位并将它置1
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] num: 位图中总的位数
  * @retval >=0: 位的序号
  * @retval -ENODATA: 没有任何一个位为0
  */
-__xwlib_code
-xwssq_t xwbmpaop_ffz_then_s1i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num);
+xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********   inline function implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 原子操作：将位图所有位设为1
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
+ * @brief XWOS AOPLIB：将位图所有位设为1
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] num: 位图中总的位数
  */
 static __xwlib_inline
-void xwbmpaop_s1all(__xwcc_atomic xwbmp_t * bmp, xwsq_t num)
+void xwbmpaop_s1all(xwbmp_a * bmp, xwsq_t num)
 {
-        xwsz_t n = BITS_TO_BMPS(num);
+        xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
-                xwaop_s1m(xwbmp_t, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
+                xwaop_s1m(xwbmp, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
         }
 }
 
 /**
- * @brief 原子操作：清除位图中所有位
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
+ * @brief XWOS AOPLIB：清除位图中所有位
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] num: 位图中总的位数
  */
 static __xwlib_inline
-void xwbmpaop_c0all(__xwcc_atomic xwbmp_t * bmp, xwsq_t num)
+void xwbmpaop_c0all(xwbmp_a * bmp, xwsq_t num)
 {
-        xwsz_t n = BITS_TO_BMPS(num);
+        xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
-                xwaop_c0m(xwbmp_t, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
+                xwaop_c0m(xwbmp, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
         }
 }
+
+/**
+ * @} xwbmpaop
+ */
 
 #endif /* xwos/lib/xwbmpaop.h */

@@ -6,4 +6,4 @@
 
 XWMO_INCDIRS :=
 XWMO_ESRCS :=
-XWMO_CSRCS += init.c msgnode.c session.c wkup.c imitator.c
+XWMO_CSRCS += init.c msgnode.c session.c wkup.c

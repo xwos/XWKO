@@ -22,8 +22,6 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/lib/xwlog.h>
-#include <xwos/lib/xwaop.h>
 #include <linux/version.h>
 #include <linux/kconfig.h>
 #include <linux/parser.h>
@@ -39,17 +37,13 @@
 #include <linux/slab.h>
 #include <linux/pagemap.h>
 #include <linux/uaccess.h>
+#include <xwos/lib/xwlog.h>
+#include <xwos/lib/xwaop.h>
+#include <xwos/mp/skd.h>
 #include <xwmd/sysfs/core.h>
 #include <xwmd/xwfs/fs.h>
 #include <xwmd/xwfs/bs.h>
-#include <xwos/core/scheduler.h>
-#include <xwos/lock/mutex.h>
-#include <xwos/sync/semaphore.h>
-#include <xwos/sync/condition.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********        fs        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWFS_DEFAULT_MODE       (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
 #define XWFS_MAGIC_NUM          0x6F736673  /* xwfs */
 
@@ -77,7 +71,7 @@ int xwfs_set_super(struct super_block * sb, void * data);
 
 static
 struct dentry * xwfs_mount(struct file_system_type * fst,
-                           int flags, const char *dev_name,
+                           int flags, const char * dev_name,
                            void * optstring);
 
 static
@@ -135,10 +129,10 @@ loff_t xwfs_node_fops_llseek(struct file * file, loff_t offset, int origin);
 
 static
 ssize_t xwfs_node_fops_read(struct file * file, char __user * buf,
-                            size_t len, loff_t *pos);
+                            size_t len, loff_t * pos);
 
 static
-ssize_t xwfs_node_fops_write(struct file *file, const char __user *buf,
+ssize_t xwfs_node_fops_write(struct file *file, const char __user * buf,
                              size_t len, loff_t * pos);
 
 static
@@ -174,7 +168,7 @@ struct path xwfs_rootpath = {
         .dentry = NULL,
 };
 
-__xwcc_atomic xwsq_t xwfs_mntcnt = 0;
+xwsq_a xwfs_mntcnt = 0;
 
 static const match_table_t xwfs_tokens = {
         {OPT_MODE, "mode=%o"},
@@ -190,7 +184,6 @@ static struct file_system_type xwfs_fstype = {
         .kill_sb = xwfs_kill_sb,
 };
 
-/******** ******** super_operations ******** ********/
 static struct kmem_cache * xwfs_entry_cache;
 static const struct super_operations xwfs_sops = {
         .alloc_inode = xwfs_sops_alloc_inode,
@@ -201,12 +194,10 @@ static const struct super_operations xwfs_sops = {
         .show_options = xwfs_sops_show_options,
 };
 
-/******** ******** dentry_operations ******** ********/
 static const struct dentry_operations xwfs_dops = {
         .d_delete = xwfs_dops_delete_dentry,
 };
 
-/******** ******** memory mapping ******** ********/
 static struct address_space_operations xwfs_aops = {
         .readpage = simple_readpage,
         .write_begin = simple_write_begin,
@@ -214,21 +205,23 @@ static struct address_space_operations xwfs_aops = {
         .set_page_dirty = xwfs_set_page_dirty_no_writeback,
 };
 
-/******** ******** directory inode operations ******** ********/
+/**
+ * @brief 目录的inode_operations
+ */
 static const struct inode_operations xwfs_dir_iops = {
         .lookup = xwfs_dir_iops_lookup,
 };
 
-/******** ******** directory file operations ******** ********/
-
-/******** ******** node inode operations ******** ********/
+/**
+ * @brief 节点的inode_operations
+ */
 static const struct inode_operations xwfs_node_iops = {
         .setattr = simple_setattr,
         .getattr = simple_getattr,
 };
 
 /**
- * @brief node file operations
+ * @brief 节点的file_operations
  */
 static const struct file_operations xwfs_node_fops = {
         .llseek = xwfs_node_fops_llseek,
@@ -242,12 +235,10 @@ static const struct file_operations xwfs_node_fops = {
 };
 
 /**
- * @brief Initialize a new super block that is allocated by <i>sget()</i>
- * @param sb: (I) pointer of super block
- * @param mntopts: (I) pointer of mount options
- * @return error code
- * @retval 0: OK.
- * @retval <0: Indicate the error code
+ * @brief 填充文件系统超级块的结构体
+ * @param sb: (I) 文件系统超级块的指针
+ * @param mntopts: (I) 挂载选项
+ * @return 错误码
  */
 static
 int xwfs_fill_superblock(struct super_block * sb, struct xwfs_mntopts * mntopts)
@@ -313,16 +304,17 @@ err_mi_alloc:
 }
 
 /**
- * @brief Test whether super block is existent.
- * @param sb: (I) pointer of super block to test.
- * @param data: (I) pointer of test data.
- * @return boolean
- * @retval 1: existent
- * @retval 0: not existent
+ * @brief 测试文件系统超级块是否存在
+ * @param sb: (I) 文件系统超级块的指针
+ * @param data: (I) 挂载选项，mount系统调用中的-o参数
+ * @return 布尔值
+ * @retval 1: 存在
+ * @retval 0: 不存在
  * @note
- * - This function is a callback that is called by sget() to test whether
- *   the given superblock is existent. XWFS is mounted once when the module is being
- *   initialized. So the result is always 1.
+ * - 当此函数返回1时表示文件系统超级块存在，VFS不会重新申请一个文件系统超级块
+ *   只会把已经存在的文件系统超级块引用计数增加载；
+ * - XWFS是单例文件系统，有且只有一个文件系统超级块，用户态的mount命令只会增加
+ *   此文件系统超级块的引用计数。
  */
 static
 int xwfs_test_super(struct super_block * sb, void * data)
@@ -331,13 +323,10 @@ int xwfs_test_super(struct super_block * sb, void * data)
 }
 
 /**
- * @brief Initialize a new superblock
- * @param sb: (I) pointer of super block
- * @param data: (I) pointer of data
- * @return error code
- * @note
- * - This function is a callback that is called by sget() to initialize a
- *   new superblock.
+ * @brief 初始化文件系统超级块
+ * @param sb: (I) 文件系统超级块的指针
+ * @param data: (I) 挂载选项，mount系统调用中的-o参数
+ * @return 错误码
  */
 static
 int xwfs_set_super(struct super_block * sb, void * data)
@@ -346,17 +335,16 @@ int xwfs_set_super(struct super_block * sb, void * data)
 }
 
 /**
- * @brief mount a filesystem
- * @param fst: (I) pointer of filesystem type
- * @param flags: (I) mount flags
- * @param dev_name: (I) the 'device' argument from 'mount' command
- * @param data: (I) pointer of mount data
- * @return dentry: The root dentry of the filesystem if successed.
- * @retval <0: Indicate the error code
+ * @brief 挂载文件系统
+ * @param fst: (I) 文件系统类型的指针
+ * @param flags: (I) 挂载标志
+ * @param dev_name: (I) mount系统调用中的'device'参数
+ * @param data: (I) 挂载选项，mount系统调用中的-o参数
+ * @return 文件系统根目录的dentry
  * @note
- * + There are two mount operation in Linux kernel:
- *   - Kernel mount: it has flag MS_KERNMOUNT.
- *   - syscall mount: the data is the mount options string.
+ * + Linux内核对于文件系统有两种挂载方式：
+ *   - Kernel mount: 会设置标记MS_KERNMOUNT；
+ *   - syscall mount: 通过命令mount挂载，命令的-o选项被由data传递到此函数。
  */
 static
 struct dentry * xwfs_mount(struct file_system_type * fst,
@@ -415,11 +403,8 @@ err_notmnt:
 }
 
 /**
- * @brief Kill superblock
- * @param sb: (I) pointer of super block
- * @note
- * - When sb->s_active == 0, this function will be called.
- * - @ref xwfs_sops_put_super() will be called in kill_litter_super.
+ * @brief 删除文件系统超级块
+ * @param sb: (I) 文件系统超级块的指针
  */
 static
 void xwfs_kill_sb(struct super_block * sb)
@@ -429,9 +414,8 @@ void xwfs_kill_sb(struct super_block * sb)
 
 /******** ******** super_operations ******** ********/
 /**
- * @brief Used by kmem_cache_alloc(xwfs_inode_cache, ...) to initialize the new
- *        xwfs_inode
- * @param data: (I) pointer of the new xwfs_inode
+ * @brief union xwfs_entry的slab缓存的构造函数
+ * @param data: (I) 指向union xwfs_entry的指针
  */
 static
 void xwfs_entry_construct(void * addr)
@@ -441,10 +425,9 @@ void xwfs_entry_construct(void * addr)
 }
 
 /**
- * @brief super operation to alloc a new xwfs inode
- * @param sb: (I) pointer of super block
- * @return new inode
- * @retval NULL: failed
+ * @brief XWFS的SOPS：新建一个inode
+ * @param sb: (I) 文件系统超级块的指针
+ * @return inode的指针
  */
 static
 struct inode * xwfs_sops_alloc_inode(struct super_block * sb)
@@ -461,12 +444,6 @@ struct inode * xwfs_sops_alloc_inode(struct super_block * sb)
         return ind;
 }
 
-/**
- * @brief Create a xwfs inode dynamically
- * @param sb: (I) pointer of super block
- * @return new inode
- * @retval NULL: failed
- */
 static
 struct inode * xwfs_new_entry(struct super_block * sb,
                               struct xwfs_dir * parent,
@@ -516,11 +493,11 @@ struct inode * xwfs_new_entry(struct super_block * sb,
 }
 
 /**
- * @brief rcu-callback to free a xwfs inode
- * @param head: (I) pointer of rcu head
+ * @brief XWFS的SOPS：释放inode时的rcu-callback
+ * @param head: (I) rcu链表头
  * @note
- * - This callback is called by @ref xwfs_sops_destroy_inode() after a
- *   rcu grace period.
+ * - 当调用@ref xwfs_sops_destroy_inode()彻底销毁inode时，此函数会在RCU的
+ *   宽限期(grace period)结束后调用。
  */
 static
 void xwfs_sops_destroy_callback(struct rcu_head * head)
@@ -532,8 +509,8 @@ void xwfs_sops_destroy_callback(struct rcu_head * head)
 }
 
 /**
- * @brief superblock operation: destroy xwfs inode
- * @param inode: (I) pointer of inode to destory
+ * @brief XWFS的SOPS：彻底销毁inode
+ * @param inode: (I) 待删除的inode
  */
 static
 void xwfs_sops_destroy_inode(struct inode * inode)
@@ -542,18 +519,18 @@ void xwfs_sops_destroy_inode(struct inode * inode)
 }
 
 /**
- * @brief superblock operation: tell the caller whether to delete the inode.
- * @param inode: (I) pointer of inode to be dropped
- * @return boolean value to tell the caller whether to delete it
- * @retval 1: delete it
- * @retval 0: don't delete it
+ * @brief XWFS的SOPS：告诉调用者（VFS），是否需要删除inode
+ * @param inode: (I) 待删除的inode
+ * @return 布尔值
+ * @retval 1: 删除它
+ * @retval 0: 不能删除它
  * @note
- * - iput() will lock the inode->i_lock before it calls iput_final().
- * - If the return value is 1, <em>iput_final()</em> will delete the inode via
- *   calling the @ref xwfs_sops_destroy_inode().
- * - If the return value is 0 and the super_block has flag MS_ACTIVE,
- *   <em>iput_final()</em> will add the inode to lru list.
- * - @ref xwfs_mount() set the MS_ACTIVE flag to the super block when mount.
+ * - 此函数在**iput_final()**中调用，此时inode->i_lock已经被锁定；
+ * - 如果此函数返回1，iput_final()会调用**xwfs_sops_destroy_inode()**释放掉inode；
+ * - 如果此函数返回0，并且文件系统的超级块拥有标志**MS_ACTIVE**，VFS会将此inode加入
+ *   到lru链表，以减少下次申请inode时的系统开销；
+ * - 当挂载文件系统时，@ref xwfs_mount()会设置**MS_ACTIVE**标志，xwfs_mount()
+ *   函数由mount system call调用。
  */
 static
 int xwfs_sops_drop_inode(struct inode * inode)
@@ -562,12 +539,8 @@ int xwfs_sops_drop_inode(struct inode * inode)
 }
 
 /**
- * @brief superblock operation: put superblock
- * @param sb: super block
- * @note
- * - This function will be called by kill_litter_super() after all inode iput()
- *   in fsnotify_unmount_inodes(). So, if sb->s_fs_info is a memory that is
- *   allocate dynamically, kfree() it here.
+ * @brief XWFS的SOPS：释放文件系统的超级块
+ * @param sb: (I) 文件系统的超级块指针
  */
 static
 void xwfs_sops_put_super(struct super_block * sb)
@@ -579,8 +552,9 @@ void xwfs_sops_put_super(struct super_block * sb)
 }
 
 /**
- * @brief superblock operation: get the status of a filesystem
- * @param sb: (I) pointer of super block
+ * @brief XWFS的SOPS：获取文件系统状态
+ * @param sb: (I) 文件系统的超级块指针
+ * @param buf: (O) 指向缓冲区的指针，通过此缓冲区返回文件系统状态
  */
 static
 int xwfs_sops_statfs(struct dentry * dentry, struct kstatfs * buf)
@@ -589,9 +563,9 @@ int xwfs_sops_statfs(struct dentry * dentry, struct kstatfs * buf)
 }
 
 /**
- * @brief superblock operation: show mount options
- * @param seq: (I) pointer of seq file to cache the output
- * @param rootd: (I) pointer ofroot dentry of filesystem
+ * @brief XWFS的SOPS：显示挂载选项
+ * @param seq: (I) 指向用于输出的seq_file的指针
+ * @param rootd: (I) 指向文件系统根目录的dentry
  * @retval 0
  */
 static
@@ -632,32 +606,23 @@ int xwfs_set_page_dirty_no_writeback(struct page * page)
 
 /******** ******** directory inode operations ******** ********/
 /**
- * @brief xwfs inode operation for directory: look up a dentry (linux >= 3.6.0)
- * @param iparent: (I) pointer ofbase directory
- * @param dentry: (I) pointer ofthe new dentry that VFS allocated.
- * @param flags: (I) lookup flags.
- * @return the dentry that the function found.
- * @retval NULL: The function doesn't create a new dentry.
- *               Use the dentry that VFS allocated.
- * @retval other dentry: function supplys a new dentry. ( It means VFS will free
- *                       the old one).
- * @retval errno: Indicate the error code
+ * @brief XWFS的IOPS：查找dentry (linux >= 3.6.0)
+ * @param iparent: (I) 指向父目录inode的指针
+ * @param dentry: (I) 指向dentry的指针，此dentry由VFS动态分配
+ * @param flags: (I) 查找标志
+ * @return 查找到的dentry的指针
+ * @retval NULL: 告诉VFS，传递进来的/dentry/有效
+ * @retval another dentry: 告诉VFS，此函数会返回另一个dentry，
+ *                         刚才传递进来的dentry不使用。
+ * @retval errno: 错误值
  * @note
- * - See <em>__lookup_hash()</em> in <b><i>fs/namei.c</i></b> to get the detail
- *   process of lookup. Default function is <em>simple_lookup()</em> in
- *   <b><i>fs/libfs.c</i></b>.
- * - If VFS can lookup the dentry, this function will not be called. And VFS
- *   use the dentry as the result.
- * - If VFS can't look up the dentry, VFS allocates a new dentry
- *   (via d_alloc()), then calls this function. the parameter
- *   <b><em>dentry</em></b> is the new dentry.
- * - If the return value of this function is <b>NOT</b> NULL, it means that the
- *   function can supply another dentry instead of the one that VFS
- *   allocated to you. VFS will dput() the old one, and use the return
- *   value as final result. (See <em>lookup_real()</em>) in
- *   <b><i>fs/namei.c</i></b> for details.
- * - If it is failed, error code will be returned.
- * - linux >= 3.6.0.
+ * - 可以在**fs/namei.c**中找到**__lookup_hash()**函数，此函数为VFS具体查找过程
+ * - 当VFS找到了已经存在的dentry，此函数不会被调用；
+ * - 仅当VFS找不到对应路径的dentry，从内存管理系统中新建了一个（通过函数**d_alloc()**）
+ *   才会调用此函数，并将新建的dentry作为参数；
+ * - 如果此函数的返回值不为空，表示此函数有自己的查找机制，VFS新建dentry无效，
+ *   之后VFS会将刚才新建的dentry释放掉，可在**lookup_real()**中找到具体代码；
+ * - linux内核版本 >= 3.6.0。
  */
 static
 struct dentry * xwfs_dir_iops_lookup(struct inode * iparent,
@@ -798,12 +763,12 @@ long xwfs_node_fops_unlocked_ioctl(struct file * file, unsigned int cmd,
 
 /******** ******** xwfs APIs ******** ********/
 /**
- * @brief Internal function to create a kernel path
- * @param name: (I) pointer of new entry name of the path
- * @param parent: (I) pointer of parent directory pointer
- * @param dptrbuf: (I) pointer of L2-pointer buffer to return the dentry pointer
- * @param pathbuf (I) pointer of buffer to return the path
- * @return error code
+ * @brief 建立内核路径
+ * @param name: (I) 相对于父目录的路径名
+ * @param parent: (I) 父目录的指针
+ * @param dptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回dentry的指针
+ * @param pathbuf (O) 指向缓冲区的指针，通过此缓冲区返回内核路径
+ * @return 错误码
  */
 static
 xwer_t xwfs_path_create(const char * name, struct xwfs_dir * parent,
@@ -862,10 +827,10 @@ err_not_mnt:
 }
 
 /**
- * @brief Internal function to finish the kernel path
- * @param pathparent: (I) pointer of kernel path
- * @param dentry: (I) pointer of dentry of the path string
- * @return error code
+ * @brief 释放内核路径
+ * @param pathparent: (I) 父目录的内核路径
+ * @param dentry: (I) 路径最后一级的dentry
+ * @return 错误码
  */
 static
 void xwfs_done_path_create(struct path * pathparent, struct dentry * dentry)
@@ -873,14 +838,6 @@ void xwfs_done_path_create(struct path * pathparent, struct dentry * dentry)
         done_path_create(pathparent, dentry);
 }
 
-/**
- * @brief Internal function to create a node
- * @param parent: (I) pointer of inode of parent directory
- * @param dentry: (I) pointer of dentry of new node
- * @param mode: (I) mode of new folder
- * @param deve: (I) device number
- * @return error code
- */
 static
 xwer_t xwfs_mknod_internal(struct xwfs_dir * parent,
                            struct dentry * dentry,
@@ -908,11 +865,11 @@ xwer_t xwfs_mknod_internal(struct xwfs_dir * parent,
 }
 
 /**
- * @brief Create a directory
- * @param name: (I) pointer of name of directory
- * @param parent: (I) pointer of parent directory
- * @param newdir: (I) pointer of pointer buffer to return the new directory
- * @return error code
+ * @brief XWFS API：创建文件夹
+ * @param name: (I) 文件夹名
+ * @param parent: (I) 父目录
+ * @param newdir: (O) 指向缓冲区的指针，通过此缓冲区返回新建的文件夹
+ * @return 错误码
  */
 xwer_t xwfs_mkdir(const char * name, struct xwfs_dir * parent,
                   struct xwfs_dir ** newdir)
@@ -955,14 +912,14 @@ err_xwfs_path_create:
 }
 
 /**
- * @brief Create a node
- * @param name: (I) pointer of node name string
- * @param mode: (I) file mode
- * @param xwfsops: (I) pointer of xwfs operations
- * @param data: (I) pointer of user data
- * @param parent: (I) pointer of parent directory
- * @param newnode: (I) pointer of buffer to return the new node
- * @return error code
+ * @brief XWFS API：创建文件节点
+ * @param name: (I) 节点名
+ * @param mode: (I) 文件的权限
+ * @param xwfsops: (I) 节点的操作函数集合
+ * @param data: (I) 用户数据指针
+ * @param parent: (I) 父目录
+ * @param newnode: (O) 指向缓冲区的指针，通过此缓冲区返回新建的节点
+ * @return 错误码
  */
 xwer_t xwfs_mknod(const char * name,
                   umode_t mode,
@@ -1003,10 +960,7 @@ err_xwfs_path_create:
 }
 
 /**
- * @brief Internal function to get a kernel path of parent directory
- * @param parent: (I) pointer of parent directory
- * @param pathbuf: (I) pointer of buffer to return the path
- * @return error code
+ * @brief 获取父目录的内核路径
  */
 static
 xwer_t xwfs_get_path_parent(struct xwfs_dir * parent, struct path * pathbuf)
@@ -1040,10 +994,7 @@ err_not_mnt:
 }
 
 /**
- * @brief Internal function to put the kernel path of parent directory
- * @param pathparent: kernel path
- * @retval XWOK: 没有错误
- * @retval <0: error code
+ * @brief 释放父目录的内核路径
  */
 static
 void xwfs_put_path_parent(struct path * pathparent)
@@ -1058,9 +1009,9 @@ void xwfs_put_path_parent(struct path * pathparent)
 }
 
 /**
- * @brief Remove a directory
- * @param dir: (I) pointer of directory
- * @return error code
+ * @brief XWFS API：删除目录
+ * @param dir: (I) 目录的指针
+ * @return 错误码
  */
 xwer_t xwfs_rmdir(struct xwfs_dir * dir)
 {
@@ -1126,9 +1077,9 @@ err_nullparent:
 }
 
 /**
- * @brief Remove a node
- * @param node: () pointer of node
- * @return error code
+ * @brief XWFS API：删除节点
+ * @param node: (I) 节点的指针
+ * @return 错误码
  */
 xwer_t xwfs_rmnod(struct xwfs_node * node)
 {
@@ -1148,8 +1099,7 @@ xwer_t xwfs_rmnod(struct xwfs_node * node)
         if (__xwcc_unlikely(rc < 0))
                 goto err_get_path_parent;
 
-        /* XWFS forbids hard link. So, there is only
-           one dentry that instantiates the inode. */
+        /* XWFS不允许创建硬链接，inode只有一个dentry */
         d = hlist_entry(node->inode.i_dentry.first,
                         struct dentry,
                         d_u.d_alias);
@@ -1194,6 +1144,10 @@ err_nullparent:
         return rc;
 }
 
+/**
+ * @brief XWFS API：启动XWFS
+ * @return 错误码
+ */
 xwer_t xwfs_start(void)
 {
         struct vfsmount * mnt;
@@ -1219,7 +1173,7 @@ xwer_t xwfs_start(void)
 
         xwfs_rootpath.mnt = mnt;
         xwfs_rootpath.dentry = mnt->mnt_root;
-        xwaop_write(xwsq_t, &xwfs_mntcnt, 1, NULL);
+        xwaop_write(xwsq, &xwfs_mntcnt, 1, NULL);
         xwfslogf(INFO, "kernel mount xwfs ... [OK]\n");
 
         rc = xwfs_create_skeleton();
@@ -1227,35 +1181,14 @@ xwer_t xwfs_start(void)
                 goto err_create_skeleton;
         }
 
-        rc = xwos_scheduler_xwfs_init();
+        rc = xwmp_skd_xwfs_init();
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_xwos_scheduler_xwfs_init;
-        }
-
-        rc = xwlk_mtx_xwfs_init();
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_oslk_mtx_xwfs_init;
-        }
-
-        rc = xwsync_smr_xwfs_init();
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_xwsync_smr_xwfs_init;
-        }
-
-        rc = xwsync_cdt_xwfs_init();
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_xwsync_cdt_xwfs_init;
+                goto err_xwmp_skd_xwfs_init;
         }
 
         return XWOK;
 
-err_xwsync_cdt_xwfs_init:
-        xwsync_smr_xwfs_exit();
-err_xwsync_smr_xwfs_init:
-        xwlk_mtx_xwfs_exit();
-err_oslk_mtx_xwfs_init:
-        xwos_scheduler_xwfs_exit();
-err_xwos_scheduler_xwfs_init:
+err_xwmp_skd_xwfs_init:
         xwfs_delete_skeleton();
 err_create_skeleton:
         kern_unmount(xwfs_rootpath.mnt);
@@ -1266,16 +1199,17 @@ err_xwfs_alrdymnted:
         return rc;
 }
 
+/**
+ * @brief XWFS API：停止XWFS
+ * @return 错误码
+ */
 xwer_t xwfs_stop(void)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_sub(xwsq_t, &xwfs_mntcnt, 1, 1, NULL, NULL);
+        rc = xwaop_teq_then_sub(xwsq, &xwfs_mntcnt, 1, 1, NULL, NULL);
         if (XWOK == rc) {
-                xwsync_cdt_xwfs_exit();
-                xwsync_smr_xwfs_exit();
-                xwlk_mtx_xwfs_exit();
-                xwos_scheduler_xwfs_exit();
+                xwmp_skd_xwfs_exit();
                 xwfs_delete_skeleton();
                 kern_unmount(xwfs_rootpath.mnt);
                 xwfs_rootpath.mnt = NULL;
@@ -1289,7 +1223,7 @@ xwer_t xwfs_holdon(void)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_add(xwsq_t, &xwfs_mntcnt, 1, 1, NULL, NULL);
+        rc = xwaop_tge_then_add(xwsq, &xwfs_mntcnt, 1, 1, NULL, NULL);
         return rc;
 }
 
@@ -1297,13 +1231,10 @@ xwer_t xwfs_giveup(void)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_sub(xwsq_t, &xwfs_mntcnt, 1, 1, NULL, NULL);
+        rc = xwaop_tge_then_sub(xwsq, &xwfs_mntcnt, 1, 1, NULL, NULL);
         return rc;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********           /sys/xwos/xwfs           ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwsys_object * xwfs_xwsys_obj;
 
 /******** /sys/xwos/xwfs/cmd ********/
@@ -1418,8 +1349,8 @@ static XWSYS_ATTR(file_xwfs_state, state, 0644,
 
 static
 ssize_t xwfs_xwsys_state_show(struct xwsys_object * xwobj,
-                                   struct xwsys_attribute * xwattr,
-                                   char * buf)
+                              struct xwsys_attribute * xwattr,
+                              char * buf)
 {
         ssize_t showcnt;
 
@@ -1443,9 +1374,6 @@ ssize_t xwfs_xwsys_state_store(struct xwsys_object * xwobj,
         return -ENOSYS;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********    init & exit    ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwfs_init(void)
 {
         xwer_t rc;

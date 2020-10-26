@@ -21,9 +21,6 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwaop.h>
@@ -31,19 +28,7 @@
 #include <bm/mcuc/init.h>
 #include <bm/mcuc/session.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      types        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********        function declarations        ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 int mcuc_session_open(struct xwfs_node * xwfsnode, struct file * file);
-
 int mcuc_session_close(struct xwfs_node * xwfsnode, struct file * file);
 
 static
@@ -59,9 +44,6 @@ static
 long mcuc_session_ioctl(struct xwfs_node * xwfsnode, struct file * file,
                        unsigned int cmd, unsigned long arg);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      .data        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 const struct xwfs_operations mcuc_session_xwfsops = {
         .open = mcuc_session_open,
         .release = mcuc_session_close,
@@ -72,9 +54,6 @@ const struct xwfs_operations mcuc_session_xwfsops = {
 
 struct xwfs_node * mcuc_session;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 int mcuc_session_open(struct xwfs_node * xwfsnode, struct file * file)
 {
         return (int)mcuc_grab();
@@ -112,7 +91,7 @@ xwer_t mcuc_session_init(void)
         struct xwfs_node * node;
 
         rc = xwfs_mknod("session", 0660, &mcuc_session_xwfsops, NULL,
-                        dir_mcuc, &node);
+                        xwfs_dir_mcuc, &node);
         if (__xwcc_unlikely(rc < 0)) {
                 mcuclogf(ERR, "Fail to mknod(\"session\"), rc: %d\n", rc);
                 goto err_mknod_session;

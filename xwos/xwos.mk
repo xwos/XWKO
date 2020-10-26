@@ -26,6 +26,7 @@ XWOS_CSRCS :=
 XWOS_ASRCS :=
 
 ######## ######## ######## ########   libs   ######## ######## ######## ########
+XWOS_CSRCS += lib/object.c
 XWOS_CSRCS += lib/xwbop.c
 XWOS_CSRCS += lib/xwlog.c
 
@@ -67,26 +68,23 @@ ifeq ($(XWLIBCFG_CRC32),y)
     XWOS_CSRCS += lib/crc32.c
 endif
 
-ifeq ($(XWLIBCFG_LINID),y)
-    XWOS_CSRCS += lib/linid.c
-endif
-
 ######## ######## ######## ######## init ######## ######## ######## ########
 XWOS_CSRCS += init.c
 
-######## ######## ######## ######## CPU resource ######## ######## ######## ########
-XWOS_CSRCS += core/scheduler.c
-XWOS_CSRCS += core/thread.c
-XWOS_CSRCS += core/swt.c
-XWOS_CSRCS += core/pm.c
+######## ######## ######## ######## Mp ######## ######## ######## ########
+XWOS_CSRCS += mp/ksym.c
+XWOS_CSRCS += mp/skd.c
+XWOS_CSRCS += mp/thd.c
+XWOS_CSRCS += mp/swt.c
+XWOS_CSRCS += mp/pm.c
 
-######## ######## ######## ######## lock ######## ######## ######## ########
-XWOS_CSRCS += lock/mutex.c
+######## lock ########
+XWOS_CSRCS += mp/lock/mtx.c
 
-######## ######## ######## ######## sync ######## ######## ######## ########
-XWOS_CSRCS += sync/semaphore.c
-XWOS_CSRCS += sync/condition.c
-XWOS_CSRCS += sync/event.c
+######## sync ########
+XWOS_CSRCS += mp/sync/sem.c
+XWOS_CSRCS += mp/sync/cond.c
+XWOS_CSRCS += mp/sync/evt.c
 
 ######## ######## ######## ######## mm ######## ######## ######## ########
 XWOS_CSRCS += mm/sma.c

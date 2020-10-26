@@ -21,16 +21,13 @@
  * > under either the MPL or the GPL.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
 #include <linux/slab.h>
 #include <linux/parser.h>
 #include <linux/uaccess.h>
+#include <xwos/lib/xwlog.h>
+#include <xwos/mp/pm.h>
+#include <xwos/osal/skd.h>
 #include <xwmd/xwfs/fs.h>
 #include <xwmd/xwfs/bs.h>
 #include <xwmd/sysfs/core.h>
@@ -40,9 +37,7 @@
 #include <xwmd/isc/xwscp/hwif/uart.h>
 #include <bdl/isc/uart.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********            XWSCP resrouces            ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+XWSCP_DEF_MEMPOOL(usi_xwscp_mem);
 struct xwscp usi_xwscp;
 xwsq_t usi_xwscp_state = USI_XWSCP_STATE_STOP;
 
@@ -51,14 +46,27 @@ xwsq_t usi_xwscp_get_state(void)
         return usi_xwscp_state;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********          xwfs/xwmd/isc/xwscp          ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+void usi_xwscp_pm_notify(unsigned long pmevt)
+{
+        switch (pmevt) {
+        case PM_HIBERNATION_PREPARE:
+        case PM_SUSPEND_PREPARE:
+                if (USI_XWSCP_STATE_START == usi_xwscp_get_state()) {
+                        xwos_thd_intr(usi_xwscp.rx.thd);
+                }
+                break;
+        case PM_POST_RESTORE:
+        case PM_POST_HIBERNATION:
+        case PM_POST_SUSPEND:
+                break;
+        case PM_RESTORE_PREPARE:
+        default:
+                break;
+        }
+}
+
 struct xwfs_dir * usi_xwscp_xwfs = NULL;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********        xwfs/xwmd/isc/xwscp/port       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 ssize_t usi_xwscp_xwfs_port_read(struct xwfs_node * xwfsnode,
                                  struct file * file,
@@ -87,22 +95,22 @@ ssize_t usi_xwscp_xwfs_port_read(struct xwfs_node * xwfsnode,
                                  size_t count,
                                  loff_t * pos)
 {
-        ssize_t rdcnt;
+        ssize_t ret;
+        xwsz_t bufsize;
         xwtm_t desired;
-        xwsz_t bufcnt;
         xwer_t rc;
         uint8_t buf[count];
 
         desired = XWTM_MAX;
-        bufcnt = count;
-        rc = xwscp_rx(&usi_xwscp, buf, &bufcnt, &desired);
+        bufsize = count;
+        rc = xwscp_rx(&usi_xwscp, buf, &bufsize, &desired);
         if (XWOK == rc) {
-                rdcnt = bufcnt;
-                rc = copy_to_user(usbuf, buf, rdcnt);
+                ret = bufsize;
+                rc = copy_to_user(usbuf, buf, bufsize);
         } else {
-                rdcnt = (ssize_t)rc;
+                ret = (ssize_t)rc;
         }
-        return rdcnt;
+        return ret;
 }
 
 static
@@ -112,35 +120,32 @@ ssize_t usi_xwscp_xwfs_port_write(struct xwfs_node *xwfsnode,
                                   size_t count,
                                   loff_t *pos)
 {
+        ssize_t ret;
+        xwsz_t datasz;
         xwtm_t desired;
         xwer_t rc;
-        xwsz_t datasz;
         uint8_t data[count];
 
         if (usdata) {
                 rc = copy_from_user(data, usdata, count);
                 datasz = count;
                 desired = XWTM_MAX;
-                rc = xwscp_tx(&usi_xwscp, data, &datasz, &desired);
-                if (__xwcc_unlikely(rc < 0)) {
-                        count = (ssize_t)rc;
+                rc = xwscp_tx(&usi_xwscp, data, &datasz, XWSCP_MSG_QOS_3, &desired);
+                if (rc < 0) {
+                        ret = (ssize_t)rc;
+                } else {
+                        ret = datasz;
                 }
         } else {
                 desired = XWTM_MAX;
                 rc = xwscp_connect(&usi_xwscp, &desired);
-                count = rc;
+                ret = rc;
         }
-        return count;
+        return ret;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********           /sys/xwosal/xwscp           ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwsys_object * usi_xwscp_xwsys;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         /sys/xwosal/xwscp/cmd         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define USI_XWSCP_XWSYS_ARGBUFSIZE  32
 
 enum usi_xwscp_xwsys_cmd_em {
@@ -192,14 +197,15 @@ xwer_t usi_xwscp_start(void)
                 goto err_xwfs_not_ready;
         }
 
-        rc = xwfs_mkdir("xwscp", dir_isc, &usi_xwscp_xwfs);
+        rc = xwfs_mkdir("xwscp", xwfs_dir_isc, &usi_xwscp_xwfs);
         if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Fail to mkdir(\"xwscp\"), rc: %d\n", rc);
                 goto err_mkdir_usi_xwscp_xwfs;
         }
 
         rc = xwscp_start(&usi_xwscp, "usi_xwscp",
-                         &xwscpif_uart_ops, modparam_isc_uart);
+                         &xwscpif_uart_ops, modparam_isc_uart,
+                         usi_xwscp_mem, sizeof(usi_xwscp_mem));
         if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Activate xwscp ... [Failed], errno: %d\n", rc);
                 goto err_xwscp_start;
@@ -358,9 +364,6 @@ ssize_t usi_xwscp_xwsys_cmd_store(struct xwsys_object * xwobj,
         return cnt;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********        /sys/xwos/xwscp/state        ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 ssize_t usi_xwscp_xwsys_state_show(struct xwsys_object * xwobj,
                                    struct xwsys_attribute * xwattr,
@@ -382,7 +385,7 @@ ssize_t usi_xwscp_xwsys_state_show(struct xwsys_object * xwobj,
                                    char * buf)
 {
         ssize_t showcnt;
-        xwssq_t smrval;
+        xwssq_t semval;
         xwer_t rc;
 
         showcnt = 0;
@@ -394,21 +397,12 @@ ssize_t usi_xwscp_xwsys_state_show(struct xwsys_object * xwobj,
                 showcnt += sprintf(&buf[showcnt], "State: OFF\n");
         } else {
                 showcnt += sprintf(&buf[showcnt], "State: ON\n");
-                /* Slot */
-                rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwscp.slot.smr),
-                                         &smrval);
-                if (XWOK == rc) {
-                        showcnt += sprintf(&buf[showcnt],
-                                           "Slot Pool: 0x%lX\n",
-                                           smrval);
-                }
 
                 /* RXQ */
-                rc = xwosal_smr_getvalue(xwosal_smr_get_id(&usi_xwscp.rxq.smr),
-                                         &smrval);
+                rc = xwos_sem_getvalue(&usi_xwscp.rx.sem, &semval);
                 if (XWOK == rc) {
                         showcnt += sprintf(&buf[showcnt],
-                                           "RX Queue: 0x%lX\n", smrval);
+                                           "RX Queue: 0x%lX\n", semval);
                 }
         }
 
@@ -426,9 +420,6 @@ ssize_t usi_xwscp_xwsys_state_store(struct xwsys_object * xwobj,
         return -ENOSYS;
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********    init & exit    ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t usi_xwscp_init(void)
 {
         xwer_t rc;

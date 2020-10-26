@@ -25,108 +25,85 @@
 #include <xwos/lib/xwlog.h>
 #include <xwmd/xwfs/fs.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macro       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+struct xwfs_dir * xwfs_dir_xwos = NULL;
+struct xwfs_dir * xwfs_dir_mp = NULL;
+struct xwfs_dir * xwfs_dir_sync = NULL;
+struct xwfs_dir * xwfs_dir_lock = NULL;
+struct xwfs_dir * xwfs_dir_xwmd = NULL;
+struct xwfs_dir * xwfs_dir_isc = NULL;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       type        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function declarations    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      .data        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwfs_dir * dir_xwos = NULL;
-
-struct xwfs_dir * dir_core = NULL;
-
-struct xwfs_dir * dir_sync = NULL;
-
-struct xwfs_dir * dir_locks = NULL;
-
-struct xwfs_dir * dir_xwmd = NULL;
-
-struct xwfs_dir * dir_isc = NULL;
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwfs_create_skeleton(void)
 {
         xwer_t rc;
 
-        rc = xwfs_mkdir("xwos", NULL, &dir_xwos);
+        rc = xwfs_mkdir("xwos", NULL, &xwfs_dir_xwos);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_mkdir_xwos;
+                goto err_mkxwfs_dir_xwos;
         }
 
-        rc = xwfs_mkdir("core", dir_xwos, &dir_core);
+        rc = xwfs_mkdir("mp", xwfs_dir_xwos, &xwfs_dir_mp);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_mkdir_core;
+                goto err_mkxwfs_dir_mp;
         }
 
-        rc = xwfs_mkdir("sync", dir_core, &dir_sync);
+        rc = xwfs_mkdir("sync", xwfs_dir_mp, &xwfs_dir_sync);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_mkdir_sync;
+                goto err_mkxwfs_dir_sync;
         }
 
-        rc = xwfs_mkdir("locks", dir_core, &dir_locks);
+        rc = xwfs_mkdir("lock", xwfs_dir_mp, &xwfs_dir_lock);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_mkdir_locks;
+                goto err_mkxwfs_dir_lock;
         }
 
-        rc = xwfs_mkdir("xwmd", NULL, &dir_xwmd);
+        rc = xwfs_mkdir("xwmd", NULL, &xwfs_dir_xwmd);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_mkdir_xwmd;
+                goto err_mkxwfs_dir_xwmd;
         }
 
-        rc = xwfs_mkdir("isc", dir_xwmd, &dir_isc);
+        rc = xwfs_mkdir("isc", xwfs_dir_xwmd, &xwfs_dir_isc);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_mkdir_isc;
+                goto err_mkxwfs_dir_isc;
         }
 
         return XWOK;
 
-err_mkdir_isc:
-        xwfs_rmdir(dir_xwmd);
-        dir_xwmd = NULL;
-err_mkdir_xwmd:
-        xwfs_rmdir(dir_locks);
-        dir_locks = NULL;
-err_mkdir_locks:
-        xwfs_rmdir(dir_sync);
-        dir_sync = NULL;
-err_mkdir_sync:
-        xwfs_rmdir(dir_core);
-        dir_core = NULL;
-err_mkdir_core:
-        xwfs_rmdir(dir_xwos);
-        dir_xwos = NULL;
-err_mkdir_xwos:
+err_mkxwfs_dir_isc:
+        xwfs_rmdir(xwfs_dir_xwmd);
+        xwfs_dir_xwmd = NULL;
+err_mkxwfs_dir_xwmd:
+        xwfs_rmdir(xwfs_dir_lock);
+        xwfs_dir_lock = NULL;
+err_mkxwfs_dir_lock:
+        xwfs_rmdir(xwfs_dir_sync);
+        xwfs_dir_sync = NULL;
+err_mkxwfs_dir_sync:
+        xwfs_rmdir(xwfs_dir_mp);
+        xwfs_dir_mp = NULL;
+err_mkxwfs_dir_mp:
+        xwfs_rmdir(xwfs_dir_xwos);
+        xwfs_dir_xwos = NULL;
+err_mkxwfs_dir_xwos:
         return rc;
 }
 
 void xwfs_delete_skeleton(void)
 {
-        xwfs_rmdir(dir_isc);
-        dir_isc = NULL;
+        xwfs_rmdir(xwfs_dir_isc);
+        xwfs_dir_isc = NULL;
 
-        xwfs_rmdir(dir_xwmd);
-        dir_xwmd = NULL;
+        xwfs_rmdir(xwfs_dir_xwmd);
+        xwfs_dir_xwmd = NULL;
 
-        xwfs_rmdir(dir_locks);
-        dir_locks = NULL;
+        xwfs_rmdir(xwfs_dir_lock);
+        xwfs_dir_lock = NULL;
 
-        xwfs_rmdir(dir_sync);
-        dir_sync = NULL;
+        xwfs_rmdir(xwfs_dir_sync);
+        xwfs_dir_sync = NULL;
 
-        xwfs_rmdir(dir_core);
-        dir_core = NULL;
+        xwfs_rmdir(xwfs_dir_mp);
+        xwfs_dir_mp = NULL;
 
-        xwfs_rmdir(dir_xwos);
-        dir_xwos = NULL;
+        xwfs_rmdir(xwfs_dir_xwos);
+        xwfs_dir_xwos = NULL;
 }
