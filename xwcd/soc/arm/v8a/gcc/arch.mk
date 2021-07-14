@@ -1,6 +1,6 @@
-#! /bin/bash
+#! /bin/make -f
 # @file
-# @brief environment-setup shell script
+# @brief ARCH描述层的编译规则
 # @author
 # + 隐星魂 (Roy.Sun) <https://xwos.tech>
 # @copyright
@@ -21,12 +21,36 @@
 # > under either the MPL or the GPL.
 #
 
-if [[ ${BASH_SOURCE[0]} = ${0} ]] ;then
-	echo -e "\033[33;1mThis script must be sourced by bash!\033[0m"
-	exit 0
-fi
+ARCH_INCDIRS :=
+ARCH_CFLAGS :=
+ARCH_AFLAGS :=
+ARCH_LDFLAGS :=
+ARCH_EOBJS :=
 
-cd $(dirname ${BASH_SOURCE[0]})
-make cfg
-source wkspc/env.rc
-xwcroot
+ARCH_CSRCS :=
+ARCH_CSRCS += xwosimpl_soc_xwbop.c
+
+ifeq ($(ARCHCFG_LIB_XWAOP8),y)
+    ARCH_CSRCS += asmlib/xwaop/xws8.c
+    ARCH_CSRCS += asmlib/xwaop/xwu8.c
+endif
+ifeq ($(ARCHCFG_LIB_XWAOP16),y)
+    ARCH_CSRCS += asmlib/xwaop/xws16.c
+    ARCH_CSRCS += asmlib/xwaop/xwu16.c
+endif
+
+ifeq ($(ARCHCFG_LIB_XWAOP32),y)
+    ARCH_CSRCS += asmlib/xwaop/xws32.c
+    ARCH_CSRCS += asmlib/xwaop/xwu32.c
+endif
+
+ifeq ($(ARCHCFG_LIB_XWAOP64),y)
+    ARCH_CSRCS += asmlib/xwaop/xws64.c
+    ARCH_CSRCS += asmlib/xwaop/xwu64.c
+endif
+
+ifeq ($(ARCHCFG_LIB_XWBMPAOP),y)
+    ARCH_CSRCS += xwosimpl_soc_xwbmpaop.c
+endif
+
+ARCH_CSRCS += xwosimpl_soc_lfq.c

@@ -38,7 +38,7 @@ __xwlib_data xwsq_a xwos_objtik_dispatcher;
 /**
  * @brief 每CPU的对象标签分配器
  */
-__xwlib_data __xwcc_atomic DEFINE_PER_CPU(xwsq_t, xwos_objtik);
+__xwlib_data DEFINE_PER_CPU(xwsq_t, xwos_objtik);
 
 /**
  * @brief 初始化对象标签分配器

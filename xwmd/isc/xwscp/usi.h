@@ -30,7 +30,11 @@
 
 struct xwscp_usmsg {
         size_t size;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0)
         struct __kernel_timespec timeout;
+#else
+        struct timeval timeout;
+#endif
         uint8_t * text;
 };
 

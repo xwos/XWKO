@@ -26,6 +26,7 @@
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
   #include <linux/sched/signal.h>
 #endif
+#include <linux/sched/rt.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/bclst.h>

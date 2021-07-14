@@ -10,7 +10,7 @@ xwos.symvers
 *.o
 *.o.d
 .tmp_versions
-wkspc
+autogen.h
 XuanWuOS.cfg
 Makefile
 GTAGS

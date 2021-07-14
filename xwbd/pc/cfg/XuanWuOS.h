@@ -12,7 +12,6 @@
 #define XuanWuOS_CFG_ARCH                               x86
 #define XuanWuOS_CFG_SUBARCH                            x86_64
 #define XuanWuOS_CFG_COMPILER                           gcc
-#define XuanWuOS_CFG_ELF_MK                             ko.mk
 #include <cfg/arch.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

@@ -28,6 +28,8 @@
 
 #define LOGTAG "ksym"
 
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 7, 0)
 typeof(kallsyms_lookup_name) * xwmp_allsyms_lookup_name = NULL;
 
 int xwmp_ksym_kp_pre_handler(struct kprobe * p, struct pt_regs * regs)
@@ -38,9 +40,14 @@ int xwmp_ksym_kp_pre_handler(struct kprobe * p, struct pt_regs * regs)
 static struct kprobe xwmp_ksym_kp = {
         .symbol_name = "kallsyms_lookup_name",
 };
+#else
+typeof(kallsyms_lookup_name) * xwmp_allsyms_lookup_name = kallsyms_lookup_name;
+
+#endif
 
 xwer_t xwmp_ksym_init(void)
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 7, 0)
         xwer_t rc = -1;
 
         xwmp_ksym_kp.pre_handler = xwmp_ksym_kp_pre_handler;
@@ -54,4 +61,7 @@ xwer_t xwmp_ksym_init(void)
                 unregister_kprobe(&xwmp_ksym_kp);
         }
         return rc;
+#else
+        return XWOK;
+#endif
 }

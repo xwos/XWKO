@@ -340,9 +340,9 @@
  */
 #define xwmb_write(t, p, v)     WRITE_ONCE(*(p), v)
 
-#define xwmb_smp_mb()           smp_mb()
-#define xwmb_smp_rmb()          smp_rmb()
-#define xwmb_smp_wmb()          smp_wmb()
+#define xwmb_mp_mb()            smp_mb()
+#define xwmb_mp_rmb()           smp_rmb()
+#define xwmb_mp_wmb()           smp_wmb()
 #define xwccmb()                barrier()
 
 /******** ******** MP primitives ******** ********/

@@ -49,7 +49,7 @@ void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n)
                 top->s.ticket = 0;
                 nv.s.link = (xwptr_t)n;
                 nv.s.ticket = ov.s.ticket + 1;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 /* 使用GCC内置函数产生指令：lock cmpxchg16b，
                    需要增加编译选项-mcx16 */
                 rc = __sync_bool_compare_and_swap(h, ov.u128, nv.u128);
@@ -76,7 +76,7 @@ xwlfq_t * xwlib_lfq_pop(xwlfq_a * h)
                         top.lfq = NULL;
                         break;
                 }
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 /* 使用GCC内置函数产生指令：lock cmpxchg16b，
                    需要增加编译选项-mcx16 */
                 rc = __sync_bool_compare_and_swap(h, ov.u128, nv.u128);
