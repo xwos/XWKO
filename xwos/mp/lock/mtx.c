@@ -123,12 +123,12 @@ xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio)
 }
 EXPORT_SYMBOL(xwmp_mtx_init);
 
-xwer_t xwmp_mtx_destroy(struct xwmp_mtx * mtx)
+xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         return xwmp_mtx_put(mtx);
 }
-EXPORT_SYMBOL(xwmp_mtx_destroy);
+EXPORT_SYMBOL(xwmp_mtx_fini);
 
 xwer_t xwmp_mtx_create(struct xwmp_mtx ** ptrbuf, xwpr_t sprio)
 {

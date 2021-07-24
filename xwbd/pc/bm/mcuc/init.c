@@ -31,8 +31,6 @@
 #include <xwmd/xwfs/fs.h>
 #include <bdl/board.h>
 #include <bm/mcuc/msgnode.h>
-#include <bm/mcuc/session.h>
-#include <bm/mcuc/wkup.h>
 #include <bm/mcuc/init.h>
 
 struct xwfs_dir * xwfs_dir_mcuc = NULL;
@@ -43,42 +41,26 @@ xwer_t mcuc_start(void)
         xwer_t rc;
 
         rc = xwaop_teq_then_add(xwsq, &mcuc_state, MCUC_STATE_STOP, 1, NULL, NULL);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 rc = -EPERM;
                 goto err_perm;
         }
-
         rc = xwfs_holdon();
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 rc = -EOWNERDEAD;
                 goto err_xwfs_not_ready;
         }
-
         rc = xwfs_mkdir("mcuc", NULL, &xwfs_dir_mcuc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_mkdir_mcuc;
         }
-
         rc = mcuc_msgnode_init();
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_msgnode_init;
         }
 
-        rc = mcuc_session_init();
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_session_init;
-        }
-
-        rc = mcuc_wkup_init();
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_wkup_init;
-        }
         return XWOK;
 
-err_wkup_init:
-        mcuc_session_exit();
-err_session_init:
-        mcuc_msgnode_exit();
 err_msgnode_init:
         xwfs_rmdir(xwfs_dir_mcuc);
         xwfs_dir_mcuc = NULL;
@@ -99,16 +81,10 @@ xwer_t mcuc_stop(void)
                 rc = -EPERM;
                 goto err_state;
         }
-
-        mcuc_wkup_exit();
-        mcuc_session_exit();
         mcuc_msgnode_exit();
-
         xwfs_rmdir(xwfs_dir_mcuc);
         xwfs_dir_mcuc = NULL;
-
         xwfs_giveup();
-
         return XWOK;
 
 err_state:

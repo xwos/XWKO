@@ -45,7 +45,7 @@ void xwmp_cond_construct(void * anon);
 xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc);
 
 xwer_t xwmp_cond_init(struct xwmp_cond * cond);
-xwer_t xwmp_cond_destroy(struct xwmp_cond * cond);
+xwer_t xwmp_cond_fini(struct xwmp_cond * cond);
 xwer_t xwmp_cond_create(struct xwmp_cond ** ptrbuf);
 xwer_t xwmp_cond_delete(struct xwmp_cond * cond);
 

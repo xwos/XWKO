@@ -143,11 +143,11 @@ err_sem_activate:
 }
 EXPORT_SYMBOL(xwmp_sem_init);
 
-xwer_t xwmp_sem_destroy(struct xwmp_sem * sem)
+xwer_t xwmp_sem_fini(struct xwmp_sem * sem)
 {
         return xwmp_sem_put(sem);
 }
-EXPORT_SYMBOL(xwmp_sem_destroy);
+EXPORT_SYMBOL(xwmp_sem_fini);
 
 xwer_t xwmp_sem_create(struct xwmp_sem ** ptrbuf, xwssq_t val, xwssq_t max)
 {

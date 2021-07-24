@@ -132,11 +132,11 @@ xwer_t xwmp_cond_init(struct xwmp_cond * cond)
 }
 EXPORT_SYMBOL(xwmp_cond_init);
 
-xwer_t xwmp_cond_destroy(struct xwmp_cond * cond)
+xwer_t xwmp_cond_fini(struct xwmp_cond * cond)
 {
         return xwmp_cond_put(cond);
 }
-EXPORT_SYMBOL(xwmp_cond_destroy);
+EXPORT_SYMBOL(xwmp_cond_fini);
 
 xwer_t xwmp_cond_create(struct xwmp_cond ** ptrbuf)
 {

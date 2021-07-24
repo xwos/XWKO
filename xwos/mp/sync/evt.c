@@ -203,12 +203,12 @@ xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
 }
 EXPORT_SYMBOL(xwmp_evt_init);
 
-xwer_t xwmp_evt_destroy(struct xwmp_evt * evt)
+xwer_t xwmp_evt_fini(struct xwmp_evt * evt)
 {
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         return xwmp_evt_put(evt);
 }
-EXPORT_SYMBOL(xwmp_evt_destroy);
+EXPORT_SYMBOL(xwmp_evt_fini);
 
 xwer_t xwmp_evt_create(struct xwmp_evt ** ptrbuf, xwsq_t type, xwsz_t num)
 {

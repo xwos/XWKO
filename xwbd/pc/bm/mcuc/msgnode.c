@@ -75,31 +75,10 @@ struct mcuc_msgnode_info mcuc_msgnode[MCUC_MSGNODE_NUM] = {
                 },
                 .xwfsnode = NULL,
         },
-        [MCUC_MSGNODE_VHC] = {
+        [MCUC_MSGNODE_DAT] = {
                 .attr = {
-                        .port = MCUC_MSGNODE_VHC,
+                        .port = MCUC_MSGNODE_DAT,
                         .prio = 2,
-                },
-                .xwfsnode = NULL,
-        },
-        [MCUC_MSGNODE_DIAG] = {
-                .attr = {
-                        .port = MCUC_MSGNODE_DIAG,
-                        .prio = 1,
-                },
-                .xwfsnode = NULL,
-        },
-        [MCUC_MSGNODE_MISC] = {
-                .attr = {
-                        .port = MCUC_MSGNODE_MISC,
-                        .prio = 3,
-                },
-                .xwfsnode = NULL,
-        },
-        [MCUC_MSGNODE_SENSOR] = {
-                .attr = {
-                        .port = MCUC_MSGNODE_SENSOR,
-                        .prio = 1,
                 },
                 .xwfsnode = NULL,
         },
@@ -226,41 +205,14 @@ xwer_t mcuc_msgnode_init(void)
         }
         mcuc_msgnode[MCUC_MSGNODE_PWR].xwfsnode = node;
 
-        rc = xwfs_mknod("vhc", 0666, &mcuc_msgnode_xwfsops,
-                        (void *)&mcuc_msgnode[MCUC_MSGNODE_VHC],
+        rc = xwfs_mknod("dat", 0666, &mcuc_msgnode_xwfsops,
+                        (void *)&mcuc_msgnode[MCUC_MSGNODE_DAT],
                         xwfs_dir_mcuc, &node);
         if (__xwcc_unlikely(rc < 0)) {
-                mcuclogf(ERR, "Fail to mknod(\"vhc\"), rc: %d\n", rc);
-                goto err_mknod_vhc;
+                mcuclogf(ERR, "Fail to mknod(\"dat\"), rc: %d\n", rc);
+                goto err_mknod_dat;
         }
-        mcuc_msgnode[MCUC_MSGNODE_VHC].xwfsnode = node;
-
-        rc = xwfs_mknod("diag", 0666, &mcuc_msgnode_xwfsops,
-                        (void *)&mcuc_msgnode[MCUC_MSGNODE_DIAG],
-                        xwfs_dir_mcuc, &node);
-        if (__xwcc_unlikely(rc < 0)) {
-                mcuclogf(ERR, "Fail to mknod(\"diag\"), rc: %d\n", rc);
-                goto err_mknod_diag;
-        }
-        mcuc_msgnode[MCUC_MSGNODE_DIAG].xwfsnode = node;
-
-        rc = xwfs_mknod("misc", 0666, &mcuc_msgnode_xwfsops,
-                        (void *)&mcuc_msgnode[MCUC_MSGNODE_MISC],
-                        xwfs_dir_mcuc, &node);
-        if (__xwcc_unlikely(rc < 0)) {
-                mcuclogf(ERR, "Fail to mknod(\"button\"), rc: %d\n", rc);
-                goto err_mknod_button;
-        }
-        mcuc_msgnode[MCUC_MSGNODE_MISC].xwfsnode = node;
-
-        rc = xwfs_mknod("sensor", 0666, &mcuc_msgnode_xwfsops,
-                        (void *)&mcuc_msgnode[MCUC_MSGNODE_SENSOR],
-                        xwfs_dir_mcuc, &node);
-        if (__xwcc_unlikely(rc < 0)) {
-                mcuclogf(ERR, "Fail to mknod(\"sensor\"), rc: %d\n", rc);
-                goto err_mknod_sensor;
-        }
-        mcuc_msgnode[MCUC_MSGNODE_SENSOR].xwfsnode = node;
+        mcuc_msgnode[MCUC_MSGNODE_DAT].xwfsnode = node;
 
         rc = xwfs_mknod("log", 0666, &mcuc_msgnode_xwfsops,
                         (void *)&mcuc_msgnode[MCUC_MSGNODE_LOG],
@@ -286,18 +238,9 @@ err_mknod_mfg:
         xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_LOG].xwfsnode);
         mcuc_msgnode[MCUC_MSGNODE_LOG].xwfsnode = NULL;
 err_mknod_log:
-        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_SENSOR].xwfsnode);
-        mcuc_msgnode[MCUC_MSGNODE_SENSOR].xwfsnode = NULL;
-err_mknod_sensor:
-        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_MISC].xwfsnode);
-        mcuc_msgnode[MCUC_MSGNODE_MISC].xwfsnode = NULL;
-err_mknod_button:
-        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_DIAG].xwfsnode);
-        mcuc_msgnode[MCUC_MSGNODE_DIAG].xwfsnode = NULL;
-err_mknod_diag:
-        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_VHC].xwfsnode);
-        mcuc_msgnode[MCUC_MSGNODE_VHC].xwfsnode = NULL;
-err_mknod_vhc:
+        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_DAT].xwfsnode);
+        mcuc_msgnode[MCUC_MSGNODE_DAT].xwfsnode = NULL;
+err_mknod_dat:
         xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_PWR].xwfsnode);
         mcuc_msgnode[MCUC_MSGNODE_PWR].xwfsnode = NULL;
 err_mknod_pwr:
@@ -315,17 +258,8 @@ xwer_t mcuc_msgnode_exit(void)
         xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_LOG].xwfsnode);
         mcuc_msgnode[MCUC_MSGNODE_LOG].xwfsnode = NULL;
 
-        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_SENSOR].xwfsnode);
-        mcuc_msgnode[MCUC_MSGNODE_SENSOR].xwfsnode = NULL;
-
-        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_MISC].xwfsnode);
-        mcuc_msgnode[MCUC_MSGNODE_MISC].xwfsnode = NULL;
-
-        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_DIAG].xwfsnode);
-        mcuc_msgnode[MCUC_MSGNODE_DIAG].xwfsnode = NULL;
-
-        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_VHC].xwfsnode);
-        mcuc_msgnode[MCUC_MSGNODE_VHC].xwfsnode = NULL;
+        xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_DAT].xwfsnode);
+        mcuc_msgnode[MCUC_MSGNODE_DAT].xwfsnode = NULL;
 
         xwfs_rmnod(mcuc_msgnode[MCUC_MSGNODE_PWR].xwfsnode);
         mcuc_msgnode[MCUC_MSGNODE_PWR].xwfsnode = NULL;

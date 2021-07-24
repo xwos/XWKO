@@ -131,7 +131,7 @@ xwer_t hixwos_start(void)
 err_create_hixwos_consumer_thd:
         xwos_thd_stop(hixwos_producer_thd, &trc);
 err_create_hixwos_producer_thd:
-        xwos_sem_destroy(&hixwos_sem);
+        xwos_sem_fini(&hixwos_sem);
 err_init_hixwos_sem:
         return rc;
 }
@@ -147,7 +147,7 @@ void hixwos_stop(void)
         xwos_thd_stop(hixwos_producer_thd, &trc);
 
         /* 销毁信号量 */
-        xwos_sem_destroy(&hixwos_sem);
+        xwos_sem_fini(&hixwos_sem);
 }
 
 xwer_t hixwos_init(void)

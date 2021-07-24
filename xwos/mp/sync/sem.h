@@ -44,7 +44,7 @@ xwer_t xwmp_sem_cache_create(void);
 void xwmp_sem_cache_destroy(void);
 
 xwer_t xwmp_sem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max);
-xwer_t xwmp_sem_destroy(struct xwmp_sem * sem);
+xwer_t xwmp_sem_fini(struct xwmp_sem * sem);
 xwer_t xwmp_sem_create(struct xwmp_sem ** ptrbuf, xwssq_t val, xwssq_t max);
 xwer_t xwmp_sem_delete(struct xwmp_sem * sem);
 

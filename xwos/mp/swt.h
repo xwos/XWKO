@@ -53,7 +53,7 @@ void xwmp_swt_cache_destroy(void);
 xwer_t xwmp_swt_init(struct xwmp_swt * swt,
                      const char * name,
                      xwsq_t flag);
-xwer_t xwmp_swt_destroy(struct xwmp_swt * swt);
+xwer_t xwmp_swt_fini(struct xwmp_swt * swt);
 xwer_t xwmp_swt_create(struct xwmp_swt ** ptrbuf, const char * name, xwsq_t flag);
 xwer_t xwmp_swt_delete(struct xwmp_swt * swt);
 

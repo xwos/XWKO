@@ -30,10 +30,7 @@
 enum mcuc_msgnode_em {
         MCUC_MSGNODE_SYS,
         MCUC_MSGNODE_PWR,
-        MCUC_MSGNODE_VHC,
-        MCUC_MSGNODE_DIAG,
-        MCUC_MSGNODE_MISC,
-        MCUC_MSGNODE_SENSOR,
+        MCUC_MSGNODE_DAT,
         MCUC_MSGNODE_LOG,
         MCUC_MSGNODE_MFG,
         MCUC_MSGNODE_NUM,
@@ -41,7 +38,7 @@ enum mcuc_msgnode_em {
 
 struct mcuc_msgnode_info {
         struct {
-                uint8_t port; /**< ARMP port */
+                uint8_t port; /**< XWPCP port */
                 uint8_t prio; /**< port default priority */
         } attr;
         struct xwfs_node * xwfsnode; /**< xwfs node who own this data */

@@ -80,7 +80,7 @@ xwtm_t xwmp_skd_get_timestamp_lc(void)
 
         hrtimer_init_on_stack(&hrt, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
         now = hrt.base->get_time();
-        /* destroy_hrtimer_on_stack(&hrt); */
+        destroy_hrtimer_on_stack(&hrt);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)
         return (xwtm_t)now;
 #else

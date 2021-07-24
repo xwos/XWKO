@@ -145,13 +145,13 @@ xwer_t xwmp_swt_init(struct xwmp_swt * swt, const char * name, xwsq_t flag)
 }
 EXPORT_SYMBOL(xwmp_swt_init);
 
-xwer_t xwmp_swt_destroy(struct xwmp_swt * swt)
+xwer_t xwmp_swt_fini(struct xwmp_swt * swt)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
         return xwmp_swt_put(swt);
 }
-EXPORT_SYMBOL(xwmp_swt_destroy);
+EXPORT_SYMBOL(xwmp_swt_fini);
 
 xwer_t xwmp_swt_create(struct xwmp_swt ** ptrbuf, const char * name, xwsq_t flag)
 {

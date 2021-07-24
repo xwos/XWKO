@@ -24,6 +24,6 @@
 #include <linux/module.h>
 #include <bdl/isc/uart.h>
 
-char modparam_isc_uart[256] = "/dev/ttyUSB0";
+char modparam_isc_uart[256] = "/dev/ttyS0";
 module_param_string(iscuart, modparam_isc_uart, 256, 0644);
 MODULE_PARM_DESC(ifdev, "ISC UART");
