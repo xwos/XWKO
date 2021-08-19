@@ -24,15 +24,17 @@
 #ifndef __xwos_mp_thd_h__
 #define __xwos_mp_thd_h__
 
+#include <linux/sched.h>
 #include <xwos/standard.h>
+#include <xwos/mp/ksym.h>
 #include <xwos/mp/skd.h>
 
 struct task_struct;
 #define xwmp_thd task_struct
-
 struct sighand_struct;
-
 typedef xwer_t (* xwmp_thd_f)(void *);
+
+KSYM_DCL(sched_setscheduler);
 
 xwer_t xwmp_thd_grab(struct xwmp_thd * thd);
 xwer_t xwmp_thd_put(struct xwmp_thd * thd);
@@ -74,6 +76,7 @@ void linux_thd_fake_signal(struct xwmp_thd * thd);
 void linux_thd_signal_wake_up_state(struct xwmp_thd * thd, unsigned int state);
 void linux_thd_fake_signal_wake_up(struct xwmp_thd * thd);
 void linux_thd_clear_fake_signal(struct xwmp_thd * thd);
+
 xwer_t linux_thd_ksym_load(void);
 
 #endif /* xwos/mp/thd.h */

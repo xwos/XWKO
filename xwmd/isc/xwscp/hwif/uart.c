@@ -25,7 +25,6 @@
 #include <linux/fs.h>
 #include <linux/tty.h>
 #include <xwos/standard.h>
-#include <xwos/lib/xwlog.h>
 #include <xwos/osal/skd.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/protocol.h>
@@ -54,7 +53,6 @@ const struct xwscp_hwifal_operations xwscpif_uart_ops = {
         .notify = xwscpif_uart_notify,
 };
 
-/* hwifal device */
 struct ktermios xwscpif_uart_dev_termios = {
         .c_cflag = CREAD | HUPCL | CLOCAL | CS8 | BRDCFG_UART_BAUDRATE,
         .c_iflag = IGNBRK | IGNPAR,
@@ -99,17 +97,18 @@ static
 xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size)
 {
         xwer_t rc;
-	mm_segment_t fs;
-	struct file *filp;
+        struct file *filp;
         xwssz_t ret, rest;
 
         rc = XWOK;
-        fs = get_fs();
         filp = xwscp->hwifcb;
         rest = (xwssz_t)size;
-        set_fs(KERNEL_DS);
         do {
-                ret = vfs_write(filp, &data[size - rest], rest, &filp->f_pos);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
+                ret = kernel_write(filp, &data[size - rest], rest, &filp->f_pos);
+#else
+                ret = vfs_write(filp, &data[size - rest], rest, filp->f_pos);
+#endif
                 if (ret > 0) {
                         rest -= ret;
                 } else {
@@ -117,29 +116,28 @@ xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size)
                         break;
                 }
         } while (rest > 0);
-        set_fs(fs);
         return rc;
 }
 
 static
 xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size)
 {
-	mm_segment_t fs;
         struct file * filp;
         xwssz_t ret, rxsize, rest;
         xwer_t rc;
 
         rc = XWOK;
+        filp = xwscp->hwifcb;
         rxsize = 0;
         rest = (xwssz_t)*size;
-        filp = xwscp->hwifcb;
-        fs = get_fs(); /* get fs */
-        set_fs(KERNEL_DS);
         do {
-                ret = vfs_read(filp, &buf[rxsize], (xwsz_t)rest, &filp->f_pos);
-                if (__xwcc_unlikely(ret < 0)) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
+                ret = kernel_read(filp, &buf[rxsize], (xwsz_t)rest, &filp->f_pos);
+#else
+                ret = kernel_read(filp, filp->f_pos, &buf[rxsize], rest);
+#endif
+                if (ret < 0) {
                         rc = (xwer_t)ret;
-                        xwscplogf(INFO, "Failed to vfs_read()! rc:%d", rc);
                         linux_thd_clear_fake_signal(current);
                         break;
                 } else {
@@ -147,13 +145,12 @@ xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size)
                         rest -= ret;
                 }
         } while (rest > 0);
-        set_fs(fs);
         *size = (xwsz_t)rxsize;
         return rc;
 }
 
 static
-void xwscpif_uart_notify(struct xwscp *xwscp, xwsq_t evt)
+void xwscpif_uart_notify(struct xwscp * xwscp, xwsq_t evt)
 {
         if (XWSCP_HWIFNTF_NETUNREACH == evt) {
         }

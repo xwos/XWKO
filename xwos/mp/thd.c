@@ -27,11 +27,11 @@
 #include <linux/hrtimer.h>
 #include <linux/jiffies.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)
-#include <linux/sched/rt.h>
+#  include <linux/sched/rt.h>
 #endif
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
-#include <linux/sched/signal.h>
-#include <uapi/linux/sched/types.h>
+#  include <linux/sched/signal.h>
+#  include <uapi/linux/sched/types.h>
 #endif
 #include <linux/preempt.h>
 #include <linux/kthread.h>
@@ -47,9 +47,10 @@
 
 #define LOGTAG "thd"
 
-KSYM_DCLR(__lock_task_sighand);
-KSYM_DCLR(signal_wake_up_state);
-KSYM_DCLR(find_task_by_vpid);
+KSYM_DEF(__lock_task_sighand);
+KSYM_DEF(signal_wake_up_state);
+KSYM_DEF(find_task_by_vpid);
+KSYM_DEF(sched_setscheduler);
 
 xwer_t xwmp_thd_grab(struct xwmp_thd * thd)
 {
@@ -120,7 +121,7 @@ xwer_t xwmp_thd_create(struct xwmp_thd ** thdbuf, const char * name,
         }
         ts->flags &= ~PF_NOFREEZE;
         schparam.sched_priority = priority;
-        sched_setscheduler(ts, SCHED_FIFO, &schparam);
+        KSYM_CALL(sched_setscheduler, ts, SCHED_FIFO, &schparam);
         if (!(attr & XWMP_SKDATTR_DETACHED)) {
                 get_task_struct(ts);
         }
@@ -390,7 +391,6 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
 
         set_current_state(TASK_INTERRUPTIBLE);
 
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
         hrtimer_init_sleeper_on_stack(&hrts, HRTIMER_BASE_MONOTONIC, HRTIMER_MODE_ABS);
         expires = ktime_add_safe(*ktorigin, ktinc);
@@ -515,6 +515,13 @@ xwer_t linux_thd_ksym_load(void)
         if (__xwcc_unlikely(rc < 0)) {
                 xwlogf(ERR, LOGTAG,
                        "Load kernel symbol find_task_by_vpid ... errno: %d\n",
+                       rc);
+                goto err_ksymload;
+        }
+        rc = KSYM_LOAD(sched_setscheduler);
+        if (__xwcc_unlikely(rc < 0)) {
+                xwlogf(ERR, LOGTAG,
+                       "Load kernel symbol sched_setscheduler ... errno: %d\n",
                        rc);
                 goto err_ksymload;
         }

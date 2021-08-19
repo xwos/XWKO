@@ -28,7 +28,8 @@
 #include <linux/kallsyms.h>
 
 extern typeof(kallsyms_lookup_name) * xwmp_allsyms_lookup_name;
-#define KSYM_DCLR(sym)          typeof(sym) *__ksym__##sym
+#define KSYM_DCL(sym)           extern typeof(sym) *__ksym__##sym
+#define KSYM_DEF(sym)           typeof(sym) *__ksym__##sym
 #define KSYM_CALL(sym, x...)    __ksym__##sym(x)
 #define KSYM_LOAD(sym)							        \
 	({                                                                      \

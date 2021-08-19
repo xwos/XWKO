@@ -97,17 +97,18 @@ static
 xwer_t xwpcpif_uart_tx(struct xwpcp * xwpcp, const xwu8_t * data, xwsz_t size)
 {
         xwer_t rc;
-	mm_segment_t fs;
 	struct file * filp;
         xwssz_t ret, rest;
 
         rc = XWOK;
-        fs = get_fs();
         filp = xwpcp->hwifcb;
         rest = (xwssz_t)size;
-        set_fs(KERNEL_DS);
         do {
-                ret = vfs_write(filp, &data[size - rest], rest, &filp->f_pos);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
+                ret = kernel_write(filp, &data[size - rest], rest, &filp->f_pos);
+#else
+                ret = vfs_write(filp, &data[size - rest], rest, filp->f_pos);
+#endif
                 if (ret > 0) {
                         rest -= ret;
                 } else {
@@ -115,29 +116,28 @@ xwer_t xwpcpif_uart_tx(struct xwpcp * xwpcp, const xwu8_t * data, xwsz_t size)
                         break;
                 }
         } while (rest > 0);
-        set_fs(fs);
         return rc;
 }
 
 static
 xwer_t xwpcpif_uart_rx(struct xwpcp * xwpcp, xwu8_t * buf, xwsz_t * size)
 {
-	mm_segment_t fs;
         struct file * filp;
         xwssz_t ret, rxsize, rest;
         xwer_t rc;
 
         rc = XWOK;
+        filp = xwpcp->hwifcb;
         rxsize = 0;
         rest = (xwssz_t)*size;
-        filp = xwpcp->hwifcb;
-        fs = get_fs(); /* get fs */
-        set_fs(KERNEL_DS);
         do {
-                ret = vfs_read(filp, &buf[rxsize], (xwsz_t)rest, &filp->f_pos);
-                if (__xwcc_unlikely(ret < 0)) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
+                ret = kernel_read(filp, &buf[rxsize], (xwsz_t)rest, &filp->f_pos);
+#else
+                ret = kernel_read(filp, filp->f_pos, &buf[rxsize], rest);
+#endif
+                if (ret < 0) {
                         rc = (xwer_t)ret;
-                        xwpcplogf(INFO, "vfs_read() ... [%d].", rc);
                         linux_thd_clear_fake_signal(current);
                         break;
                 } else {
@@ -145,7 +145,6 @@ xwer_t xwpcpif_uart_rx(struct xwpcp * xwpcp, xwu8_t * buf, xwsz_t * size)
                         rest -= ret;
                 }
         } while (rest > 0);
-        set_fs(fs);
         *size = (xwsz_t)rxsize;
         return rc;
 }

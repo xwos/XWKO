@@ -23,10 +23,11 @@
 
 #include <xwos/standard.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
-  #include <uapi/linux/sched/types.h>
+#  include <uapi/linux/sched/types.h>
 #endif
 #include <linux/smp.h>
 #include <linux/preempt.h>
+#include <xwos/mp/ksym.h>
 #include <xwos/mp/thd.h>
 #include <xwos/mp/skd.h>
 #include <xwmd/xwfs/fs.h>
@@ -181,7 +182,7 @@ ssize_t xwmp_skd_xwfsnode_priority_write(struct xwfs_node * xwfsnode,
                 goto err_nosuchtid;
         }
         schparam.sched_priority = pr;
-        rc = sched_setscheduler(thd, SCHED_FIFO, &schparam);
+        rc = KSYM_CALL(sched_setscheduler, thd, SCHED_FIFO, &schparam);
         xwmp_thd_put(thd);
         if (rc < 0) {
                 ret = count;
