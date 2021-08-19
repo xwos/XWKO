@@ -3,6 +3,8 @@
 *.ko
 *.mod.c
 *.mod
+wkspc/
+XuanWuOS.cfg
 modules.order
 Module.symvers
 XuanWuOS.symvers
@@ -10,11 +12,8 @@ xwos.symvers
 *.o
 *.o.d
 .tmp_versions
-autogen.h
-XuanWuOS.cfg
-Makefile
+xwbs/util/js/xwgitloglint/node_modules
+xwbs/util/js/xwgitloglint/package-lock.json
 GTAGS
 GRTAGS
 GPATH
-xwbs/util/js/xwgitloglint/node_modules
-xwbs/util/js/xwgitloglint/package-lock.json

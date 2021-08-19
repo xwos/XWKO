@@ -43,6 +43,9 @@ $(WKSPC)/XuanWuOS.cfg: cfg/*.h
 c clean: cfg
 	$(MAKE) -C $(XuanWuKO) M=$(WKSPC) clean
 
+d distclean:
+	$(RM) -rf $(WKSPC)
+
 .DEFAULT: cfg
 	$(MAKE) -C $(XuanWuKO) M=$(WKSPC) $@
 
