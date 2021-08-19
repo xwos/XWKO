@@ -58,6 +58,7 @@ xwer_t mcuc_start(void)
         if (rc < 0) {
                 goto err_msgnode_init;
         }
+        xwaop_teq_then_add(xwsq, &mcuc_state, MCUC_STATE_INITING, 1, NULL, NULL);
 
         return XWOK;
 
@@ -67,7 +68,7 @@ err_msgnode_init:
 err_mkdir_mcuc:
         xwfs_giveup();
 err_xwfs_not_ready:
-        xwaop_teq_then_sub(xwsq, &mcuc_state, MCUC_STATE_START, 1, NULL, NULL);
+        xwaop_sub(xwsq, &mcuc_state, 1, NULL, NULL);
 err_perm:
         return rc;
 }
@@ -85,6 +86,7 @@ xwer_t mcuc_stop(void)
         xwfs_rmdir(xwfs_dir_mcuc);
         xwfs_dir_mcuc = NULL;
         xwfs_giveup();
+        xwaop_sub(xwsq, &mcuc_state, 1, NULL, NULL);
         return XWOK;
 
 err_state:

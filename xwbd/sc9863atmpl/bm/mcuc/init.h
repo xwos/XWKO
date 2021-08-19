@@ -31,7 +31,7 @@
 
 enum mcuc_state_em {
         MCUC_STATE_STOP = 0,
-        MCUC_STATE_INIT,
+        MCUC_STATE_INITING,
         MCUC_STATE_START,
         MCUC_STATE_RUNNING,
 };

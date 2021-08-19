@@ -22,6 +22,6 @@
 #
 
 BRD_CSRCS :=
-BRD_CSRCS += board.c
-BRD_CSRCS += xwac/pm.c
-BRD_CSRCS += isc/uart.c
+BRD_CSRCS += bdl/board.c
+BRD_CSRCS += bdl/xwac/pm.c
+BRD_CSRCS += bdl/isc/uart.c
