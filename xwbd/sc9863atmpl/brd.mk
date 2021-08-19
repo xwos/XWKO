@@ -21,8 +21,7 @@
 # > under either the MPL or the GPL.
 #
 
-BDL_CSRCS :=
-
-BDL_CSRCS += board.c
-BDL_CSRCS += xwac/pm.c
-BDL_CSRCS += isc/uart.c
+BRD_CSRCS :=
+BRD_CSRCS += board.c
+BRD_CSRCS += xwac/pm.c
+BRD_CSRCS += isc/uart.c

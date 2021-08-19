@@ -26,7 +26,7 @@ ifeq ($(wildcard $(M)/XuanWuOS.cfg),)
   $(error "Can't find XuanWuOS.cfg. Build from the xwbd/<BOARD> folder to generate it!")
 endif
 -include $(M)/XuanWuOS.cfg
--include $(XWOS_PATH)/$(XWBS_UTIL_MK_XWMO)
+-include $(XuanWuOS_PATH)/$(XWBS_UTIL_MK_XWMO)
 
 TARGET ?= xwos
 KDIR ?= /lib/modules/`uname -r`/build
@@ -35,11 +35,11 @@ CC ?= $(CROSS_COMPILE)gcc
 STRIP ?= $(CROSS_COMPILE)strip
 
 INCDIRS :=
-INCDIRS += $(addprefix -I,$(XWOS_PATH)/$(XWOS_ARCH_DIR))
-INCDIRS += $(addprefix -I,$(XWOS_PATH)/$(XWOS_CPU_DIR))
-INCDIRS += $(addprefix -I,$(XWOS_PATH)/$(XWOS_SOC_DIR))
-INCDIRS += $(addprefix -I,$(XWOS_PATH)/$(XWOS_BRD_DIR))
-INCDIRS += $(addprefix -I,$(XWOS_WKSPC_DIR))
+INCDIRS += $(addprefix -I,$(XuanWuOS_PATH)/$(XuanWuOS_ARCH_DIR))
+INCDIRS += $(addprefix -I,$(XuanWuOS_PATH)/$(XuanWuOS_CPU_DIR))
+INCDIRS += $(addprefix -I,$(XuanWuOS_PATH)/$(XuanWuOS_SOC_DIR))
+INCDIRS += $(addprefix -I,$(XuanWuOS_PATH)/$(XuanWuOS_BRD_DIR))
+INCDIRS += $(addprefix -I,$(XuanWuOS_WKSPC_DIR))
 
 EOBJS =
 obj-m = $(TARGET).o
@@ -47,41 +47,41 @@ obj-m = $(TARGET).o
 $(TARGET)-y = init.o
 
 ######## ######## ######## ######## arch ######## ######## ######## ########
--include $(XWOS_PATH)/$(XWOS_ARCH_DIR)/arch.mk
-ARCH_EOBJS := $(addprefix $(XWOS_PATH)/$(XWOS_ARCH_DIR)/, $(ARCH_EOBJS))
-ARCH_CSRCS := $(addprefix $(XWOS_ARCH_DIR)/, $(ARCH_CSRCS))
+-include $(XuanWuOS_PATH)/$(XuanWuOS_ARCH_DIR)/arch.mk
+ARCH_EOBJS := $(addprefix $(XuanWuOS_PATH)/$(XuanWuOS_ARCH_DIR)/, $(ARCH_EOBJS))
+ARCH_CSRCS := $(addprefix $(XuanWuOS_ARCH_DIR)/, $(ARCH_CSRCS))
 ARCH_COBJS := $(addsuffix .o,$(basename $(ARCH_CSRCS)))
 $(TARGET)-y += $(ARCH_COBJS)
 EOBJS += $(ARCH_EOBJS)
 
 ######## ######## ######## ######## cpu ######## ######## ######## ########
--include $(XWOS_PATH)/$(XWOS_CPU_DIR)/cpu.mk
-CPU_EOBJS := $(addprefix $(XWOS_PATH)/$(XWOS_CPU_DIR)/, $(CPU_EOBJS))
-CPU_CSRCS := $(addprefix $(XWOS_CPU_DIR)/, $(CPU_CSRCS))
+-include $(XuanWuOS_PATH)/$(XuanWuOS_CPU_DIR)/cpu.mk
+CPU_EOBJS := $(addprefix $(XuanWuOS_PATH)/$(XuanWuOS_CPU_DIR)/, $(CPU_EOBJS))
+CPU_CSRCS := $(addprefix $(XuanWuOS_CPU_DIR)/, $(CPU_CSRCS))
 CPU_COBJS := $(addsuffix .o,$(basename $(CPU_CSRCS)))
 $(TARGET)-y += $(CPU_COBJS)
 EOBJS += $(CPU_EOBJS)
 
 ######## ######## ######## ######## soc ######## ######## ######## ########
--include $(XWOS_PATH)/$(XWOS_SOC_DIR)/soc.mk
-SOC_EOBJS := $(addprefix $(XWOS_PATH)/$(XWOS_SOC_DIR)/, $(SOC_EOBJS))
-SOC_CSRCS := $(addprefix $(XWOS_SOC_DIR)/, $(SOC_CSRCS))
+-include $(XuanWuOS_PATH)/$(XuanWuOS_SOC_DIR)/soc.mk
+SOC_EOBJS := $(addprefix $(XuanWuOS_PATH)/$(XuanWuOS_SOC_DIR)/, $(SOC_EOBJS))
+SOC_CSRCS := $(addprefix $(XuanWuOS_SOC_DIR)/, $(SOC_CSRCS))
 SOC_COBJS := $(addsuffix .o,$(basename $(SOC_CSRCS)))
 $(TARGET)-y += $(SOC_COBJS)
 EOBJS += $(SOC_EOBJS)
 
 ######## ######## ######## ######## board ######## ######## ######## ########
--include $(XWOS_PATH)/$(XWOS_BDL_DIR)/bdl.mk
-BDL_EOBJS := $(addprefix $(XWOS_PATH)/$(XWOS_BDL_DIR)/, $(BDL_EOBJS))
-BDL_CSRCS := $(addprefix $(XWOS_BDL_DIR)/, $(BDL_CSRCS))
-BDL_COBJS := $(addsuffix .o,$(basename $(BDL_CSRCS)))
-$(TARGET)-y += $(BDL_COBJS)
-EOBJS += $(BDL_EOBJS)
+-include $(XuanWuOS_PATH)/$(XuanWuOS_BRD_DIR)/brd.mk
+BRD_EOBJS := $(addprefix $(XuanWuOS_PATH)/$(XuanWuOS_BRD_DIR)/, $(BRD_EOBJS))
+BRD_CSRCS := $(addprefix $(XuanWuOS_BRD_DIR)/, $(BRD_CSRCS))
+BRD_COBJS := $(addsuffix .o,$(basename $(BRD_CSRCS)))
+$(TARGET)-y += $(BRD_COBJS)
+EOBJS += $(BRD_EOBJS)
 
 ######## ######## ######## ######## xwos ######## ######## ######## ########
--include $(XWOS_PATH)/$(XWOS_KN_DIR)/xwos.mk
-XWOS_EOBJS := $(addprefix $(XWOS_PATH)/$(XWOS_KN_DIR)/, $(XWOS_EOBJS))
-XWOS_CSRCS := $(addprefix $(XWOS_KN_DIR)/, $(XWOS_CSRCS))
+-include $(XuanWuOS_PATH)/$(XuanWuOS_XWOS_DIR)/xwos.mk
+XWOS_EOBJS := $(addprefix $(XuanWuOS_PATH)/$(XuanWuOS_XWOS_DIR)/, $(XWOS_EOBJS))
+XWOS_CSRCS := $(addprefix $(XuanWuOS_XWOS_DIR)/, $(XWOS_CSRCS))
 XWOS_COBJS := $(addsuffix .o,$(basename $(XWOS_CSRCS)))
 $(TARGET)-y += $(XWOS_COBJS)
 EOBJS += $(XWOS_EOBJS)
@@ -90,20 +90,20 @@ EOBJS += $(XWOS_EOBJS)
 XWMD_INCDIRS :=
 XWMD_COBJS :=
 XWMD_EOBJS :=
-XWMD_LIST := $(shell test -d $(XWOS_PATH)/$(XWOS_MD_DIR) && \
-                     find $(XWOS_PATH)/$(XWOS_MD_DIR) -type f -name "xwmo.mk" \
+XWMD_LIST := $(shell test -d $(XuanWuOS_PATH)/$(XuanWuOS_XWMD_DIR) && \
+                     find $(XuanWuOS_PATH)/$(XuanWuOS_XWMD_DIR) -type f -name "xwmo.mk" \
                      -exec dirname {} \;)
 
 define findXwmdTarget
-ifeq ($$(XWMDCFG$(call xwmoPathToName,$(1),$(XWOS_PATH)/$(XWOS_MD_DIR))),y)
+ifeq ($$(XWMDCFG$(call xwmoPathToName,$(1),$(XuanWuOS_PATH)/$(XuanWuOS_XWMD_DIR))),y)
     XWMO_INCDIRS :=
     XWMO_ESRCS :=
     XWMO_CSRCS :=
     include $(1)/xwmo.mk
-    XWMD_NAME := $(call xwmoPathToName,$(1),$(XWOS_PATH)/$(XWOS_MD_DIR))
+    XWMD_NAME := $(call xwmoPathToName,$(1),$(XuanWuOS_PATH)/$(XuanWuOS_XWMD_DIR))
     XWMO_INCDIRS := $$(addprefix -I$(1)/,$(strip $$(XWMO_INCDIRS)))
     XWMD_INCDIRS += $$(XWMO_INCDIRS)
-    XWMO_CSRC := $$(addprefix $(subst $(XWOS_PATH)/,,$(1)/),$$(XWMO_CSRCS))
+    XWMO_CSRC := $$(addprefix $(subst $(XuanWuOS_PATH)/,,$(1)/),$$(XWMO_CSRCS))
     XWMO_COBJS := $$(addsuffix .o,$$(basename $$(XWMO_CSRC)))
     XWMD_COBJS += $$(XWMO_COBJS)
     XWMO_EOBJS := $$(addprefix $(1)/,$$(XWMO_EOBJS))
@@ -122,20 +122,20 @@ INCDIRS += $(XWMD_INCDIRS)
 XWBM_INCDIRS :=
 XWBM_COBJS :=
 XWBM_EOBJS :=
-XWBM_LIST := $(shell test -d $(XWOS_PATH)/$(XWOS_BM_DIR) && \
-                     find $(XWOS_PATH)/$(XWOS_BM_DIR) -type f -name "xwmo.mk" \
+XWBM_LIST := $(shell test -d $(XuanWuOS_PATH)/$(XuanWuOS_BM_DIR) && \
+                     find $(XuanWuOS_PATH)/$(XuanWuOS_BM_DIR) -type f -name "xwmo.mk" \
                      -exec dirname {} \;)
 
 define findXwbmTarget
-ifeq ($$(BMCFG$(call xwmoPathToName,$(1),$(XWOS_PATH)/$(XWOS_BM_DIR))),y)
+ifeq ($$(BMCFG$(call xwmoPathToName,$(1),$(XuanWuOS_PATH)/$(XuanWuOS_BM_DIR))),y)
     XWMO_INCDIRS :=
     XWMO_ESRCS :=
     XWMO_CSRCS :=
     include $(1)/xwmo.mk
-    XWBM_NAME := $(call xwmoPathToName,$(1),$(XWOS_PATH)/$(XWOS_BM_DIR))
+    XWBM_NAME := $(call xwmoPathToName,$(1),$(XuanWuOS_PATH)/$(XuanWuOS_BM_DIR))
     XWMO_INCDIRS := $$(addprefix -I$(1)/,$(strip $$(XWMO_INCDIRS)))
     XWBM_INCDIRS += $$(XWMO_INCDIRS)
-    XWMO_CSRC := $$(addprefix $(subst $(XWOS_PATH)/,,$(1)/),$$(XWMO_CSRCS))
+    XWMO_CSRC := $$(addprefix $(subst $(XuanWuOS_PATH)/,,$(1)/),$$(XWMO_CSRCS))
     XWMO_COBJS := $$(addsuffix .o,$$(basename $$(XWMO_CSRC)))
     XWBM_COBJS += $$(XWMO_COBJS)
     XWMO_EOBJS := $$(addprefix $(1)/,$$(XWMO_EOBJS))
@@ -154,20 +154,20 @@ INCDIRS += $(XWBM_INCDIRS)
 XWAM_INCDIRS :=
 XWAM_COBJS :=
 XWAM_EOBJS :=
-XWAM_LIST := $(shell test -d $(XWOS_PATH)/$(XWOS_AM_DIR) && \
-                     find $(XWOS_PATH)/$(XWOS_AM_DIR) -type f -name "xwmo.mk" \
+XWAM_LIST := $(shell test -d $(XuanWuOS_PATH)/$(XuanWuOS_XWAM_DIR) && \
+                     find $(XuanWuOS_PATH)/$(XuanWuOS_XWAM_DIR) -type f -name "xwmo.mk" \
                      -exec dirname {} \;)
 
 define findXwamTarget
-ifeq ($$(XWAMCFG$(call xwmoPathToName,$(1),$(XWOS_PATH)/$(XWOS_AM_DIR))),y)
+ifeq ($$(XWAMCFG$(call xwmoPathToName,$(1),$(XuanWuOS_PATH)/$(XuanWuOS_XWAM_DIR))),y)
     XWMO_INCDIRS :=
     XWMO_ESRCS :=
     XWMO_CSRCS :=
     include $(1)/xwmo.mk
-    XWAM_NAME := $(call xwmoPathToName,$(1),$(XWOS_PATH)/$(XWOS_AM_DIR))
+    XWAM_NAME := $(call xwmoPathToName,$(1),$(XuanWuOS_PATH)/$(XuanWuOS_XWAM_DIR))
     XWMO_INCDIRS := $$(addprefix -I$(1)/,$(strip $$(XWMO_INCDIRS)))
     XWAM_INCDIRS += $$(XWMO_INCDIRS)
-    XWMO_CSRC := $$(addprefix $(subst $(XWOS_PATH)/,,$(1)/),$$(XWMO_CSRCS))
+    XWMO_CSRC := $$(addprefix $(subst $(XuanWuOS_PATH)/,,$(1)/),$$(XWMO_CSRCS))
     XWMO_COBJS := $$(addsuffix .o,$$(basename $$(XWMO_CSRC)))
     XWAM_COBJS += $$(XWMO_COBJS)
     XWMO_EOBJS := $$(addprefix $(1)/,$$(XWMO_EOBJS))
@@ -183,12 +183,12 @@ EOBJS += $(XWAM_EOBJS)
 INCDIRS += $(XWAM_INCDIRS)
 
 ######## ######## ######## ######## rule ######## ######## ######## ########
-ccflags-y := -I$(XWOS_PATH) $(INCDIRS) $(ARCH_CFLAGS) -fno-pic -Wno-vla
+ccflags-y := -I$(XuanWuOS_PATH) $(INCDIRS) $(ARCH_CFLAGS) -fno-pic -Wno-vla
 ldflags-y := $(ARCH_LDFLAGS) $(CPU_LDFLAGS) $(EOBJS)
 ALLOBJS := $(addprefix $(M)/,$($(TARGET)-y))
 
 modules: dir
-	@$(MAKE) -C $(KDIR) M=$(M) src=$(XWOS_PATH) $@
+	@$(MAKE) -C $(KDIR) M=$(M) src=$(XuanWuOS_PATH) $@
 	$(STRIP) $(M)/$(TARGET).ko --strip-unneeded
 	@cp $(M)/Module.symvers $(M)/$(TARGET).symvers
 
