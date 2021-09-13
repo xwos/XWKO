@@ -106,9 +106,6 @@ enum hrtimer_restart xwmp_swt_hrtimer_cb(struct hrtimer * hrt)
 #endif
                 hrtimer_forward(hrt, hrt->base->get_time(), kt);
                 ret = HRTIMER_RESTART;
-        } else if (XWMP_SWT_FLAG_AUTORM & swt->flag) {
-                ret = HRTIMER_NORESTART;
-                xwmp_swt_put(swt);
         } else {
                 ret = HRTIMER_NORESTART;
         }

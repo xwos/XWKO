@@ -31,7 +31,6 @@
 enum xwmp_swt_flag_em {
         XWMP_SWT_FLAG_NULL = 0, /**< null */
         XWMP_SWT_FLAG_RESTART = (1 << 0), /**< auto-restart */
-        XWMP_SWT_FLAG_AUTORM = (1 << 1), /**< auto-remove  */
 };
 
 struct xwmp_swt;
