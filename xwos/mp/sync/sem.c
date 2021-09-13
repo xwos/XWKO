@@ -24,12 +24,13 @@
 #include <xwos/standard.h>
 #include <linux/slab.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
-  #include <linux/sched/signal.h>
+#  include <linux/sched/signal.h>
 #endif
 #include <linux/sched/rt.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/bclst.h>
+#include <xwos/mm/common.h>
 #include <xwos/mp/thd.h>
 #include <xwos/mp/pm.h>
 #include <xwos/mp/lock/spinlock.h>
@@ -89,7 +90,7 @@ xwer_t xwmp_sem_cache_create(void)
 
         xwmp_sem_cache = kmem_cache_create("xwmp_sem_slab",
                                            sizeof(struct xwmp_sem),
-                                           XWMMCFG_ALIGNMENT, SLAB_PANIC,
+                                           XWMM_ALIGNMENT, SLAB_PANIC,
                                            xwmp_sem_construct);
         if (is_err_or_null(xwmp_sem_cache)) {
                 rc = -ENOMEM;

@@ -23,6 +23,7 @@
 
 #include <xwos/standard.h>
 #include <linux/slab.h>
+#include <xwos/mm/common.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/mp/swt.h>
 
@@ -69,7 +70,7 @@ xwer_t xwmp_swt_cache_create(void)
 
         xwmp_swt_cache = kmem_cache_create("xwmp_swt_slab",
                                            sizeof(struct xwmp_swt),
-                                           XWMMCFG_ALIGNMENT, SLAB_PANIC,
+                                           XWMM_ALIGNMENT, SLAB_PANIC,
                                            xwmp_swt_construct);
         if (is_err_or_null(xwmp_swt_cache)) {
                 rc = -ENOMEM;

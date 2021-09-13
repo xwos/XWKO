@@ -1598,4 +1598,4 @@ xwer_t xwaop__xws16__tst_then_op(xws16_a * a,
         return rc;
 }
 
-#endif /* #ifdef __GNUC__ */
+#endif

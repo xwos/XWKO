@@ -836,7 +836,7 @@ xwer_t xwos_cthd_get_data(xwsq_t pos, void ** databuf)
         return xwosdl_cthd_get_data(pos, databuf);
 
 }
-#endif /* XWOS_THD_LOCAL_DATA_NUM */
+#endif
 
 /**
  * @} xwos_skd

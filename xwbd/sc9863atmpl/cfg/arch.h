@@ -68,34 +68,34 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #if (((!defined(ARCHCFG_BIG_ENDIAN)) || (1 != ARCHCFG_BIG_ENDIAN)) && \
      ((!defined(ARCHCFG_LITTLE_ENDIAN)) || (1 != ARCHCFG_LITTLE_ENDIAN)))
-  #error "Bit-endian is not defined!"
+#  error "Bit-endian is not defined!"
 #endif
 
 #if ((defined(ARCHCFG_64BIT) && (1 != ARCHCFG_64BIT)) && \
      (defined(ARCHCFG_32BIT) && (1 != ARCHCFG_32BIT)) && \
      (defined(ARCHCFG_16BIT) && (1 != ARCHCFG_16BIT)))
-  #error "ARCH-bits is not defined!"
+#  error "ARCH-bits is not defined!"
 #endif
 
 #if ((defined(ARCHCFG_64BIT) && (1 == ARCHCFG_64BIT)) && \
      (defined(ARCHCFG_32BIT) && (1 == ARCHCFG_32BIT)) && \
      (defined(ARCHCFG_16BIT) && (1 == ARCHCFG_16BIT)))
-  #error "ARCH-bits is multi-defined!"
+#  error "ARCH-bits is multi-defined!"
 #endif
 
 #if ((defined(ARCHCFG_32BIT) && (1 == ARCHCFG_32BIT)) && \
      (defined(ARCHCFG_16BIT) && (1 == ARCHCFG_16BIT)))
-  #error "ARCH-bits is multi-defined!"
+#  error "ARCH-bits is multi-defined!"
 #endif
 
 #if ((defined(ARCHCFG_64BIT) && (1 == ARCHCFG_64BIT)) && \
      (defined(ARCHCFG_16BIT) && (1 == ARCHCFG_16BIT)))
-  #error "ARCH-bits is multi-defined!"
+#  error "ARCH-bits is multi-defined!"
 #endif
 
 #if ((defined(ARCHCFG_64BIT) && (1 == ARCHCFG_64BIT)) && \
      (defined(ARCHCFG_32BIT) && (1 == ARCHCFG_32BIT)))
-  #error "ARCH-bits is multi-defined!"
+#  error "ARCH-bits is multi-defined!"
 #endif
 
 #endif /* cfg/arch.h */

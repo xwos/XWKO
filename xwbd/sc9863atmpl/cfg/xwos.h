@@ -31,9 +31,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   Memory Management Configurations  ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** common ********/
-#define XWMMCFG_ALIGNMENT                               (8U)
-
 /******** ******** default kernel memory allocater ******** ********/
 #define XWMMCFG_KMA_SIZE                                (4096U)
 

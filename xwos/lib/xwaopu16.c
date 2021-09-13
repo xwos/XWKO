@@ -24,6 +24,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwaop.h>
 
+#ifdef __GNUC__
 __xwlib_code
 xwu16_t xwaop__xwu16__load(xwu16_a * a,
                            const enum xwmb_memory_order_em mo)
@@ -1752,3 +1753,5 @@ xwer_t xwaop__xwu16__tst_then_op(xwu16_a * a,
         }
         return rc;
 }
+
+#endif

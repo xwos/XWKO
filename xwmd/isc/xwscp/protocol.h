@@ -34,6 +34,7 @@
 #include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/sync/sem.h>
 #include <xwos/osal/sync/cond.h>
+#include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/mif.h>
@@ -69,23 +70,23 @@
  * @brief 调试XWSCP的日志函数
  */
 #if defined(XWMDCFG_isc_xwscp_LOG) && (1 == XWMDCFG_isc_xwscp_LOG)
-  #define XWSCP_LOG_TAG                 "xwscp"
-  #define xwscplogf(lv, fmt, ...)        xwlogf(lv, XWSCP_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWMDCFG_isc_xwscp_LOG */
-  #define xwscplogf(lv, fmt, ...)
-#endif /* !XWMDCFG_isc_xwscp_LOG */
+#  define XWSCP_LOG_TAG                 "xwscp"
+#  define xwscplogf(lv, fmt, ...)        xwlogf(lv, XWSCP_LOG_TAG, fmt, ##__VA_ARGS__)
+#else
+#  define xwscplogf(lv, fmt, ...)
+#endif
 
 #define XWSCP_BUG()     XWOS_BUG()
 #define XWSCP_BUG_ON(x) XWOS_BUG_ON(x)
 
 #if defined(XWMDCFG_CHECK_PARAMETERS) && (1 == XWMDCFG_CHECK_PARAMETERS)
-  #define XWSCP_VALIDATE(exp, errstr, ...)      \
+#  define XWSCP_VALIDATE(exp, errstr, ...)      \
         if (__xwcc_unlikely(!(exp))) {          \
                 return __VA_ARGS__;             \
         }
-#else /* XWMDCFG_CHECK_PARAMETERS */
-  #define XWSCP_VALIDATE(exp, errstr, ...)
-#endif /* !XWMDCFG_CHECK_PARAMETERS */
+#else
+#  define XWSCP_VALIDATE(exp, errstr, ...)
+#endif
 
 #define XWSCP_VALIDATE_FORCE(exp, errstr, ...)  \
         if (__xwcc_unlikely(!(exp))) {          \
@@ -138,7 +139,7 @@ struct __xwcc_packed xwscp_frm {
 /**
  * @brief XWSCP帧槽
  */
-union __xwcc_aligned(XWMMCFG_ALIGNMENT) xwscp_slot {
+union __xwcc_aligned(XWMM_ALIGNMENT) xwscp_slot {
         struct {
                 struct xwlib_bclst_node node; /**< 链表节点 (占位，发送时未使用) */
                 xwsz_t frmsize; /**< 帧的总长度 */

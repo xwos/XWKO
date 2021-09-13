@@ -29,8 +29,8 @@
 #include <bdl/board.h>
 
 #if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
-  #include <xwam/example/hixwos/mif.h>
-#endif /* XWAMCFG_example_hixwos */
+#  include <xwam/example/hixwos/mif.h>
+#endif
 
 xwer_t board_example_init(void)
 {
@@ -45,13 +45,13 @@ xwer_t board_example_init(void)
                 goto err_hixwos_init;
         }
         xwbdlogf(INFO, "Init example hixwos ... [OK]\n");
-#endif /* XWAMCFG_example_hixwos */
+#endif
 
         return XWOK;
 
 #if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
 err_hixwos_init:
-#endif /* XWAMCFG_example_hixwos */
+#endif
         return rc;
 }
 
@@ -59,7 +59,7 @@ void board_example_exit(void)
 {
 #if defined(XWAMCFG_example_hixwos) && (1 == XWAMCFG_example_hixwos)
         hixwos_exit();
-#endif /* XWAMCFG_example_hixwos */
+#endif
 }
 
 xwer_t board_init(void)

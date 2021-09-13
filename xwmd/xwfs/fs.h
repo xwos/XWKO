@@ -31,11 +31,10 @@
 #include <xwos/lib/xwlog.h>
 
 #if defined(XWMDCFG_xwfs_LOG) && (1 == XWMDCFG_xwfs_LOG)
-  #define xwfslogf(lv, fmt, ...)        xwlogf(lv, "xwfs", fmt, ##__VA_ARGS__)
+#  define xwfslogf(lv, fmt, ...)        xwlogf(lv, "xwfs", fmt, ##__VA_ARGS__)
 #else
-  #define xwfslogf(lv, fmt, ...)
+#  define xwfslogf(lv, fmt, ...)
 #endif
-/* #if defined(XWMDCFG_XWFS_LOG) && (1 == XWMDCFG_XWFS_LOG) */
 
 struct xwfs_mntopts {
         umode_t mode;

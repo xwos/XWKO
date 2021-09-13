@@ -1754,4 +1754,4 @@ xwer_t xwaop__xwu32__tst_then_op(xwu32_a * a,
         return rc;
 }
 
-#endif /* #ifdef __GNUC__ */
+#endif

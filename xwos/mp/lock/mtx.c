@@ -25,9 +25,10 @@
 #include <linux/hrtimer.h>
 #include <linux/rtmutex.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)
-  #include <linux/sched/rt.h>
+#  include <linux/sched/rt.h>
 #endif
 #include <xwos/lib/xwlog.h>
+#include <xwos/mm/common.h>
 #include <xwos/mp/thd.h>
 #include <xwos/mp/lock/mtx.h>
 #include <xwmd/xwfs/fs.h>
@@ -78,7 +79,7 @@ xwer_t xwmp_mtx_cache_create(void)
         rc = XWOK;
         xwmp_mtx_cache = kmem_cache_create("xwmp_mtx_slab",
                                            sizeof(struct xwmp_mtx),
-                                           XWMMCFG_ALIGNMENT, SLAB_PANIC,
+                                           XWMM_ALIGNMENT, SLAB_PANIC,
                                            xwmp_mtx_construct);
         if (is_err_or_null(xwmp_mtx_cache)) {
                 rc = -ENOMEM;
