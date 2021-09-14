@@ -2,9 +2,9 @@
  * @file
  * @brief MCU通讯模块：用户态文件节点
  * @author
- * + 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
- * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > Licensed under the MIT License (the "License");
  * > You may obtain a copy of the License at
  * >

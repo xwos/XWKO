@@ -2,7 +2,7 @@
  * @file
  * @brief 板级描述层：板级电源管理
  * @author
- * + 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright MIT license <https://mit-license.org>
  */
 
