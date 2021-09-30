@@ -327,9 +327,9 @@ xwer_t xwos_br_get_num(struct xwos_br * br, xwsz_t * numbuf)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[])
+xwer_t xwos_br_wait(struct xwos_br * br)
 {
-        return xwosdl_br_sync(&br->osbr, pos, msk);
+        return xwosdl_br_wait(&br->osbr);
 }
 
 /**
@@ -353,10 +353,9 @@ xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[])
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_br_timedsync(struct xwos_br * br, xwsq_t pos,
-                         xwbmp_t msk[], xwtm_t * xwtm)
+xwer_t xwos_br_timedwait(struct xwos_br * br, xwtm_t * xwtm)
 {
-        return xwosdl_br_timedsync(&br->osbr, pos, msk, xwtm);
+        return xwosdl_br_timedwait(&br->osbr, xwtm);
 }
 
 /**

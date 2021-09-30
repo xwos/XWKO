@@ -1070,23 +1070,22 @@ err_evt_grab:
 EXPORT_SYMBOL(xwmp_sel_timedselect);
 
 /******** type:XWMP_EVT_TYPE_BR ********/
-xwer_t xwmp_br_sync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[])
+xwer_t xwmp_br_wait(struct xwmp_evt * evt)
 {
         xwtm_t expected = XWTM_MAX;
-        return xwmp_br_timedsync(evt, pos, msk, &expected);
+        return xwmp_br_timedwait(evt, &expected);
 }
-EXPORT_SYMBOL(xwmp_br_sync);
+EXPORT_SYMBOL(xwmp_br_wait);
 
-xwer_t xwmp_br_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[],
-                         xwtm_t * xwtm)
+xwer_t xwmp_br_timedwait(struct xwmp_evt * evt, xwtm_t * xwtm)
 {
         xwreg_t cpuirq;
+        xwssq_t pos;
         bool triggered;
         xwsq_t lkst;
         xwer_t rc;
 
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
@@ -1097,15 +1096,16 @@ xwer_t xwmp_br_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[],
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_evt_grab;
         }
-        if (pos >= evt->num) {
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        pos = xwbmpop_ffz(evt->bmp, evt->num);
+        if ((pos < 0) || (pos >= (xwssq_t)evt->num)) {
                 rc = -ECHRNG;
                 goto err_pos_range;
         }
-        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        xwbmpop_s1i(evt->bmp, pos);
-        triggered = xwbmpop_t1ma(evt->bmp, msk, evt->num);
+        xwbmpop_s1i(evt->bmp, (xwsq_t)pos);
+        triggered = xwbmpop_t1ma(evt->bmp, evt->msk, evt->num);
         if (triggered) {
-                xwbmpop_c0i(evt->bmp, pos);
+                xwbmpop_c0i(evt->bmp, (xwsq_t)pos);
                 xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 xwmp_cond_broadcast(&evt->cond);
                 xwmp_cthd_yield();
@@ -1117,15 +1117,16 @@ xwer_t xwmp_br_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[],
                 if (XWOS_LKST_UNLOCKED == lkst) {
                         xwmp_splk_lock(&evt->lock);
                 }
-                xwbmpop_c0i(evt->bmp, pos);
+                xwbmpop_c0i(evt->bmp, (xwsq_t)pos);
                 xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         }
         xwmp_evt_put(evt);
         return XWOK;
 
 err_pos_range:
+        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwmp_evt_put(evt);
 err_evt_grab:
         return rc;
 }
-EXPORT_SYMBOL(xwmp_br_timedsync);
+EXPORT_SYMBOL(xwmp_br_timedwait);
