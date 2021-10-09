@@ -47,7 +47,7 @@ int XuanWuKo_init(void)
 {
         xwer_t rc;
 
-        xwkologf(INFO, "V%s\n", XWOS_VER_STR);
+        xwkologf(INFO, "V%s\n", XWOS_VERSION);
 
         rc = xwos_init();
         if (__xwcc_unlikely(rc < 0)) {

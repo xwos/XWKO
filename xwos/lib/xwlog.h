@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：日志
+ * @brief 玄武OS通用库：日志
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -34,57 +34,49 @@
 int xwpf(const char * fmt, ...);
 
 #if (XWLIBCFG_XWLOG_LEVEL <= 1)
-#  define XWLOGF_VERBOSE(tag, fmt, ...)         \
-          xwpf("[V.%s] " fmt, tag, ##__VA_ARGS__)
+#  define XWLOGF_VERBOSE(tag, fmt, ...) xwpf("[V.%s] " fmt, tag, ##__VA_ARGS__)
 #else
 #  define XWLOGF_VERBOSE(tag, fmt, ...)
 #endif
 
 #if (XWLIBCFG_XWLOG_LEVEL <= 2)
-#  define XWLOGF_DEBUG(tag, fmt, ...)           \
-          xwpf("[D.%s] " fmt, tag, ##__VA_ARGS__)
+#  define XWLOGF_DEBUG(tag, fmt, ...) xwpf("[D.%s] " fmt, tag, ##__VA_ARGS__)
 #else
 #  define XWLOGF_DEBUG(tag, fmt, ...)
 #endif
 
 #if (XWLIBCFG_XWLOG_LEVEL <= 3)
-#  define XWLOGF_INFO(tag, fmt, ...)            \
-          xwpf("[I.%s] " fmt, tag, ##__VA_ARGS__)
+#  define XWLOGF_INFO(tag, fmt, ...) xwpf("[I.%s] " fmt, tag, ##__VA_ARGS__)
 #else
 #  define XWLOGF_INFO(tag, fmt, ...)
 #endif
 
 #if (XWLIBCFG_XWLOG_LEVEL <= 4)
-#  define XWLOGF_NOTICE(tag, fmt, ...)          \
-          xwpf("[N.%s] " fmt, tag, ##__VA_ARGS__)
+#  define XWLOGF_NOTICE(tag, fmt, ...) xwpf("[N.%s] " fmt, tag, ##__VA_ARGS__)
 #else
 #  define XWLOGF_NOTICE(tag, fmt, ...)
 #endif
 
 #if (XWLIBCFG_XWLOG_LEVEL <= 5)
-#  define XWLOGF_WARNING(tag, fmt, ...)         \
-          xwpf("[W.%s] " fmt, tag, ##__VA_ARGS__)
+#  define XWLOGF_WARNING(tag, fmt, ...) xwpf("[W.%s] " fmt, tag, ##__VA_ARGS__)
 #else
 #  define XWLOGF_WARNING(tag, fmt, ...)
 #endif
 
 #if (XWLIBCFG_XWLOG_LEVEL <= 6)
-#  define XWLOGF_ERR(tag, fmt, ...)             \
-          xwpf("[E.%s] " fmt, tag, ##__VA_ARGS__)
+#  define XWLOGF_ERR(tag, fmt, ...) xwpf("[E.%s] " fmt, tag, ##__VA_ARGS__)
 #else
 #  define XWLOGF_ERR(tag, fmt, ...)
 #endif
 
 #if (XWLIBCFG_XWLOG_LEVEL <= 7)
-#  define XWLOGF_CRIT(tag, fmt, ...)            \
-          xwpf("[C.%s] " fmt, tag, ##__VA_ARGS__)
+#  define XWLOGF_CRIT(tag, fmt, ...) xwpf("[C.%s] " fmt, tag, ##__VA_ARGS__)
 #else
 #  define XWLOGF_CRIT(tag, fmt, ...)
 #endif
 
 #if (XWLIBCFG_XWLOG_LEVEL <= 8)
-#  define XWLOGF_EMERG(tag, fmt, ...)           \
-          xwpf("[G.%s] " fmt, tag, ##__VA_ARGS__)
+#  define XWLOGF_EMERG(tag, fmt, ...) xwpf("[G.%s] " fmt, tag, ##__VA_ARGS__)
 #else
 #  define XWLOGF_EMERG(tag, fmt, ...)
 #endif
@@ -108,7 +100,7 @@ int xwpf(const char * fmt, ...);
  * - 上下文：依据BSP中soc_log_write()或board_log_write()的实现
  * - 重入性：依据BSP中soc_log_write()或board_log_write()的实现
  */
-#define xwlogf(lv, tag, fmt, ...)    XWLOGF_##lv(tag, fmt, ##__VA_ARGS__)
+#define xwlogf(lv, tag, fmt, ...) XWLOGF_##lv(tag, fmt, ##__VA_ARGS__)
 
 /**
  * @} xwlogf

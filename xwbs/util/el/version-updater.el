@@ -1,7 +1,7 @@
 #! /bin/sh
 ":"; exec emacs --quick --script "$0" -- "$@" # -*- mode: emacs-lisp; lexical-binding: t; -*-
 ;; @file
-;; @brief Emacs-script to update XuanWuKO version
+;; @brief Emacs-script to update XWKO version
 ;; @author
 ;; + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 ;; @copyright
@@ -72,6 +72,7 @@
 (defvar opt-major nil "increase major")
 (defvar opt-minor nil "increase minor")
 (defvar opt-revision nil "increase revision")
+(defvar opt-phase "alpha" "version phase")
 (defvar opt-reset nil "Reset change")
 ;;(logi "argv:%s" argv)
 
@@ -95,6 +96,13 @@
        ;; --revision
        ((string= option "--revision") (setq opt-revision t))
        ((string= option "-v") (setq opt-revision t))
+       ;; -p foo
+       ;; --phase foo
+       ;; --phase=foo
+       ((string= option "--phase") (setq opt-phase (pop argv)))
+       ((string= option "-p") (setq opt-phase (pop argv)))
+       ((string-match "\\`--phase=\\(\\(?:.\\|\n\\)*\\)\\'" option)
+        (setq opt-phase (match-string 1 option)))
        ;; -r
        ;; --reset
        ((string= option "--reset") (setq opt-reset t))
@@ -113,31 +121,35 @@
         (kill-emacs EINVAL))))))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; env ;;;;;;;; ;;;;;;;; ;;;;;;;;
-(defvar XuanWuKO-topdir (expand-directory elpath "../../../"))
-(defvar XuanWuKO-kndir (expand-directory XuanWuKO-topdir "xwos/"))
-(defvar XuanWuKO-version-file (expand-file-name "lib/version.h" XuanWuKO-kndir))
+(defvar XWOS-topdir (expand-directory elpath "../../../"))
+(defvar XWOS-kndir (expand-directory XWOS-topdir "xwos/"))
+(defvar XWOS-version-file (expand-file-name "lib/version.h" XWOS-kndir))
 
-;;(logd "XuanWuKO-topdir:%s" XuanWuKO-topdir)
-;;(logd "XuanWuKO-version-file:%s" XuanWuKO-version-file)
+;;(logd "XWOS-topdir:%s" XWOS-topdir)
+;;(logd "XWOS-version-file:%s" XWOS-version-file)
 
-(setq version-file-buffer (find-file-noselect XuanWuKO-version-file))
+(setq version-file-buffer (find-file-noselect XWOS-version-file))
 (set-buffer version-file-buffer)
 (set-buffer-multibyte t)
 
 (goto-char (point-min))
 (re-search-forward "^#define[ \t]+\\(XWOS_VERSION_MAJOR\\)[ \t]+\\(.+\\)")
-(setq XuanWuKO-version-major (match-string 2))
+(setq XWOS-version-major (match-string 2))
 
 (goto-char (point-min))
 (re-search-forward "^#define[ \t]+\\(XWOS_VERSION_MINOR\\)[ \t]+\\(.+\\)")
-(setq XuanWuKO-version-minor (match-string 2))
+(setq XWOS-version-minor (match-string 2))
 
 (goto-char (point-min))
 (re-search-forward "^#define[ \t]+\\(XWOS_VERSION_REVISION\\)[ \t]+\\(.+\\)")
-(setq XuanWuKO-version-revision (match-string 2))
+(setq XWOS-version-revision (match-string 2))
 
-(logi "current version: V%s.%s.%s"
-      XuanWuKO-version-major XuanWuKO-version-minor XuanWuKO-version-revision)
+(goto-char (point-min))
+(re-search-forward "^#define[ \t]+\\(XWOS_VERSION_PHASE\\)[ \t]+\\(.+\\)")
+(setq XWOS-version-phase (match-string 2))
+
+(logi "current version: V%s.%s.%s.%s"
+      XWOS-version-major XWOS-version-minor XWOS-version-revision XWOS-version-phase)
 
 (if opt-reset
   ;; then
@@ -146,107 +158,139 @@
           (with-temp-buffer
             (call-process "git" nil t nil "log" "-1")
             (buffer-string)))
-    (setq vnum-major (string-to-number XuanWuKO-version-major))
-    (setq vnum-minor (string-to-number XuanWuKO-version-minor))
-    (setq vnum-revision (string-to-number XuanWuKO-version-revision))
-    (setq vstr (concat XuanWuKO-version-major "."
-                       XuanWuKO-version-minor "."
-                       XuanWuKO-version-revision))
-    (setq bvstr (concat XuanWuKO-version-major "." XuanWuKO-version-minor))
+    (setq vnum-major (string-to-number XWOS-version-major))
+    (setq vnum-minor (string-to-number XWOS-version-minor))
+    (setq vnum-revision (string-to-number XWOS-version-revision))
+    (setq vstr (concat XWOS-version-major "."
+                       XWOS-version-minor "."
+                       XWOS-version-revision))
+    (setq bvstr (concat XWOS-version-major "." XWOS-version-minor))
     (cond
      ((or (string-match "release: :bookmark:" recent-git-commit)
           (string-match "milestone: :bookmark:" recent-git-commit))
       (call-process "git" nil nil nil "branch" "-D" (concat "XWKO-V" bvstr))
       (call-process "git" nil nil nil "tag" "-d" (concat "XWKO-V" vstr))
       (call-process "git" nil nil nil "reset" "HEAD^")
-      (call-process "git" nil nil nil "checkout" XuanWuKO-version-file)
+      (call-process "git" nil nil nil "checkout" XWOS-version-file)
       (logi "Reset version .... [OK]"))
      ((string-match "revision: :bookmark:" recent-git-commit)
       (call-process "git" nil nil nil "tag" "-d" (concat "XWKO-V" vstr))
       (call-process "git" nil nil nil "reset" "HEAD^")
-      (call-process "git" nil nil nil "checkout" XuanWuKO-version-file)
+      (call-process "git" nil nil nil "checkout" XWOS-version-file)
+      (logi "Reset version .... [OK]"))
+     ((or (string-match "alpha: :bookmark:" recent-git-commit)
+          (string-match "beta: :bookmark:" recent-git-commit)
+          (string-match "rc: :bookmark:" recent-git-commit))
+      (call-process "git" nil nil nil "reset" "HEAD^")
+      (call-process "git" nil nil nil "checkout" XWOS-version-file)
       (logi "Reset version .... [OK]"))
      (t (loge "[FAILED] The recent git commit is not a version update!"))))
   ;; else
   (let (vnum-major vnum-minor vnum-revision vstr bvstr)
-    (setq vnum-major (string-to-number XuanWuKO-version-major))
-    (setq vnum-minor (string-to-number XuanWuKO-version-minor))
-    (setq vnum-revision (string-to-number XuanWuKO-version-revision))
+    (setq vnum-major (string-to-number XWOS-version-major))
+    (setq vnum-minor (string-to-number XWOS-version-minor))
+    (setq vnum-revision (string-to-number XWOS-version-revision))
     (cond
+     ((or (string= opt-phase "milestone") ;; case opt-phase == "milestone"
+          (string= opt-phase "release")) ;; case opt-phase == "release"
+      (setq XWOS-version-phase opt-phase)
+      (setq vstr (concat XWOS-version-major "."
+                         XWOS-version-minor "."
+                         XWOS-version-revision))
+      (setq bvstr (concat XWOS-version-major "." XWOS-version-minor))
+      (set-buffer version-file-buffer)
+      (set-buffer-multibyte t)
+      (goto-char (point-min))
+      (while (re-search-forward
+              "^\\(#define[ \t]+XWOS_VERSION_PHASE[ \t]+\\)\\(.+\\)"
+              nil t)
+        (replace-match (concat "\\1" XWOS-version-phase)))
+      (save-buffer)
+      (call-process "git" nil nil nil "add" XWOS-version-file)
+      (call-process "git" nil nil nil "commit" "-m" (concat opt-phase ": :bookmark: XWKO-V" vstr))
+      (call-process "git" nil nil nil "tag" "-a" "-m" (concat "XWKO-V" vstr) (concat "XWKO-V" vstr))
+      (call-process "git" nil nil nil "branch" (concat "XWKO-V" bvstr))
+      (logi "update phase: %s" XWOS-version-phase))
      (opt-major ;; case opt-major
-      (setq XuanWuKO-version-major (number-to-string (+ vnum-major 1)))
-      (setq XuanWuKO-version-minor "0")
-      (setq XuanWuKO-version-revision "0")
-      (setq vstr (concat XuanWuKO-version-major "."
-                         XuanWuKO-version-minor "."
-                         XuanWuKO-version-revision))
-      (setq bvstr (concat XuanWuKO-version-major "." XuanWuKO-version-minor))
+      (setq XWOS-version-major (number-to-string (+ vnum-major 1)))
+      (setq XWOS-version-minor "0")
+      (setq XWOS-version-revision "0")
+      (setq XWOS-version-phase opt-phase)
+      (setq vstr (concat XWOS-version-major "."
+                         XWOS-version-minor "."
+                         XWOS-version-revision))
       (set-buffer version-file-buffer)
       (set-buffer-multibyte t)
       (goto-char (point-min))
       (while (re-search-forward
               "^\\(#define[ \t]+XWOS_VERSION_MAJOR[ \t]+\\)\\(.+\\)"
               nil t)
-        (replace-match (concat "\\1" XuanWuKO-version-major)))
+        (replace-match (concat "\\1" XWOS-version-major)))
       (goto-char (point-min))
       (while (re-search-forward
               "^\\(#define[ \t]+XWOS_VERSION_MINOR[ \t]+\\)\\(.+\\)"
               nil t)
-        (replace-match (concat "\\1" XuanWuKO-version-minor)))
+        (replace-match (concat "\\1" XWOS-version-minor)))
       (goto-char (point-min))
       (while (re-search-forward
               "^\\(#define[ \t]+XWOS_VERSION_REVISION[ \t]+\\)\\(.+\\)"
               nil t)
-        (replace-match (concat "\\1" XuanWuKO-version-revision)))
+        (replace-match (concat "\\1" XWOS-version-revision)))
+      (goto-char (point-min))
+      (while (re-search-forward
+              "^\\(#define[ \t]+XWOS_VERSION_PHASE[ \t]+\\)\\(.+\\)"
+              nil t)
+        (replace-match (concat "\\1" XWOS-version-phase)))
       (save-buffer)
-      (call-process "git" nil nil nil "add" XuanWuKO-version-file)
-      (call-process "git" nil nil nil "commit" "-m" (concat "milestone: :bookmark: XWKO-V" vstr))
-      (call-process "git" nil nil nil "tag" "-a" "-m" (concat "XWKO-V" vstr) (concat "XWKO-V" vstr))
-      (call-process "git" nil nil nil "branch" (concat "XWKO-V" bvstr))
-      (logi "next version: V%s" vstr))
+      (call-process "git" nil nil nil "add" XWOS-version-file)
+      (call-process "git" nil nil nil "commit" "-m" (concat opt-phase ": :bookmark: XWKO-V" vstr))
+      (logi "update version: V%s.%s" vstr opt-phase))
      (opt-minor ;; case opt-minor
       (set-buffer version-file-buffer)
       (set-buffer-multibyte t)
       (setq vnum-minor (+ vnum-minor 1))
-      (setq XuanWuKO-version-minor (number-to-string vnum-minor))
-      (setq XuanWuKO-version-revision "0")
-      (setq vstr (concat XuanWuKO-version-major "."
-                         XuanWuKO-version-minor "."
-                         XuanWuKO-version-revision))
-      (setq bvstr (concat XuanWuKO-version-major "." XuanWuKO-version-minor))
+      (setq XWOS-version-minor (number-to-string vnum-minor))
+      (setq XWOS-version-revision "0")
+      (setq XWOS-version-phase opt-phase)
+      (setq vstr (concat XWOS-version-major "."
+                         XWOS-version-minor "."
+                         XWOS-version-revision))
       (goto-char (point-min))
       (while (re-search-forward
               "^\\(#define[ \t]+XWOS_VERSION_MINOR[ \t]+\\)\\(.+\\)"
               nil t)
-        (replace-match (concat "\\1" XuanWuKO-version-minor)))
+        (replace-match (concat "\\1" XWOS-version-minor)))
       (goto-char (point-min))
       (while (re-search-forward
               "^\\(#define[ \t]+XWOS_VERSION_REVISION[ \t]+\\)\\(.+\\)"
               nil t)
-        (replace-match (concat "\\1" XuanWuKO-version-revision)))
+        (replace-match (concat "\\1" XWOS-version-revision)))
+      (goto-char (point-min))
+      (while (re-search-forward
+              "^\\(#define[ \t]+XWOS_VERSION_PHASE[ \t]+\\)\\(.+\\)"
+              nil t)
+        (replace-match (concat "\\1" XWOS-version-phase)))
       (save-buffer)
-      (call-process "git" nil nil nil "add" XuanWuKO-version-file)
-      (call-process "git" nil nil nil "commit" "-m" (concat "release: :bookmark: XWKO-V" vstr))
-      (call-process "git" nil nil nil "tag" "-a" "-m" (concat "XWKO-V" vstr) (concat "XWKO-V" vstr))
-      (call-process "git" nil nil nil "branch" (concat "XWKO-V" bvstr))
-      (logi "next version: V%s" vstr))
+      (call-process "git" nil nil nil "add" XWOS-version-file)
+      (call-process "git" nil nil nil "commit" "-m" (concat opt-phase ": :bookmark: XWKO-V" vstr))
+      (logi "update version: V%s.%s" vstr opt-phase))
      (opt-revision ;; case opt-revision
-      (setq XuanWuKO-version-revision (number-to-string (+ vnum-revision 1)))
-      (setq vstr (concat XuanWuKO-version-major "."
-                         XuanWuKO-version-minor "."
-                         XuanWuKO-version-revision))
+      (setq XWOS-version-revision (number-to-string (+ vnum-revision 1)))
+      (setq vstr (concat XWOS-version-major "."
+                         XWOS-version-minor "."
+                         XWOS-version-revision))
       (set-buffer version-file-buffer)
       (set-buffer-multibyte t)
       (goto-char (point-min))
       (while (re-search-forward
               "^\\(#define[ \t]+XWOS_VERSION_REVISION[ \t]+\\)\\(.+\\)"
               nil t)
-        (replace-match (concat "\\1" XuanWuKO-version-revision)))
+        (replace-match (concat "\\1" XWOS-version-revision)))
       (save-buffer)
-      (call-process "git" nil nil nil "add" XuanWuKO-version-file)
+      (call-process "git" nil nil nil "add" XWOS-version-file)
       (call-process "git" nil nil nil "commit" "-m" (concat "revision: :bookmark: XWKO-V" vstr))
       (call-process "git" nil nil nil "tag" "-a" "-m" (concat "XWKO-V" vstr) (concat "XWKO-V" vstr))
-      (logi "next version: V%s" vstr)))))
+      (logi "update version: V%s" vstr)))))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; exit ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (kill-emacs 0)

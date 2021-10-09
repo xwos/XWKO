@@ -7,13 +7,12 @@ wkspc/
 XuanWuOS.cfg
 modules.order
 Module.symvers
-XuanWuOS.symvers
 xwos.symvers
 *.o
 *.o.d
 .tmp_versions
-xwbs/util/js/xwgitloglint/node_modules
-xwbs/util/js/xwgitloglint/package-lock.json
+xwbs/util/js/xwgml/node_modules
+xwbs/util/js/xwgml/package-lock.json
 GTAGS
 GRTAGS
 GPATH

@@ -163,21 +163,23 @@ xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
 {
         xwer_t rc;
         xwsz_t size;
+        xwsq_t i;
 
         size = BITS_TO_XWBMP_T(evt->num);
         rc = xwmp_cond_activate(&evt->cond, gcfunc);
         if (__xwcc_likely(XWOK == rc)) {
                 evt->type = type;
                 switch (type & XWMP_EVT_TYPE_MASK) {
-                case XWMP_EVT_TYPE_FLG:
-                        memset(evt->msk, 0xFF, size);
-                        break;
                 case XWMP_EVT_TYPE_BR:
                         memset(evt->msk, 0, size);
+                        for (i = 0; i < evt->num; i++) {
+                                xwbmpop_s1i(evt->msk, i);
+                        }
                         break;
                 case XWMP_EVT_TYPE_SEL:
                         memset(evt->msk, 0, size);
                         break;
+                case XWMP_EVT_TYPE_FLG:
                 default:
                         memset(evt->msk, 0xFF, size);
                         break;

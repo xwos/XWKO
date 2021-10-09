@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：玄武OS的对象
+ * @brief 玄武OS通用库：XWOS的对象
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -29,7 +29,7 @@
 #include <xwos/mm/common.h>
 
 /**
- * @defgroup xwobj 玄武OS的对象
+ * @defgroup xwobj XWOS的对象
  * @{
  */
 
