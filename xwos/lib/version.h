@@ -31,14 +31,14 @@
  *   - r: 修正号
  */
 
-#define XWOS_VERSION_MAJOR              1
-#define XWOS_VERSION_MINOR              9
+#define XWOS_VERSION_MAJOR              2
+#define XWOS_VERSION_MINOR              0
 #define XWOS_VERSION_REVISION           0
 
 /**
  * @brief XWOS的版本阶段
  */
-#define XWOS_VERSION_PHASE              alpha
+#define XWOS_VERSION_PHASE              beta
 
 /**
  * @brief XWOS的版本号（数值形式）
