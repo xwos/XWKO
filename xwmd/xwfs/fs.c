@@ -496,7 +496,7 @@ struct inode * xwfs_new_entry(struct super_block * sb,
  * @brief XWFS的SOPS：释放inode时的rcu-callback
  * @param head: (I) rcu链表头
  * @note
- * - 当调用@ref xwfs_sops_destroy_inode()彻底销毁inode时，此函数会在RCU的
+ * - 当调用 @ref xwfs_sops_destroy_inode() 彻底销毁inode时，此函数会在RCU的
  *   宽限期(grace period)结束后调用。
  */
 static
@@ -525,11 +525,11 @@ void xwfs_sops_destroy_inode(struct inode * inode)
  * @retval 1: 删除它
  * @retval 0: 不能删除它
  * @note
- * - 此函数在**iput_final()**中调用，此时inode->i_lock已经被锁定；
- * - 如果此函数返回1，iput_final()会调用**xwfs_sops_destroy_inode()**释放掉inode；
- * - 如果此函数返回0，并且文件系统的超级块拥有标志**MS_ACTIVE**，VFS会将此inode加入
+ * - 此函数在```iput_final()```中调用，此时inode->i_lock已经被锁定；
+ * - 如果此函数返回1，iput_final()会调用```xwfs_sops_destroy_inode()```释放掉inode；
+ * - 如果此函数返回0，并且文件系统的超级块拥有标志```MS_ACTIVE```，VFS会将此inode加入
  *   到lru链表，以减少下次申请inode时的系统开销；
- * - 当挂载文件系统时，@ref xwfs_mount()会设置**MS_ACTIVE**标志，xwfs_mount()
+ * - 当挂载文件系统时，@ref xwfs_mount() 会设置```MS_ACTIVE```标志，xwfs_mount()
  *   函数由mount system call调用。
  */
 static
@@ -616,12 +616,12 @@ int xwfs_set_page_dirty_no_writeback(struct page * page)
  *                         刚才传递进来的dentry不使用。
  * @retval errno: 错误值
  * @note
- * - 可以在**fs/namei.c**中找到**__lookup_hash()**函数，此函数为VFS具体查找过程
+ * - 可以在```fs/namei.c```中找到```__lookup_hash()```函数，此函数为VFS具体查找过程
  * - 当VFS找到了已经存在的dentry，此函数不会被调用；
- * - 仅当VFS找不到对应路径的dentry，从内存管理系统中新建了一个（通过函数**d_alloc()**）
+ * - 仅当VFS找不到对应路径的dentry，从内存管理系统中新建了一个（通过函数```d_alloc()```）
  *   才会调用此函数，并将新建的dentry作为参数；
  * - 如果此函数的返回值不为空，表示此函数有自己的查找机制，VFS新建dentry无效，
- *   之后VFS会将刚才新建的dentry释放掉，可在**lookup_real()**中找到具体代码；
+ *   之后VFS会将刚才新建的dentry释放掉，可在```lookup_real()```中找到具体代码；
  * - linux内核版本 >= 3.6.0。
  */
 static

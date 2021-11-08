@@ -21,32 +21,32 @@
 # > under either the MPL or the GPL.
 #
 
-XuanWuKO ?= $(shell cd ../.. && pwd)
+XWKO ?= $(shell cd ../.. && pwd)
 WKSPC ?= wkspc
 
-MKCFG := $(XuanWuKO)/xwbs/util/el/mkcfg.el
+MKCFG := $(XWKO)/xwbs/util/el/mkcfg.el
 WKSPC := $(shell [ -d $(WKSPC) ] || mkdir -p $(WKSPC) && cd $(WKSPC) && pwd)
 
 modules: cfg
-	$(MAKE) -C $(XuanWuKO) M=$(WKSPC) $@
+	$(MAKE) -C $(XWKO) M=$(WKSPC) $@
 
 modules_install: modules
-	$(MAKE) -C $(XuanWuKO) M=$(WKSPC) $@
+	$(MAKE) -C $(XWKO) M=$(WKSPC) $@
 
 cfg: $(WKSPC)/XuanWuOS.cfg
 
 $(WKSPC)/XuanWuOS.cfg: cfg/*.h
 	@[ -x $(MKCFG) ] || chmod +x $(MKCFG)
-	@${MKCFG} --XuanWuOS=$(XuanWuKO) --cfgdir=cfg --wkspc=$(WKSPC) -- $(@F)
-	@ln -snf $(XuanWuKO)/Makefile $(WKSPC)/Makefile
+	@${MKCFG} --XWOS=$(XWKO) --cfgdir=cfg --wkspc=$(WKSPC) -- $(@F)
+	@ln -snf $(XWKO)/Makefile $(WKSPC)/Makefile
 
 c clean: cfg
-	$(MAKE) -C $(XuanWuKO) M=$(WKSPC) clean
+	$(MAKE) -C $(XWKO) M=$(WKSPC) clean
 
 d distclean:
 	$(RM) -rf $(WKSPC)
 
 .DEFAULT: cfg
-	$(MAKE) -C $(XuanWuKO) M=$(WKSPC) $@
+	$(MAKE) -C $(XWKO) M=$(WKSPC) $@
 
 .PHONY : modules modules_install cfg c clean

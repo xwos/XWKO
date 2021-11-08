@@ -1,7 +1,7 @@
 #! /bin/sh
 ":"; exec emacs --quick --script "$0" -- "$@" # -*- mode: emacs-lisp; lexical-binding: t; -*-
 ;; @file
-;; @brief Emacs-script to generate XuanWuOS configurations and makefile
+;; @brief Emacs-script to generate XWOS configurations and makefile
 ;; @author
 ;; + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 ;; @copyright
@@ -87,12 +87,12 @@
        ;; options after "--"
        ((string= option "--") (setq options-done t))
 
-       ;; --XuanWuOS foo
+       ;; --XWOS foo
        ;; -s foo
-       ;; --XuanWuOS=foo
-       ((string= option "--XuanWuOS") (setq XuanWuOS-opt-srcpath (pop argv)))
+       ;; --XWOS=foo
+       ((string= option "--XWOS") (setq XuanWuOS-opt-srcpath (pop argv)))
        ((string= option "-s") (setq XuanWuOS-opt-srcpath (pop argv)))
-       ((string-match "\\`--XuanWuOS=\\(\\(?:.\\|\n\\)*\\)\\'" option)
+       ((string-match "\\`--XWOS=\\(\\(?:.\\|\n\\)*\\)\\'" option)
         (setq XuanWuOS-opt-srcpath (match-string 1 option)))
 
        ;; --cfgdir foo
@@ -124,7 +124,7 @@
        (t (setq XuanWuOS-cfg option)))))
 
   (unless (> (length XuanWuOS-opt-srcpath) 0)
-    (loge "Missing argument for --XuanWuOS!")
+    (loge "Missing argument for --XWOS!")
     (kill-emacs EINVAL))
   (unless (> (length XuanWuOS-opt-cfgdir) 0)
     (loge "Missing argument for --cfgdir!")
@@ -150,7 +150,7 @@
 (logi "XuanWuOS Workspace:%s" XuanWuOS-opt-wkspc)
 (logi "XuanWuOS.cfg:%s" XuanWuOS-cfg)
 (setq XuanWuOS-cfg-buffer (find-file-noselect (concat XuanWuOS-opt-wkspc "/" XuanWuOS-cfg)))
-(setq xwos-autogen-header-buffer (find-file-noselect (concat XuanWuOS-opt-wkspc "/autogen.h")))
+(setq XuanWuOS-autogen-header-buffer (find-file-noselect (concat XuanWuOS-opt-wkspc "/autogen.h")))
 
 (defvar XuanWuOS-cfg-h (concat XuanWuOS-opt-cfgdir "/" "XuanWuOS.h") "Path of cfg/XuanWuOS.h")
 (defvar arch-cfg-h (concat XuanWuOS-opt-cfgdir "/" "arch.h") "Path of cfg/arch.h")
@@ -476,7 +476,7 @@
 (save-buffer)
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; generate header ;;;;;;;; ;;;;;;;; ;;;;;;;;
-(set-buffer xwos-autogen-header-buffer)
+(set-buffer XuanWuOS-autogen-header-buffer)
 (set-buffer-multibyte nil)
 (erase-buffer)
 (insert (concat
