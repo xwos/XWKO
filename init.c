@@ -31,19 +31,19 @@
 #define xwkologf(lv, fmt, ...)    xwlogf(lv, "xwko", fmt, ##__VA_ARGS__)
 
 static
-int XuanWuKo_init(void);
+int xwko_init(void);
 
 static
-void XuanWuKo_exit(void);
+void xwko_exit(void);
 
 MODULE_LICENSE("Dual MPL/GPL");
 MODULE_AUTHOR("隐星魂(Roy.Sun) <https://http://xwos.tech>");
 MODULE_DESCRIPTION("XuanWuKO");
-module_init(XuanWuKo_init);
-module_exit(XuanWuKo_exit);
+module_init(xwko_init);
+module_exit(xwko_exit);
 
 static
-int XuanWuKo_init(void)
+int xwko_init(void)
 {
         xwer_t rc;
 
@@ -90,7 +90,7 @@ err_xwos_init:
 }
 
 static
-void XuanWuKo_exit(void)
+void xwko_exit(void)
 {
 	board_exit();
         xwkologf(INFO, "clean board ... [OK]\n");
