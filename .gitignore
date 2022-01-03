@@ -11,8 +11,8 @@ xwos.symvers
 *.o
 *.o.d
 .tmp_versions
-xwbs/util/js/xwgml/node_modules
-xwbs/util/js/xwgml/package-lock.json
+node_modules
+package-lock.json
 GTAGS
 GRTAGS
 GPATH
